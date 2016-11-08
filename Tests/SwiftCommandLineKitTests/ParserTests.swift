@@ -184,7 +184,9 @@ class ParserTests : XCTestCase {
             ("testAddValidCommand", testAddValidCommand),
             ("testAddCommandNameWithSpaceThrowsError", testAddCommandNameWithSpaceThrowsError),
             ("testAddEmptyCommandNameThrowsError", testAddEmptyCommandNameThrowsError),
-            ("testParseCommandWithNoRegisteredCommandsThrowsError", testParseCommandWithNoRegisteredCommandsThrowsError)
+            ("testParseCommandWithNoRegisteredCommandsThrowsError", testParseCommandWithNoRegisteredCommandsThrowsError),
+            ("testEmptyOptionNameThrows", testEmptyOptionNameThrows),
+            ("testEmptyArgumentNameThrows", testEmptyArgumentNameThrows)
         ]
     }
 }
