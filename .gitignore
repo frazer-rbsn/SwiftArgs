@@ -4,3 +4,4 @@
 /*.xcodeproj
 /DerivedData
 Gemfile.lock
+/build
