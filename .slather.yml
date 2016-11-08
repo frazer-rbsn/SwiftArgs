@@ -1,0 +1,6 @@
+coverage_service: coveralls
+xcodeproj: SwiftCommandLineKit.xcodeproj
+scheme: SwiftCommandLineKit
+ignore:
+  - Tests/*
+  
