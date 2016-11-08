@@ -6,5 +6,5 @@ before_install:
   - tar xzf swift-3.0.1-RELEASE-ubuntu14.04.tar.gz
   - export PATH=${PWD}/swift-3.0.1-RELEASE-ubuntu14.04/usr/bin:"${PATH}"
 script:
-  - swift build
+  - swift test
   
