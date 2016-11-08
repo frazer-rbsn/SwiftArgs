@@ -1,11 +1,8 @@
 os: osx
 osx_image: xcode8
 
-before_install:
-  - bundle install --without=documentation
 script:
   - swift package generate-xcodeproj
-  - swift test
-  - xcodebuild GCC_GENERATE_TEST_COVERAGE_FILES=YES
+  - xcodebuild -scheme SwiftCommandLineKit -sdk macosx -enableCodeCoverage YES test
 after_success: 
   - bash <(curl -s https://codecov.io/bash)
