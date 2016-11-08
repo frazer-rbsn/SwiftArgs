@@ -7,4 +7,4 @@ A pure Swift library for writing command-line apps.
 [![codecov](https://codecov.io/gh/frazer-rbsn/SwiftCommandLineKit/branch/master/graph/badge.svg)](https://codecov.io/gh/frazer-rbsn/SwiftCommandLineKit)
 
 
-Still in early stages. Hasn't been tested on Linux. Doesn't support short-form option switches yet.
+Early stages. Hasn't been tested on Linux. Doesn't support short-form option switches yet.
