@@ -189,7 +189,6 @@ public protocol OptionWithArgument : Option {
     
     /**
      The value of the option's argument when set at command runtime.
-     If the `set` property is not true, this value will not be used.
      */
     var value : String? { get set }
 }

@@ -75,6 +75,20 @@ class ParserTests : XCTestCase {
         XCTAssertThrowsError(try parser.addCommand(cmd))
     }
     
+    func testOptionNameWithHyphenThrows() {
+        let parser = CommandParser()
+        let op1 = MockOption(name:"op-tion")
+        let cmd = MockCommand(options: [op1])
+        XCTAssertThrowsError(try parser.addCommand(cmd))
+    }
+    
+    func testArgumentNameWithHyphenThrows() {
+        let parser = CommandParser()
+        let arg1 = MockArgument(name:"arg-ument")
+        let cmd = MockCommand(args: [arg1])
+        XCTAssertThrowsError(try parser.addCommand(cmd))
+    }
+    
     // MARK: Parser logic tests
     
     func testGetOptionRaw() {

@@ -17,10 +17,6 @@ extension String {
         let index = self.index(self.startIndex, offsetBy: atIndex)
         return self[index]
     }
-    
-    func beginsWith(char : Character) -> Bool {
-        return firstChar == char
-    }
 }
 
 extension Array {

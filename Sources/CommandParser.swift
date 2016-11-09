@@ -13,7 +13,7 @@ public class CommandParser {
     /**
      Register a command with the parser, so that when the user supplies command line arguments 
      to your program, they will be recognised and parsed into objects.
-     - throws: a `ParserError` if the command model or any of it's option or argument models is invalid.
+     - throws: a `CommandModelError` if the command model or any of it's option or argument models is invalid.
      - parameter c: The command to be registered with the parser.
      */
     public func addCommand(_ c : Command) throws {
@@ -21,19 +21,29 @@ public class CommandParser {
         commands.append(c)
     }
     
+    /**
+     Thrown if the command models are valid but the parser 
+     is supplied invalid arguments at runtime.
+     */
     public enum ParserError : Error {
         case noSuchCommand(String),
         noCommands,
-        invalidCommand,
         commandNotSupplied,
         emptyArgument(String)
+    }
+    
+    /**
+     Thrown if the command model or any of it's option or argument models is invalid.
+     */
+    public enum CommandModelError : Error {
+        case invalidCommand
     }
     
     /**
      Checks if the command model and it's `Option` and `Argument` models are suitable for 
      use with the parser.
      
-     - throws: a `ParserError` if the command model or any of it's option or argument models is invalid.
+     - throws: a `CommandModelError` if the command model or any of it's option or argument models is invalid.
      - parameter c: The command to be validated.
     */
     public func validateCommand(_ c : Command) throws {
@@ -43,45 +53,45 @@ public class CommandParser {
         guard !c.name.contains(" ") else {
             print("Error: Invalid command model \'\(c)\'.")
             print("Command name: \"\(c.name)\"\nCommand names must not contain spaces.")
-            throw ParserError.invalidCommand
+            throw CommandModelError.invalidCommand
         }
         guard c.name != "" else {
             print("Error: Invalid command model \'\(c)\'.")
             print("Command name: \"\(c.name)\"\nCommand name must not be empty.")
-            throw ParserError.invalidCommand
+            throw CommandModelError.invalidCommand
         }
         for o in c.options {
             guard !o.name.contains(" ") else {
                 print("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
                 print("\nOption names must not contain spaces.")
-                throw ParserError.invalidCommand
+                throw CommandModelError.invalidCommand
             }
             guard !o.name.contains("-") else {
                 print("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
                 print("\nOption names must not contain hyphens.")
-                throw ParserError.invalidCommand
+                throw CommandModelError.invalidCommand
             }
             guard o.name != "" else {
                 print("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
                 print("\nOption names must not be empty.")
-                throw ParserError.invalidCommand
+                throw CommandModelError.invalidCommand
             }
         }
         for a in c.arguments {
             guard !a.name.contains(" ") else {
                 print("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
                 print("\nArgument names must not contain spaces.")
-                throw ParserError.invalidCommand
+                throw CommandModelError.invalidCommand
             }
             guard !a.name.contains("-") else {
                 print("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
                 print("\nArgument names must not contain hyphens.")
-                throw ParserError.invalidCommand
+                throw CommandModelError.invalidCommand
             }
             guard a.name != "" else {
                 print("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
                 print("\nArgument names must not be empty.")
-                throw ParserError.invalidCommand
+                throw CommandModelError.invalidCommand
             }
         }
         
@@ -90,19 +100,19 @@ public class CommandParser {
         guard !commands.contains(where: { $0 == c }) else {
             print("Error: Duplicate command model \'\(c)\'.")
             print("CommandParser already has a registered command with name: \"\(c.name)\"")
-            throw ParserError.invalidCommand
+            throw CommandModelError.invalidCommand
         }
         
         guard Set(c.optionNames).count == c.optionNames.count else {
             print("Error: Invalid options for command model \'\(c)\'.")
             print("Two or more options have the same name.")
-            throw ParserError.invalidCommand
+            throw CommandModelError.invalidCommand
         }
         
         guard Set(c.argumentNames).count == c.argumentNames.count else {
             print("Error: Invalid arguments for command model \'\(c)\'.")
             print("Two or more arguments have the same name.")
-            throw ParserError.invalidCommand
+            throw CommandModelError.invalidCommand
         }
     }
     
