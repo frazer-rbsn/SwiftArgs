@@ -214,6 +214,7 @@ public class CommandParser {
     
     private func parseCommandOptions(_ c : Command, args : [String]) throws -> (command: Command, arguments : [String]) {
         var command = c
+        var arguments = args
         for a in args {
             guard a.firstChar == "-" else { break }
             let s = getOptionRaw(a)
@@ -223,20 +224,19 @@ public class CommandParser {
             } else {
                 try command.setOption(s)
             }
+            arguments.remove(at: 0)
         }
-        return (command, args)
+        return (command, arguments)
     }
     
     private func parseCommandArguments(_ c : Command, args : [String]) throws -> Command {
         var command = c
         var arguments = args
-        var i : UInt = 0
         for var a in command.arguments {
-            guard let argValue = args[safe:i]
+            guard let argValue = arguments[safe:0]
                 else { throw CommandError.invalidArguments(commandName: command.name, suppliedArguments: args) }
             a.value = argValue
-            arguments.remove(at: Int(i))
-            i+=1
+            arguments.remove(at: 0)
         }
         guard arguments.isEmpty else { throw CommandError.invalidArguments(commandName: command.name, suppliedArguments: args) }
         return command

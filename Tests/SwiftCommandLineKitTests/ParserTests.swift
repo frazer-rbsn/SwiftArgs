@@ -116,6 +116,17 @@ class ParserTests : XCTestCase {
     
     // MARK: Parser runtime tests
     
+    func testAddValidCommandWithOneOptionAndOneOptionWithArgAndOneArgAndParse() {
+        let cmd = MockCommand(name: "mockcommand", helptext: "Blah blah!",
+                              args: [MockArgument(name:"mockarg")],
+                              options: [MockOption(name:"op"),
+                                        MockOptionWithArgument(name:"opwitharg")])
+        let parser = CommandParser()
+        try! parser.addCommand(cmd)
+        let command = try! parser.parse(args: ["mockcommand", "--op", "--opwitharg=value", "argumentvalue"])
+        XCTAssertNotNil(command)
+    }
+    
     func testSendNoArgsToParserThrowsError() {
         let parser = CommandParser()
         let cmd = MockCommand()
@@ -128,6 +139,13 @@ class ParserTests : XCTestCase {
         let cmd = MockCommand()
         try! parser.addCommand(cmd)
         XCTAssertThrowsError(try parser.parse(args: [""]))
+    }
+    
+    func testNonExistingCommandToParserThrowsError() {
+        let parser = CommandParser()
+        let cmd = MockCommand(name:"foo")
+        try! parser.addCommand(cmd)
+        XCTAssertThrowsError(try parser.parse(args: ["bar"]))
     }
     
     func testSendOneOptionNoArgsWithCommandThatRequiresArgsThrowsError() {
@@ -161,6 +179,13 @@ class ParserTests : XCTestCase {
         let cmd = MockCommand(name: "generate", args: [arg])
         try! parser.addCommand(cmd)
         XCTAssertThrowsError(try parser.parse(args: ["generate"]))
+    }
+    
+    func testSendOneArgWithCommandThatHasNoArgsThrowsError() {
+        let parser = CommandParser()
+        let cmd = MockCommand(name: "generate", args: [])
+        try! parser.addCommand(cmd)
+        XCTAssertThrowsError(try parser.parse(args: ["generate","arg"]))
     }
     
     func testSendOneArgWithCommandThatRequiresTwoArgsThrowsError() {
