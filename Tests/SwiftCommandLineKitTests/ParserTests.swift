@@ -17,32 +17,40 @@ class ParserTests : XCTestCase {
     func testAddCommandNameWithSpaceThrowsError() {
         let cmd = MockCommand(name: "gener ate")
         let parser = CommandParser()
-        XCTAssertThrowsError(try parser.validateCommand(cmd))
+        AssertThrows(expectedError: CommandParser.CommandModelError.invalidCommand,
+                     try parser.addCommand(cmd))
     }
     
     func testAddEmptyCommandNameThrowsError() {
         let cmd = MockCommand(name: "")
         let parser = CommandParser()
-        XCTAssertThrowsError(try parser.validateCommand(cmd))
+        AssertThrows(expectedError: CommandParser.CommandModelError.invalidCommand,
+                     try parser.addCommand(cmd))
     }
     
-    func testParseCommandWithNoRegisteredCommandsThrowsError() {
+    func testDuplicateCommandNameThrowsError() {
+        let cmd1 = MockCommand(name: "generate")
+        let cmd2 = MockCommand(name: "generate")
         let parser = CommandParser()
-        XCTAssertThrowsError(try parser.parse(args: ["generate"]))
+        try! parser.addCommand(cmd1)
+        AssertThrows(expectedError: CommandParser.CommandModelError.invalidCommand,
+                     try parser.addCommand(cmd2))
     }
     
     func testEmptyOptionNameThrows() {
         let parser = CommandParser()
         let op1 = MockOption(name:"")
         let cmd = MockCommand(options: [op1])
-        XCTAssertThrowsError(try parser.addCommand(cmd))
+        AssertThrows(expectedError: CommandParser.CommandModelError.invalidCommand,
+                     try parser.addCommand(cmd))
     }
     
     func testEmptyArgumentNameThrows() {
         let parser = CommandParser()
         let arg1 = MockArgument(name:"")
         let cmd = MockCommand(args: [arg1])
-        XCTAssertThrowsError(try parser.addCommand(cmd))
+        AssertThrows(expectedError: CommandParser.CommandModelError.invalidCommand,
+                     try parser.addCommand(cmd))
     }
     
     func testDuplicateOptionNamesThrows() {
@@ -50,7 +58,8 @@ class ParserTests : XCTestCase {
         let op1 = MockOption(name:"option")
         let op2 = MockOption(name:"option")
         let cmd = MockCommand(options: [op1, op2])
-        XCTAssertThrowsError(try parser.addCommand(cmd))
+        AssertThrows(expectedError: CommandParser.CommandModelError.invalidCommand,
+                     try parser.addCommand(cmd))
     }
     
     func testDuplicateArgumentNamesThrows() {
@@ -58,35 +67,40 @@ class ParserTests : XCTestCase {
         let arg1 = MockArgument(name:"arg")
         let arg2 = MockArgument(name:"arg")
         let cmd = MockCommand(args: [arg1, arg2])
-        XCTAssertThrowsError(try parser.addCommand(cmd))
+        AssertThrows(expectedError: CommandParser.CommandModelError.invalidCommand,
+                     try parser.addCommand(cmd))
     }
     
     func testOptionNameWithSpaceThrows() {
         let parser = CommandParser()
         let op1 = MockOption(name:"op tion")
         let cmd = MockCommand(options: [op1])
-        XCTAssertThrowsError(try parser.addCommand(cmd))
+        AssertThrows(expectedError: CommandParser.CommandModelError.invalidCommand,
+                     try parser.addCommand(cmd))
     }
     
     func testArgumentNameWithSpaceThrows() {
         let parser = CommandParser()
         let arg1 = MockArgument(name:"arg ument")
         let cmd = MockCommand(args: [arg1])
-        XCTAssertThrowsError(try parser.addCommand(cmd))
+        AssertThrows(expectedError: CommandParser.CommandModelError.invalidCommand,
+                     try parser.addCommand(cmd))
     }
     
     func testOptionNameWithHyphenThrows() {
         let parser = CommandParser()
         let op1 = MockOption(name:"op-tion")
         let cmd = MockCommand(options: [op1])
-        XCTAssertThrowsError(try parser.addCommand(cmd))
+        AssertThrows(expectedError: CommandParser.CommandModelError.invalidCommand,
+                     try parser.addCommand(cmd))
     }
     
     func testArgumentNameWithHyphenThrows() {
         let parser = CommandParser()
         let arg1 = MockArgument(name:"arg-ument")
         let cmd = MockCommand(args: [arg1])
-        XCTAssertThrowsError(try parser.addCommand(cmd))
+        AssertThrows(expectedError: CommandParser.CommandModelError.invalidCommand,
+                     try parser.addCommand(cmd))
     }
     
     // MARK: Parser logic tests
@@ -115,6 +129,12 @@ class ParserTests : XCTestCase {
     
     
     // MARK: Parser runtime tests
+    
+    func testParseCommandWithNoRegisteredCommandsThrowsError() {
+        let parser = CommandParser()
+        AssertThrows(expectedError: CommandParser.ParserError.noCommands,
+                     try parser.parse(args: ["generate"]))
+    }
     
     func testAddValidCommandWithOneOptionAndOneOptionWithArgAndOneArgAndParse() {
         let cmd = MockCommand(name: "mockcommand", helptext: "Blah blah!",
