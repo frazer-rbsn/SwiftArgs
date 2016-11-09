@@ -103,6 +103,7 @@ class ParserTests : XCTestCase {
                      try parser.addCommand(cmd))
     }
     
+    
     // MARK: Parser logic tests
     
     func testGetOptionRaw() {

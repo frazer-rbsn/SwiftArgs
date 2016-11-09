@@ -51,45 +51,45 @@ public class CommandParser {
         
         guard !c.name.contains(" ") else {
             print("Error: Invalid command model \'\(c)\'.")
-            print("Command name: \"\(c.name)\"\nCommand names must not contain spaces.")
+            print("Command name: \'\(c.name)\'\nCommand names must not contain spaces.")
             throw CommandModelError.invalidCommand
         }
         guard c.name != "" else {
             print("Error: Invalid command model \'\(c)\'.")
-            print("Command name: \"\(c.name)\"\nCommand name must not be empty.")
+            print("Command name: \'\(c.name)\'\nCommand name must not be empty.")
             throw CommandModelError.invalidCommand
         }
         for o in c.options {
             guard !o.name.contains(" ") else {
                 print("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
-                print("\nOption names must not contain spaces.")
+                print("Option names must not contain spaces.")
                 throw CommandModelError.invalidCommand
             }
             guard !o.name.contains("-") else {
                 print("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
-                print("\nOption names must not contain hyphens.")
+                print("Option names must not contain hyphens.")
                 throw CommandModelError.invalidCommand
             }
             guard o.name != "" else {
                 print("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
-                print("\nOption names must not be empty.")
+                print("Option names must not be empty.")
                 throw CommandModelError.invalidCommand
             }
         }
         for a in c.arguments {
             guard !a.name.contains(" ") else {
                 print("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
-                print("\nArgument names must not contain spaces.")
+                print("Argument names must not contain spaces.")
                 throw CommandModelError.invalidCommand
             }
             guard !a.name.contains("-") else {
                 print("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
-                print("\nArgument names must not contain hyphens.")
+                print("Argument names must not contain hyphens.")
                 throw CommandModelError.invalidCommand
             }
             guard a.name != "" else {
                 print("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
-                print("\nArgument names must not be empty.")
+                print("Argument names must not be empty.")
                 throw CommandModelError.invalidCommand
             }
         }
@@ -98,7 +98,7 @@ public class CommandParser {
         
         guard !commands.contains(where: { $0 == c }) else {
             print("Error: Duplicate command model \'\(c)\'.")
-            print("CommandParser already has a registered command with name: \"\(c.name)\"")
+            print("CommandParser already has a registered command with name: \'\(c.name)\'")
             throw CommandModelError.invalidCommand
         }
         
