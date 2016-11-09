@@ -28,8 +28,7 @@ public class CommandParser {
     public enum ParserError : Error {
         case noSuchCommand(String),
         noCommands,
-        commandNotSupplied,
-        emptyArgument(String)
+        commandNotSupplied
     }
     
     /**
@@ -152,11 +151,7 @@ public class CommandParser {
             print("Error: no such command \'\(name)\'\n")
             printUsageInfo()
             throw ParserError.noSuchCommand("\(name)")
-            
-        } catch ParserError.emptyArgument(let name) {
-            print("Error: Option \'\(name) \' was supplied with a blank argument.")
-            throw ParserError.emptyArgument("\(name)")
-            
+
         } catch CommandError.requiresArguments(let name) {
             print("Error: command \'\(name)\' has required arguments but none were supplied.")
             printUsageInfo()
