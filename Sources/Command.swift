@@ -43,12 +43,12 @@ public protocol Command {
 }
 
 public enum CommandError : Error {
-    case noOptions(String),
-        noSuchOption(String),
-        optionRequiresArgument(String),
-        requiresArguments(String),
-        noArguments(String),
-        invalidArguments(commandName : String, suppliedArguments : [String])
+    case noOptions(Command),
+        noSuchOption(command:Command, optionName: String),
+        optionRequiresArgument(command:Command, option:Option),
+        requiresArguments(Command),
+        noArguments(Command),
+        invalidArguments(Command)
 }
 
 
@@ -112,9 +112,10 @@ public extension Command {
                 `OptionWithArgument` protocol and `value` is nil.
      */
     public mutating func setOption(_ o : String, value : String?) throws {
-        guard let i = optionLongForms.index(of: o) else { throw CommandError.noSuchOption(o) }
+        guard let i = optionLongForms.index(of: o)
+            else { throw CommandError.noSuchOption(command:self, optionName: o) }
         if var op = options[i] as? OptionWithArgument {
-            guard let v = value else { throw CommandError.optionRequiresArgument(op.name) }
+            guard let v = value else { throw CommandError.optionRequiresArgument(command:self, option: op) }
             op.value = v
         }
         options[i].set = true

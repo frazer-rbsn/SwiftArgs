@@ -10,6 +10,10 @@ public class CommandParser {
 
     internal var commands : [Command] = []
     
+    public var debugMode : Bool = false
+    
+    public var printHelp : Bool = true
+    
     /**
      Register a command with the parser, so that when the user supplies command line arguments 
      to your program, they will be recognised and parsed into objects.
@@ -50,46 +54,46 @@ public class CommandParser {
         // Name checks
         
         guard !c.name.contains(" ") else {
-            print("Error: Invalid command model \'\(c)\'.")
-            print("Command name: \'\(c.name)\'\nCommand names must not contain spaces.")
+            printDebug("Error: Invalid command model \'\(c)\'.")
+            printDebug("Command name: \'\(c.name)\'\nCommand names must not contain spaces.")
             throw CommandModelError.invalidCommand
         }
         guard c.name != "" else {
-            print("Error: Invalid command model \'\(c)\'.")
-            print("Command name: \'\(c.name)\'\nCommand name must not be empty.")
+            printDebug("Error: Invalid command model \'\(c)\'.")
+            printDebug("Command name: \'\(c.name)\'\nCommand name must not be empty.")
             throw CommandModelError.invalidCommand
         }
         for o in c.options {
             guard !o.name.contains(" ") else {
-                print("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
-                print("Option names must not contain spaces.")
+                printDebug("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
+                printDebug("Option names must not contain spaces.")
                 throw CommandModelError.invalidCommand
             }
             guard !o.name.contains("-") else {
-                print("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
-                print("Option names must not contain hyphens.")
+                printDebug("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
+                printDebug("Option names must not contain hyphens.")
                 throw CommandModelError.invalidCommand
             }
             guard o.name != "" else {
-                print("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
-                print("Option names must not be empty.")
+                printDebug("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
+                printDebug("Option names must not be empty.")
                 throw CommandModelError.invalidCommand
             }
         }
         for a in c.arguments {
             guard !a.name.contains(" ") else {
-                print("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
-                print("Argument names must not contain spaces.")
+                printDebug("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
+                printDebug("Argument names must not contain spaces.")
                 throw CommandModelError.invalidCommand
             }
             guard !a.name.contains("-") else {
-                print("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
-                print("Argument names must not contain hyphens.")
+                printDebug("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
+                printDebug("Argument names must not contain hyphens.")
                 throw CommandModelError.invalidCommand
             }
             guard a.name != "" else {
-                print("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
-                print("Argument names must not be empty.")
+                printDebug("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
+                printDebug("Argument names must not be empty.")
                 throw CommandModelError.invalidCommand
             }
         }
@@ -97,20 +101,20 @@ public class CommandParser {
         // Duplication checks
         
         guard !commands.contains(where: { $0 == c }) else {
-            print("Error: Duplicate command model \'\(c)\'.")
-            print("CommandParser already has a registered command with name: \'\(c.name)\'")
+            printDebug("Error: Duplicate command model \'\(c)\'.")
+            printDebug("CommandParser already has a registered command with name: \'\(c.name)\'")
             throw CommandModelError.invalidCommand
         }
         
         guard Set(c.optionNames).count == c.optionNames.count else {
-            print("Error: Invalid options for command model \'\(c)\'.")
-            print("Two or more options have the same name.")
+            printDebug("Error: Invalid options for command model \'\(c)\'.")
+            printDebug("Two or more options have the same name.")
             throw CommandModelError.invalidCommand
         }
         
         guard Set(c.argumentNames).count == c.argumentNames.count else {
-            print("Error: Invalid arguments for command model \'\(c)\'.")
-            print("Two or more arguments have the same name.")
+            printDebug("Error: Invalid arguments for command model \'\(c)\'.")
+            printDebug("Two or more arguments have the same name.")
             throw CommandModelError.invalidCommand
         }
     }
@@ -123,7 +127,7 @@ public class CommandParser {
                 arguments/options were supplied.
      */
     public func parseCommandLine() throws -> Command {
-        return try parse(args: CommandLine.argumentsWithoutFilename)
+        return try parse(arguments: CommandLine.argumentsWithoutFilename)
     }
     
     /**
@@ -134,76 +138,80 @@ public class CommandParser {
                 Or `CommandError` if a valid command was supplied but invalid 
                 arguments/options were supplied.
     */
-    public func parse(args : [String]) throws -> Command {
+    public func parse(arguments : [String]) throws -> Command {
         do {
-            let command = try _parse(args)
+            let command = try _parse(arguments)
             return command
             
         } catch ParserError.noCommands {
-            print("Error: no commands registered with the parser.")
+            printDebug("Error: no commands registered with the parser.")
             throw ParserError.noCommands
             
-        } catch ParserError.commandNotSupplied {
-            printUsageInfo()
-            throw ParserError.commandNotSupplied
-            
         } catch ParserError.noSuchCommand(let name) {
-            print("Error: no such command \'\(name)\'\n")
-            printUsageInfo()
+            printHelp("Error: no such command \'\(name)\'\n")
+            printCommands()
             throw ParserError.noSuchCommand("\(name)")
 
-        } catch CommandError.requiresArguments(let name) {
-            print("Error: command \'\(name)\' has required arguments but none were supplied.")
-            printUsageInfo()
-            throw CommandError.requiresArguments("\(name)")
+        } catch CommandError.requiresArguments(let command) {
+            printHelp("Error: command \'\(command.name)\' has required arguments but none were supplied.")
+            printUsageInfoForCommand(command)
+            throw CommandError.requiresArguments(command)
             
-        } catch CommandError.noOptions(let name) {
-            print("Error: command \'\(name)\' has no options.")
-            printUsageInfo()
-            throw CommandError.noOptions("\(name)")
+        } catch CommandError.noOptions(let command) {
+            printHelp("Error: command \'\(command.name)\' has no options.")
+            printUsageInfoForCommand(command)
+            throw CommandError.noOptions(command)
             
-        } catch CommandError.optionRequiresArgument(let name) {
-            print("Error: expected argument for option \'\(name)\', but none found.")
-            printUsageInfo()
-            throw CommandError.optionRequiresArgument("\(name)")
+        } catch CommandError.optionRequiresArgument(let command, let option) {
+            printHelp("Error: expected argument for option \'\(option.name)\', but none found.")
+            printUsageInfoForCommand(command)
+            throw CommandError.optionRequiresArgument(command: command, option: option)
             
-        } catch CommandError.invalidArguments(let name, let args) {
-            print("Error: invalid arguments for command \'\(name)\': \(args)")
-            printUsageInfo()
-            throw CommandError.invalidArguments(commandName: "\(name)",suppliedArguments: args)
+        } catch CommandError.invalidArguments(let command) {
+            printHelp("Error: invalid arguments for command \'\(command.name)\': \(arguments)")
+            printUsageInfoForCommand(command)
+            throw CommandError.invalidArguments(command)
             
-        } catch CommandError.noArguments(let name) {
-            print("Error: command \'\(name)\' does not take arguments.")
-            throw CommandError.noArguments("\(name)")
+        } catch CommandError.noArguments(let command) {
+            printHelp("Error: command \'\(command.name)\' does not take arguments.")
+            printUsageInfoForCommand(command)
+            throw CommandError.noArguments(command)
         }
     }
     
-    private func _parse(_ arguments : [String]) throws -> Command {
+    private func _parse(_ args : [String]) throws -> Command {
         guard !commands.isEmpty else { throw ParserError.noCommands }
-        guard !arguments.isEmpty else { throw ParserError.commandNotSupplied }
-        
-        let cmdString = arguments[0]
-        guard cmdString != "" else { throw ParserError.commandNotSupplied }
+        guard !args.isEmpty else {
+            printCommands()
+            throw ParserError.commandNotSupplied
+        }
+        let cmdString = args[0]
+        guard cmdString != "" else {
+            printCommands()
+            throw ParserError.commandNotSupplied
+        }
         
         var command = try getCommand(cmdString)
-        var args = arguments
-        args.remove(at: 0) // Remove command from args
+        var arguments = args
+        arguments.remove(at: 0) // Remove command from args
         
-        if args.isEmpty {
-            guard !command.hasRequiredArguments else { throw CommandError.requiresArguments(command.name) }
-            printUsageInfo()
+        if arguments.isEmpty {
+            if command.hasRequiredArguments {
+                printUsageInfoForCommand(command)
+                throw CommandError.noArguments(command)
+            }
             return command
         }
         
         // If options were supplied, parse options
-        if isLongformOption(args[0]) {
-            guard command.hasOptions else { throw CommandError.noOptions(command.name) }
-            (command, args) = try parseCommandOptions(command, args: args)
+        if isLongformOption(arguments[0]) {
+            guard command.hasOptions else { throw CommandError.noOptions(command) }
+            (command, arguments) = try parseCommandOptions(command, args: arguments)
         } else {
-            guard command.hasRequiredArguments else { throw CommandError.noArguments(command.name) }
+            guard command.hasRequiredArguments else { throw CommandError.noArguments(command) }
         }
         
-        command = try parseCommandArguments(command, args: args)
+        command = try parseCommandArguments(command, args: arguments)
         return command
     }
     
@@ -229,11 +237,11 @@ public class CommandParser {
         var arguments = args
         for var a in command.arguments {
             guard let argValue = arguments[safe:0]
-                else { throw CommandError.invalidArguments(commandName: command.name, suppliedArguments: args) }
+                else { throw CommandError.invalidArguments(command) }
             a.value = argValue
             arguments.remove(at: 0)
         }
-        guard arguments.isEmpty else { throw CommandError.invalidArguments(commandName: command.name, suppliedArguments: args) }
+        guard arguments.isEmpty else { throw CommandError.invalidArguments(command) }
         return command
     }
     
@@ -260,7 +268,27 @@ public class CommandParser {
         return string.components(separatedBy: "=").last!
     }
     
-    private func printUsageInfo() {
-        UsageInfoPrinter().printInfo(commands)
+    private func printDebug(_ s : String) {
+        if debugMode {
+            print(s)
+        }
+    }
+    
+    private func printCommands() {
+        if printHelp {
+            UsageInfoPrinter().printCommands(for: self)
+        }
+    }
+    
+    private func printUsageInfoForCommand(_ c : Command) {
+        if printHelp {
+            UsageInfoPrinter().printInfo(c)
+        }
+    }
+    
+    private func printHelp(_ s : String) {
+        if printHelp {
+            print(s)
+        }
     }
 }
