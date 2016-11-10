@@ -117,7 +117,6 @@ class ParserRuntimeTests : XCTestCase {
         let arg2 = MockArgument(name:"arg2")
         let cmd = MockCommand(name: "generate", args: [arg1, arg2])
         try! parser.addCommand(cmd)
-        XCTAssertThrowsError(try parser.parse(arguments: ["generate", "--option"]))
         AssertThrows(expectedError: CommandError.noOptions(cmd),
                      try parser.parse(arguments: ["generate", "--option"]))
     }
@@ -143,14 +142,16 @@ class ParserRuntimeTests : XCTestCase {
         let arg = MockArgument()
         let cmd = MockCommand(name: "generate", args: [arg])
         try! parser.addCommand(cmd)
-        XCTAssertThrowsError(try parser.parse(arguments: ["generate"]))
+        AssertThrows(expectedError: CommandError.requiresArguments(cmd),
+                     try parser.parse(arguments: ["generate"]))
     }
     
     func testSendOneArgWithCommandThatHasNoArgsThrows() {
         let parser = CommandParser()
         let cmd = MockCommand(name: "generate", args: [])
         try! parser.addCommand(cmd)
-        XCTAssertThrowsError(try parser.parse(arguments: ["generate","arg"]))
+        AssertThrows(expectedError: CommandError.invalidArguments(cmd),
+                     try parser.parse(arguments: ["generate","arg"]))
     }
     
     func testSendOneArgWithCommandThatRequiresTwoArgsThrows() {
