@@ -46,6 +46,9 @@ public class CommandParser : HasDebugMode {
         commands.append(c)
     }
     
+    
+    // MARK: Parsing
+    
     /**
      Parses the input from the CommandLine and returns a `Command` object if successful.
      - throws:  `ParserError` if no commands are registered or there is a problem with 
@@ -106,32 +109,61 @@ public class CommandParser : HasDebugMode {
         }
     }
     
-    private func _parse(_ args : [String]) throws -> Command {
+    private func _parse(_ tokens : [String]) throws -> Command {
         guard !commands.isEmpty else { throw ParserError.noCommands }
-        guard !args.isEmpty else { throw ParserError.commandNotSupplied }
+        guard !tokens.isEmpty else { throw ParserError.commandNotSupplied }
         
-        let cmdString = args[0]
+        let cmdString = tokens[0]
         guard cmdString != "" else { throw ParserError.commandNotSupplied }
         
-        var command = try getCommand(cmdString)
-        var arguments = args
-        arguments.remove(at: 0) // Remove command from args
+        let command = try getCommand(cmdString)
+        let result = try parseCommand(command, tokens: tokens)
+        return result.command
+    }
+    
+    private func parseCommand(_ c : Command, tokens : [String]) throws -> (command : Command, remainingTokens : [String]) {
+        var command = c
+        var remainingTokens = tokens
+        remainingTokens.remove(at: 0) // Remove command name
         
-        if arguments.isEmpty {
+        if remainingTokens.isEmpty {
             guard !command.hasRequiredArguments else { throw CommandError.requiresArguments(command) }
-            return command
+            return (command, remainingTokens)
         }
         
-        // If options were supplied, parse options
-        if isLongformOption(arguments[0]) {
+        (command, remainingTokens) = try parseCommandTokens(command, tokens: remainingTokens)
+        return (command,remainingTokens)
+    }
+    
+    private func parseCommandTokens(_ c : Command, tokens : [String]) throws -> (command : Command, remainingTokens : [String]) {
+        var command = c
+        var remainingTokens = tokens
+        
+        // Options
+        if isLongformOption(tokens[0]) {
             guard command.hasOptions else { throw CommandError.noOptions(command) }
-            (command, arguments) = try parseCommandOptions(command, args: arguments)
-        } else {
-            guard command.hasRequiredArguments else { throw CommandError.noArguments(command) }
+            (command, remainingTokens) = try parseCommandOptions(command, args: remainingTokens)
         }
         
-        command = try parseCommandArguments(command, args: arguments)
-        return command
+        // Arguments
+        (command, remainingTokens) = try parseCommandArguments(command, args: remainingTokens)
+        guard command.allArgumentsSet else {
+            throw CommandError.invalidArguments(command)
+        }
+        
+        if remainingTokens.isEmpty {
+            return (command, remainingTokens)
+        }
+        
+        // Subcommands
+        if command.hasSubCommand(name: remainingTokens[0]) {
+            var subCommand = try command.getSubCommand(name: tokens[0])
+            (subCommand, remainingTokens) = try parseCommand(subCommand, tokens: remainingTokens)
+            command.usedSubCommand = subCommand
+            return (command, remainingTokens)
+        } else {
+            throw CommandError.invalidArguments(command)
+        }
     }
     
     private func parseCommandOptions(_ c : Command, args : [String]) throws -> (command: Command, arguments : [String]) {
@@ -151,7 +183,7 @@ public class CommandParser : HasDebugMode {
         return (command, arguments)
     }
     
-    private func parseCommandArguments(_ c : Command, args : [String]) throws -> Command {
+    private func parseCommandArguments(_ c : Command, args : [String]) throws -> (command: Command, arguments : [String])  {
         var command = c
         var arguments = args
         for var a in command.arguments {
@@ -160,12 +192,14 @@ public class CommandParser : HasDebugMode {
             a.value = argValue
             arguments.remove(at: 0)
         }
-        guard arguments.isEmpty else { throw CommandError.invalidArguments(command) }
-        return command
+        return (command, arguments)
     }
     
-    private func getCommand(_ arg : String) throws -> Command {
-        guard let c = commands.filter({ $0.name == arg }).first else { throw ParserError.noSuchCommand(arg) }
+    
+    // MARK: Token manipulation
+    
+    private func getCommand(_ name : String) throws -> Command {
+        guard let c = commands.filter({ $0.name == name }).first else { throw ParserError.noSuchCommand(name) }
         return c
     }
     
@@ -186,6 +220,9 @@ public class CommandParser : HasDebugMode {
     func getOptionArgument(_ string : String) -> String {
         return string.components(separatedBy: "=").last!
     }
+    
+    
+    // MARK: Usage text & debug
     
     private func printCommands() {
         if printHelp {

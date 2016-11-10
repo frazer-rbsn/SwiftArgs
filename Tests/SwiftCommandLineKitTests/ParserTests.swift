@@ -269,15 +269,30 @@ class ParserTests : XCTestCase {
     
     func testParseCommandWithSubcommand() {
         let parser = CommandParser()
-        let cmd = MockCommand()
-        XCTAssert(false)
+        let subcmdarg = MockArgument()
+        let subcmd = MockCommand(name: "subcommand", args: [subcmdarg])
+        let cmd = MockCommand(name: "command", subCommands: [subcmd])
+        try! parser.addCommand(cmd)
+        let command = try! parser.parse(arguments: ["command", "subcommand", "mockargvalue"])
+        XCTAssert(command == cmd as Command)
+        XCTAssertNotNil(command.usedSubCommand)
+        XCTAssert(command.usedSubCommand! == subcmd as Command)
     }
     
-    func testParseCommandWithTwoSubcommands() {
-        let parser = CommandParser()
-        let cmd = MockCommand()
-        XCTAssert(false)
-    }
+//    func testParseCommandWithSubcommandExtraArgThrows() {
+//        let parser = CommandParser()
+//        let subcmdarg = MockArgument()
+//        let subcmd = MockCommand(name: "subcommand", args: [subcmdarg])
+//        let cmd = MockCommand(name: "command", subCommands: [subcmd])
+//        try! parser.addCommand(cmd)
+//        try! parser.parse(arguments: ["command", "subcommand", "mockargvalue","somethingelse"])
+//    }
+    
+//    func testParseCommandWithTwoSubcommands() {
+//        let parser = CommandParser()
+//        let cmd = MockCommand()
+//        XCTAssert(false)
+//    }
     
     static var allTests : [(String, (ParserTests) -> () throws -> Void)] {
         return [
@@ -290,3 +305,5 @@ class ParserTests : XCTestCase {
         ]
     }
 }
+
+

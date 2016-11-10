@@ -4,13 +4,16 @@
 class MockCommand : Command {
     var name = "mockcommand"
     var helptext = "Mock help text"
-    var arguments : [Argument] = []
     var options : [Option] = []
+    var arguments : [Argument] = []
+    var subCommands: [Command] = []
+    var usedSubCommand: Command?
     
     init(name : String = "mockcommand", helptext : String = "Mock help text",
-         args : [Argument] = [], options : [Option] = []) {
+         subCommands : [Command] = [], args : [Argument] = [], options : [Option] = []) {
         self.name = name
         self.helptext = helptext
+        self.subCommands = subCommands
         self.arguments = args
         self.options = options
     }
