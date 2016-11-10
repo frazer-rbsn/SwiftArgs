@@ -8,16 +8,16 @@
 
 import Foundation
 
-/**
- Thrown if the command model or any of it's option or argument models is invalid.
- */
-public enum CommandModelError : Error {
-    case invalidCommand
-}
-
 struct CommandValidator : HasDebugMode {
     
     var debugMode : Bool
+    
+    /**
+     Thrown if the command model or any of it's option or argument models is invalid.
+     */
+    public enum ModelError : Error {
+        case invalidCommand
+    }
     
     /**
      Checks if the command model and it's `Option` and `Argument` models are suitable for
@@ -30,13 +30,14 @@ struct CommandValidator : HasDebugMode {
         guard !c.name.contains(" ") else {
             printDebug("Error: Invalid command model \'\(c)\'.")
             printDebug("Command name: \'\(c.name)\'\nCommand names must not contain spaces.")
-            throw CommandModelError.invalidCommand
+            throw ModelError.invalidCommand
         }
         guard c.name != "" else {
             printDebug("Error: Invalid command model \'\(c)\'.")
             printDebug("Command name: \'\(c.name)\'\nCommand name must not be empty.")
-            throw CommandModelError.invalidCommand
+            throw ModelError.invalidCommand
         }
+        //try validateSubCommands(c)
         try validateOptions(c)
         try validateArguments(c)
     }
@@ -45,23 +46,23 @@ struct CommandValidator : HasDebugMode {
         guard Set(c.optionNames).count == c.optionNames.count else {
             printDebug("Error: Invalid options for command model \'\(c)\'.")
             printDebug("Two or more options have the same name.")
-            throw CommandModelError.invalidCommand
+            throw ModelError.invalidCommand
         }
         for o in c.options {
             guard !o.name.contains(" ") else {
                 printDebug("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
                 printDebug("Option names must not contain spaces.")
-                throw CommandModelError.invalidCommand
+                throw ModelError.invalidCommand
             }
             guard !o.name.contains("-") else {
                 printDebug("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
                 printDebug("Option names must not contain hyphens.")
-                throw CommandModelError.invalidCommand
+                throw ModelError.invalidCommand
             }
             guard o.name != "" else {
                 printDebug("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
                 printDebug("Option names must not be empty.")
-                throw CommandModelError.invalidCommand
+                throw ModelError.invalidCommand
             }
         }
     }
@@ -70,23 +71,23 @@ struct CommandValidator : HasDebugMode {
         guard Set(c.argumentNames).count == c.argumentNames.count else {
             printDebug("Error: Invalid arguments for command model \'\(c)\'.")
             printDebug("Two or more arguments have the same name.")
-            throw CommandModelError.invalidCommand
+            throw ModelError.invalidCommand
         }
         for a in c.arguments {
             guard !a.name.contains(" ") else {
                 printDebug("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
                 printDebug("Argument names must not contain spaces.")
-                throw CommandModelError.invalidCommand
+                throw ModelError.invalidCommand
             }
             guard !a.name.contains("-") else {
                 printDebug("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
                 printDebug("Argument names must not contain hyphens.")
-                throw CommandModelError.invalidCommand
+                throw ModelError.invalidCommand
             }
             guard a.name != "" else {
                 printDebug("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
                 printDebug("Argument names must not be empty.")
-                throw CommandModelError.invalidCommand
+                throw ModelError.invalidCommand
             }
         }
     }

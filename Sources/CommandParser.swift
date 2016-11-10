@@ -20,37 +20,30 @@ public class CommandParser : HasDebugMode {
      */
     public var printHelp : Bool = true
     
+    public enum ParserError : Error {
+        case duplicateCommand,
+        noCommands,
+        commandNotSupplied,
+        noSuchCommand(String)
+    }
+    
     /**
      Register a command with the parser, so that when the user supplies command line arguments 
      to your program, they will be recognised and parsed into objects.
-     - throws: a `CommandModelError` if the command model or any of it's option or argument models is invalid.
+     - throws:  `PaserError.duplicateCommand` if the command parser instance already has a command registered
+                with the same name as the command.
+                Or `CommandValidator.ModelError` if the command model or any of it's option or
+                argument models is invalid.
      - parameter c: The command to be registered with the parser.
      */
     public func addCommand(_ c : Command) throws {
         guard !commands.contains(where: { $0 == c }) else {
             printDebug("Error: Duplicate command model \'\(c)\'.")
             printDebug("CommandParser already has a registered command with name: \'\(c.name)\'")
-            throw CommandModelError.invalidCommand
+            throw ParserError.duplicateCommand
         }
         try CommandValidator(debugMode: debugMode).validateCommand(c)
         commands.append(c)
-    }
-    
-    /**
-     Thrown if the command models are valid but the parser 
-     is supplied invalid arguments at runtime.
-     */
-    public enum ParserError : Error {
-        case noSuchCommand(String),
-        noCommands,
-        commandNotSupplied
-    }
-    
-    /**
-     Thrown if the command model or any of it's option or argument models is invalid.
-     */
-    public enum CommandModelError : Error {
-        case invalidCommand
     }
     
     /**
