@@ -10,8 +10,14 @@ public class CommandParser {
 
     internal var commands : [Command] = []
     
+    /**
+     If `true`, prints debug information. Default value is `false`.
+    */
     public var debugMode : Bool = false
     
+    /**
+     If true, prints command usage help. Default value is `true`.
+     */
     public var printHelp : Bool = true
     
     /**
