@@ -267,6 +267,18 @@ class ParserTests : XCTestCase {
         XCTAssertNotNil(command)
     }
     
+    func testParseCommandWithSubcommand() {
+        let parser = CommandParser()
+        let cmd = MockCommand()
+        XCTAssert(false)
+    }
+    
+    func testParseCommandWithTwoSubcommands() {
+        let parser = CommandParser()
+        let cmd = MockCommand()
+        XCTAssert(false)
+    }
+    
     static var allTests : [(String, (ParserTests) -> () throws -> Void)] {
         return [
             ("testAddValidCommand", testAddValidCommand),

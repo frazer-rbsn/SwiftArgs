@@ -81,27 +81,27 @@ public class CommandParser : HasDebugMode {
 
         } catch CommandError.requiresArguments(let command) {
             printHelp("Error: command \'\(command.name)\' has required arguments but none were supplied.")
-            printUsageInfoForCommand(command)
+            printUsageFor(command)
             throw CommandError.requiresArguments(command)
             
         } catch CommandError.noOptions(let command) {
             printHelp("Error: command \'\(command.name)\' has no options.")
-            printUsageInfoForCommand(command)
+            printUsageFor(command)
             throw CommandError.noOptions(command)
             
         } catch CommandError.optionRequiresArgument(let command, let option) {
             printHelp("Error: expected argument for option \'\(option.name)\', but none found.")
-            printUsageInfoForCommand(command)
+            printUsageFor(command)
             throw CommandError.optionRequiresArgument(command: command, option: option)
             
         } catch CommandError.invalidArguments(let command) {
             printHelp("Error: invalid arguments for command \'\(command.name)\': \(arguments)")
-            printUsageInfoForCommand(command)
+            printUsageFor(command)
             throw CommandError.invalidArguments(command)
             
         } catch CommandError.noArguments(let command) {
             printHelp("Error: command \'\(command.name)\' does not take arguments.")
-            printUsageInfoForCommand(command)
+            printUsageFor(command)
             throw CommandError.noArguments(command)
         }
     }
@@ -193,9 +193,9 @@ public class CommandParser : HasDebugMode {
         }
     }
     
-    private func printUsageInfoForCommand(_ c : Command) {
+    private func printUsageFor(_ c : Command) {
         if printHelp {
-            UsageInfoPrinter().printHelpAndUsage(for: c)
+            UsageInfoPrinter().printUsage(for: c)
         }
     }
     

@@ -37,6 +37,13 @@ public protocol Command {
     var options : [Option] { get set }
     
     /**
+     So I heard you like commands...
+     In the command line, subcommands come directly after the command and themselves are Commands.
+     You can nest as many commands within commands as you like.
+     */
+    var subCommands : [Command] { get set }
+    
+    /**
      Make the command grow legs and begin a light jog.
      */
     func run()
@@ -53,6 +60,14 @@ public enum CommandError : Error {
 
 
 public extension Command {
+    
+    public var hasSubcommands : Bool {
+        return !subCommands.isEmpty
+    }
+    
+    public var subCommandNames : [String] {
+        return subCommands.map() { $0.name }
+    }
     
     public var hasOptions : Bool {
         return !options.isEmpty

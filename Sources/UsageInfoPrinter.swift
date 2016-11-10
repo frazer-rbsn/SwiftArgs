@@ -23,6 +23,12 @@ public struct UsageInfoPrinter {
         print("\n")
     }
     
+    public func printUsage(for command : Command) {
+        print("\nUSAGE:")
+        _printCommandUsage(command)
+        print("\n")
+    }
+    
     private func _printNameAndHelpText(for cmds : [Command]) {
         for c in cmds {
             _printNameAndHelpText(for: c)
