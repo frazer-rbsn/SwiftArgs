@@ -9,33 +9,37 @@
 public struct UsageInfoPrinter {
     
     public func printCommands(for parser : CommandParser) {
-        guard !parser.commands.isEmpty else {
-            print("No registered commands.")
-            return
-        }
+        guard !parser.commands.isEmpty else { return } // No registered commands
         print("\nCOMMANDS:")
-        for cmd in parser.commands {
-            print("\t\(cmd.name)\t\(cmd.helptext)")
-        }
+        _printNameAndHelpText(for: parser.commands)
+        print("")
     }
     
-    public func printInfo(_ cmds : [Command]) {
-        for c in cmds {
-            printInfo(c)
-        }
-    }
-    
-    public func printInfo(_ cmd : Command) {
+    public func printHelpAndUsage(for command : Command) {
         print("\nCOMMAND:")
-        print("\t\(cmd.name)\t\(cmd.helptext)")
+        _printNameAndHelpText(for: command)
         print("\nUSAGE:")
-        print("\t\(cmd.name)", terminator:" ")
+        _printCommandUsage(command)
+        print("\n")
+    }
+    
+    private func _printNameAndHelpText(for cmds : [Command]) {
+        for c in cmds {
+            _printNameAndHelpText(for: c)
+        }
+    }
+    
+    private func _printNameAndHelpText(for cmd: Command) {
+        print("    \(cmd.name)\t\(cmd.helptext)")
+    }
+    
+    private func _printCommandUsage(_ cmd : Command) {
+        print("    \(cmd.name)", terminator:" ")
         for o in cmd.options {
             print("[\(o.longFormName)", terminator:"] ")
         }
         for a in cmd.arguments {
             print("<\(a.name)>", terminator: " ")
         }
-        print("\n")
     }
 }

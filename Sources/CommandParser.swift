@@ -148,7 +148,7 @@ public class CommandParser {
             throw ParserError.noCommands
             
         } catch ParserError.noSuchCommand(let name) {
-            printHelp("Error: no such command \'\(name)\'\n")
+            printHelp("Error: no such command \'\(name)\'")
             printCommands()
             throw ParserError.noSuchCommand("\(name)")
 
@@ -181,25 +181,17 @@ public class CommandParser {
     
     private func _parse(_ args : [String]) throws -> Command {
         guard !commands.isEmpty else { throw ParserError.noCommands }
-        guard !args.isEmpty else {
-            printCommands()
-            throw ParserError.commandNotSupplied
-        }
+        guard !args.isEmpty else { throw ParserError.commandNotSupplied }
+        
         let cmdString = args[0]
-        guard cmdString != "" else {
-            printCommands()
-            throw ParserError.commandNotSupplied
-        }
+        guard cmdString != "" else { throw ParserError.commandNotSupplied }
         
         var command = try getCommand(cmdString)
         var arguments = args
         arguments.remove(at: 0) // Remove command from args
         
         if arguments.isEmpty {
-            if command.hasRequiredArguments {
-                printUsageInfoForCommand(command)
-                throw CommandError.noArguments(command)
-            }
+            guard !command.hasRequiredArguments else { throw CommandError.requiresArguments(command) }
             return command
         }
         
@@ -282,7 +274,7 @@ public class CommandParser {
     
     private func printUsageInfoForCommand(_ c : Command) {
         if printHelp {
-            UsageInfoPrinter().printInfo(c)
+            UsageInfoPrinter().printHelpAndUsage(for: c)
         }
     }
     
