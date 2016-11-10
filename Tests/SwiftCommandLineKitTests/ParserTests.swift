@@ -279,20 +279,15 @@ class ParserTests : XCTestCase {
         XCTAssert(command.usedSubCommand! == subcmd as Command)
     }
     
-//    func testParseCommandWithSubcommandExtraArgThrows() {
-//        let parser = CommandParser()
-//        let subcmdarg = MockArgument()
-//        let subcmd = MockCommand(name: "subcommand", args: [subcmdarg])
-//        let cmd = MockCommand(name: "command", subCommands: [subcmd])
-//        try! parser.addCommand(cmd)
-//        try! parser.parse(arguments: ["command", "subcommand", "mockargvalue","somethingelse"])
-//    }
-    
-//    func testParseCommandWithTwoSubcommands() {
-//        let parser = CommandParser()
-//        let cmd = MockCommand()
-//        XCTAssert(false)
-//    }
+    func testParseCommandWithSubcommandExtraArgThrows() {
+        let parser = CommandParser()
+        let subcmdarg = MockArgument()
+        let subcmd = MockCommand(name: "subcommand", args: [subcmdarg])
+        let cmd = MockCommand(name: "command", subCommands: [subcmd])
+        try! parser.addCommand(cmd)
+        AssertThrows(expectedError: CommandError.invalidArguments(cmd),
+                     try parser.parse(arguments: ["command", "subcommand", "mockargvalue", "somethingelse"]))
+    }
     
     static var allTests : [(String, (ParserTests) -> () throws -> Void)] {
         return [

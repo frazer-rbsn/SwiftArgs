@@ -37,12 +37,12 @@ struct CommandValidator : HasDebugMode {
             printDebug("Command name: \'\(c.name)\'\nCommand name must not be empty.")
             throw ModelError.invalidCommand
         }
-        //try validateSubCommands(c)
         try validateOptions(c)
         try validateArguments(c)
+        try validateSubCommands(c)
     }
     
-    private func validateOptions(_ c : Command) throws {
+    func validateOptions(_ c : Command) throws {
         guard Set(c.optionNames).count == c.optionNames.count else {
             printDebug("Error: Invalid options for command model \'\(c)\'.")
             printDebug("Two or more options have the same name.")
@@ -67,7 +67,7 @@ struct CommandValidator : HasDebugMode {
         }
     }
     
-    private func validateArguments(_ c : Command) throws {
+    func validateArguments(_ c : Command) throws {
         guard Set(c.argumentNames).count == c.argumentNames.count else {
             printDebug("Error: Invalid arguments for command model \'\(c)\'.")
             printDebug("Two or more arguments have the same name.")
@@ -89,6 +89,12 @@ struct CommandValidator : HasDebugMode {
                 printDebug("Argument names must not be empty.")
                 throw ModelError.invalidCommand
             }
+        }
+    }
+    
+    func validateSubCommands(_ c : Command) throws {
+        for subcmd in c.subCommands {
+            try validateCommand(subcmd)
         }
     }
 }
