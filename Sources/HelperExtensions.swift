@@ -33,5 +33,23 @@ extension CommandLine {
         args.remove(at: 0)
         return args
     }
-    
 }
+
+protocol HasDebugMode {
+    
+    /**
+     If `true`, prints debug information. Default value is `false`.
+     */
+    var debugMode : Bool { get set }
+}
+
+extension HasDebugMode {
+    
+    func printDebug(_ s : String) {
+        if debugMode {
+            print(s)
+        }
+    }
+}
+
+

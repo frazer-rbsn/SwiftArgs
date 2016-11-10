@@ -1,7 +1,7 @@
 ##### TODO:
 
-Features
-- Option short form support ( -o, -aev etc.)
+**Features**
+- Support short form options ( -o, -aEv etc.)
 - Better validation
-
-Refactoring
+- Support spaces between OptionWithArgument and argument
+- Support subcommands
