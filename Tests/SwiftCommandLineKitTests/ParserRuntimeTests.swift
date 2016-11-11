@@ -6,6 +6,24 @@ class ParserRuntimeTests : XCTestCase {
     
     // MARK: Valid scenarios
     
+    func testParseNoCommands() {
+        let parser = CommandParser()
+        let cmd = MockCommand()
+        try! parser.addCommand(cmd)
+        let delegate = MockCommandParserDelegate()
+        try! parser.parse(arguments: [], delegate: delegate)
+        XCTAssert(delegate.commandNotSuppliedFlag)
+    }
+    
+    func testParseBlankCommand() {
+        let parser = CommandParser()
+        let cmd = MockCommand()
+        try! parser.addCommand(cmd)
+        let delegate = MockCommandParserDelegate()
+        try! parser.parse(arguments: [""], delegate: delegate)
+        XCTAssert(delegate.commandNotSuppliedFlag)
+    }
+    
     func testParseValidCommandOptionNotSet() {
         let parser = CommandParser()
         let option = MockOption(name: "option")
