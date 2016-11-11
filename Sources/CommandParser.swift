@@ -23,7 +23,7 @@ public enum ParserError : Error {
 
 public class CommandParser : HasDebugMode {
 
-    private var commands : [Command] = []
+    internal var commands : [Command] = []
     
     /**
      If `true`, prints debug information. Default value is `false`.

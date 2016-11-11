@@ -139,6 +139,15 @@ class ParserRuntimeTests : XCTestCase {
                      try parser.parse(arguments: ["bar"]))
     }
     
+    func testParseCommandWithIncorrectOptionName() {
+        let parser = CommandParser()
+        let op = MockOption(name:"foo")
+        let cmd = MockCommand(name: "generate", options: [op])
+        try! parser.addCommand(cmd)
+        AssertThrows(expectedError: ParserError.noSuchOption(command: cmd, option: "--bar"),
+                     try parser.parse(arguments: ["generate", "--bar"]))
+    }
+    
     func testParseCommandWithOneOptionNoArgsAsCommandThatRequiresTwoArgsThrows() {
         let parser = CommandParser()
         let arg1 = MockArgument(name:"arg1")
