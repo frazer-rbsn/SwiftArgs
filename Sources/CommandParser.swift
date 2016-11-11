@@ -23,7 +23,7 @@ public enum ParserError : Error {
 
 public class CommandParser : HasDebugMode {
 
-    internal var commands : [Command] = []
+    private var commands : [Command] = []
     
     /**
      If `true`, prints debug information. Default value is `false`.
@@ -245,7 +245,7 @@ public class CommandParser : HasDebugMode {
     
     private func printCommands() {
         if printHelp {
-            UsageInfoPrinter().printCommands(for: self)
+            UsageInfoPrinter().printCommands(commands)
         }
     }
     

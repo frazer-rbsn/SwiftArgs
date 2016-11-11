@@ -8,10 +8,10 @@
 
 public struct UsageInfoPrinter {
     
-    public func printCommands(for parser : CommandParser) {
-        guard !parser.commands.isEmpty else { return } // No registered commands
+    public func printCommands(_ cmds : [Command]) {
+        guard !cmds.isEmpty else { return } // No registered commands
         print("\nCOMMANDS:")
-        _printNameAndHelpText(for: parser.commands)
+        _printNameAndHelpText(for: cmds)
         print("")
     }
     
