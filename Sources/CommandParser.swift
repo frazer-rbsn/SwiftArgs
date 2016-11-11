@@ -38,11 +38,13 @@ public class CommandParser : HasDebugMode {
     /**
      Register a command with the parser, so that when the user supplies command line arguments 
      to your program, they will be recognised and parsed into objects.
-     - throws:  `PaserError.duplicateCommand` if the command parser instance already has a command registered
-                with the same name as the command.
-                Or `CommandValidator.ModelError` if the command model or any of it's option or
-                argument models is invalid.
+     
      - parameter c: The command to be registered with the parser.
+     
+     - throws:  `ParserError.duplicateCommand` if the command parser instance already has a
+                command registered with the same name as the command.
+                Or `CommandValidator.ModelError.invalidCommand` if the command model or 
+                any of it's option or argument models is invalid.
      */
     public func addCommand(_ c : Command) throws {
         guard !commands.contains(where: { $0 == c }) else {
@@ -69,6 +71,7 @@ public class CommandParser : HasDebugMode {
     /**
      Parses the supplied input and returns a `Command` object if successful.
      - parameter args: The arguments to be parsed.
+     
      - throws:  `ParserError` if no commands are registered or there is a problem with 
                 parsing the command, or invalid arguments were supplied.
     */

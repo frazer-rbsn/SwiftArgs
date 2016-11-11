@@ -81,10 +81,16 @@ public extension Command {
         return options.map() { $0.name }
     }
     
+    /**
+     Option names with the "--" prefix.
+    */
     public var optionLongForms : [String] {
         return options.map() { "--" + $0.name }
     }
     
+    /**
+     Options that were used with the command at runtime.
+    */
     public var setOptions : [Option] {
         return options.filter( { $0.set == true })
     }
@@ -93,46 +99,16 @@ public extension Command {
         return !options.isEmpty
     }
     
-    /**
-     Returns an `Option` object that belongs to the command.
-     
-     - parameter name: The "name" property of the option
-     
-     - returns:     a `Option` object if the option exists and
-                    is a member of the Command's `options` property.
-     
-     - throws:      `CommandError.noSuchOption` if no option with `name` is found.
-     */
     func getOption(_ name : String) throws -> Option {
         guard let option = options.filter({ $0.name == name }).first
             else { throw CommandError.noSuchOption(command:self, optionName: name) }
         return option
     }
     
-    /**
-     Sets the option on the command. Use for setting options that don't have arguments, like flags/switches.
-     
-     - parameter name: The "name" property of the option
-     
-     - throws:  `CommandError.noSuchOption` if no option with `name` is found,
-                or the option has not been set, or nil if it is does not conform to
-                the `VariableOption` protocol.
-     */
     mutating func setOption(_ o : String) throws {
         try setOption(o, value: nil)
     }
     
-    /**
-     Sets the option on the command. Use this function for options that
-     require an argument.
-     
-     - parameter name: The `name` property of the option.
-     - parameter value: The argument value to use with the option.
-     
-     - throws:  `CommandError.noSuchOption` if no option with `name` is found,
-                or `CommandError.optionRequiresArgument` if option conforms to
-                `OptionWithArgument` protocol and `value` is nil.
-     */
     mutating func setOption(_ o : String, value : String?) throws {
         guard let i = optionLongForms.index(of: o)
             else { throw CommandError.noSuchOption(command:self, optionName: o) }
@@ -143,17 +119,17 @@ public extension Command {
         options[i].set = true
     }
     
-    public var allArgumentsSet : Bool {
-        let flags = arguments.map() { $0.value != nil }
-        return !flags.contains(where: { $0 == false })
-    }
-    
     var hasRequiredArguments : Bool {
         return !arguments.isEmpty
     }
 
     var argumentNames : [String] {
         return arguments.map() { $0.name }
+    }
+    
+    var allArgumentsSet : Bool {
+        let flags = arguments.map() { $0.value != nil }
+        return !flags.contains(where: { $0 == false })
     }
     
     var hasSubCommands : Bool {
@@ -222,8 +198,8 @@ public extension Option {
 }
 
 /**
- For options that would be used as,  YourProgramName yourcommandname --youroptionname=<arg>
- For example, AwesomeScript make --directory=/mydir/mysubdir/
+ For options that would be used as,  yourcommandname --youroptionname=<arg>
+ For example, make --directory=/mydir/mysubdir/
  */
 public protocol OptionWithArgument : Option {
     

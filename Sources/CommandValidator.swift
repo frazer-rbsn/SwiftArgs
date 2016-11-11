@@ -14,19 +14,12 @@ struct CommandValidator : HasDebugMode {
     
     /**
      Thrown if the command model or any of it's option or argument models is invalid.
-     */
+    */
     public enum ModelError : Error {
         case invalidCommand
     }
     
-    /**
-     Checks if the command model and it's `Option` and `Argument` models are suitable for
-     use with the parser.
-     
-     - throws: a `CommandModelError` if the command model or any of it's option or argument models is invalid.
-     - parameter c: The command to be validated.
-     */
-    public func validateCommand(_ c : Command) throws {
+    func validateCommand(_ c : Command) throws {
         guard !c.name.contains(" ") else {
             printDebug("Error: Invalid command model \'\(c)\'.")
             printDebug("Command name: \'\(c.name)\'\nCommand names must not contain spaces.")
