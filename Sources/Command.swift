@@ -75,7 +75,7 @@ public enum CommandError : Error {
 }
 
 
-public extension Command {
+extension Command {
 
     public var optionNames : [String] {
         return options.map() { $0.name }
@@ -95,21 +95,21 @@ public extension Command {
         return options.filter( { $0.set == true })
     }
     
-    var hasOptions : Bool {
+    internal var hasOptions : Bool {
         return !options.isEmpty
     }
     
-    func getOption(_ name : String) throws -> Option {
+    internal func getOption(_ name : String) throws -> Option {
         guard let option = options.filter({ $0.name == name }).first
             else { throw CommandError.noSuchOption(command:self, optionName: name) }
         return option
     }
     
-    mutating func setOption(_ o : String) throws {
+    internal mutating func setOption(_ o : String) throws {
         try setOption(o, value: nil)
     }
     
-    mutating func setOption(_ o : String, value : String?) throws {
+    internal mutating func setOption(_ o : String, value : String?) throws {
         guard let i = optionLongForms.index(of: o)
             else { throw CommandError.noSuchOption(command:self, optionName: o) }
         if var op = options[i] as? OptionWithArgument {
@@ -119,24 +119,24 @@ public extension Command {
         options[i].set = true
     }
     
-    var hasRequiredArguments : Bool {
+    internal var hasRequiredArguments : Bool {
         return !arguments.isEmpty
     }
 
-    var argumentNames : [String] {
+    internal var argumentNames : [String] {
         return arguments.map() { $0.name }
     }
     
-    var allArgumentsSet : Bool {
+    internal var allArgumentsSet : Bool {
         let flags = arguments.map() { $0.value != nil }
         return !flags.contains(where: { $0 == false })
     }
     
-    var hasSubCommands : Bool {
+    internal var hasSubCommands : Bool {
         return !subCommands.isEmpty
     }
     
-    func getSubCommand(name : String) throws -> Command {
+    internal func getSubCommand(name : String) throws -> Command {
         guard let c = subCommands.filter({ $0.name == name }).first
             else { throw CommandError.noSuchSubCommand(command: self, subCommandName: name) }
         return c
