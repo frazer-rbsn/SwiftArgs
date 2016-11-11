@@ -73,25 +73,11 @@ public class CommandParser : HasDebugMode {
      - throws:  `ParserError` if no commands are registered or there is a problem with
                 parsing the command, or invalid arguments were supplied.
      */
-    public func parseCommandLine() throws {
-        return try parse(arguments: CommandLine.argumentsWithoutFilename, delegate: nil)
-    }
-    
-    /**
-     Parses the input from the CommandLine.
-     - throws:  `ParserError` if no commands are registered or there is a problem with
-                parsing the command, or invalid arguments were supplied.
-     */
     public func parseCommandLine(delegate : CommandParserDelegate?) throws {
         return try parse(arguments: CommandLine.argumentsWithoutFilename, delegate: delegate)
     }
-    
-    /**
-     Parses the input from the CommandLine.
-     - throws:  `ParserError` if no commands are registered or there is a problem with
-                parsing the command, or invalid arguments were supplied.
-     */
-    public func parse(arguments : [String]) throws {
+
+    func parse(arguments : [String]) throws {
         return try parse(arguments: arguments, delegate: nil)
     }
     
