@@ -73,7 +73,7 @@ public enum CommandError : Error {
         noSuchOption(command:Command, optionName: String),
         optionRequiresArgument(command:Command, option:Option),
         requiresArguments(Command),
-        noArguments(Command),
+        noArgumentsOrSubCommands(Command),
         invalidArguments(Command)
 }
 

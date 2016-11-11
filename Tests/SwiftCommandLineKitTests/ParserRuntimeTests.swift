@@ -65,7 +65,7 @@ class ParserRuntimeTests : XCTestCase {
         XCTAssertEqual(command.arguments[0].value!, "argumentvalue")
     }
     
-    func testParseValidCommandWithSubcommand() {
+    func testParseValidCommandWithSubcommandWithArgument() {
         let parser = CommandParser()
         let subcmdarg = MockArgument()
         let subcmd = MockCommand(name: "subcommand", args: [subcmdarg])
@@ -78,16 +78,44 @@ class ParserRuntimeTests : XCTestCase {
         XCTAssert(command.usedSubCommand!.arguments[0].value! == "subcommandargvalue")
     }
     
+    func testParseValidCommandWithArgumentWithSubcommand() {
+        let parser = CommandParser()
+        let subcmd = MockCommand(name: "subcommand")
+        let cmdarg = MockArgument()
+        let cmd = MockCommand(name: "command", subCommands: [subcmd], args: [cmdarg])
+        try! parser.addCommand(cmd)
+        let command = try! parser.parse(arguments: ["command", "commandargvalue", "subcommand"])
+        XCTAssert(command == cmd as Command)
+        XCTAssert(command.arguments[0].value! == "commandargvalue")
+        XCTAssertNotNil(command.usedSubCommand)
+        XCTAssert(command.usedSubCommand! == subcmd as Command)
+    }
+    
+    func testParseValidCommandWithTwoArgumentsWithSubcommand() {
+        let parser = CommandParser()
+        let subcmd = MockCommand(name: "subcommand")
+        let cmdarg1 = MockArgument(name: "mockarg1")
+        let cmdarg2 = MockArgument(name: "mockarg2")
+        let cmd = MockCommand(name: "command", subCommands: [subcmd], args: [cmdarg1, cmdarg2])
+        try! parser.addCommand(cmd)
+        let command = try! parser.parse(arguments: ["command", "arg1value", "arg2value", "subcommand"])
+        XCTAssert(command == cmd as Command)
+        XCTAssert(command.arguments[0].value! == "arg1value")
+        XCTAssert(command.arguments[1].value! == "arg2value")
+        XCTAssertNotNil(command.usedSubCommand)
+        XCTAssert(command.usedSubCommand! == subcmd as Command)
+    }
+    
     
     // MARK: Invalid scenarios
     
-    func testParseCommandWithNoRegisteredCommandsThrows() {
+    func testParseWithNoRegisteredCommandsThrows() {
         let parser = CommandParser()
         AssertThrows(expectedError: CommandParser.ParserError.noCommands,
                      try parser.parse(arguments: ["generate"]))
     }
     
-    func testSendNoArgsToParserThrows() {
+    func testParseEmptyArgsThrows() {
         let parser = CommandParser()
         let cmd = MockCommand()
         try! parser.addCommand(cmd)
@@ -95,7 +123,7 @@ class ParserRuntimeTests : XCTestCase {
                      try parser.parse(arguments: []))
     }
     
-    func testSendBlankCommandNameToParserThrows() {
+    func testParseBlankArgThrows() {
         let parser = CommandParser()
         let cmd = MockCommand()
         try! parser.addCommand(cmd)
@@ -103,7 +131,7 @@ class ParserRuntimeTests : XCTestCase {
                      try parser.parse(arguments: []))
     }
     
-    func testNonExistingCommandToParserThrows() {
+    func testParseNonExistingCommandThrows() {
         let parser = CommandParser()
         let cmd = MockCommand(name:"foo")
         try! parser.addCommand(cmd)
@@ -111,7 +139,7 @@ class ParserRuntimeTests : XCTestCase {
                      try parser.parse(arguments: ["bar"]))
     }
     
-    func testSendOneOptionNoArgsWithCommandThatRequiresTwoArgsThrows() {
+    func testParseCommandWithOneOptionNoArgsAsCommandThatRequiresTwoArgsThrows() {
         let parser = CommandParser()
         let arg1 = MockArgument(name:"arg1")
         let arg2 = MockArgument(name:"arg2")
@@ -121,7 +149,7 @@ class ParserRuntimeTests : XCTestCase {
                      try parser.parse(arguments: ["generate", "--option"]))
     }
     
-    func testSendOneOptionWithCommandThatHasNoOptionsThrows() {
+    func testParseCommandWithOneOptionAsCommandThatHasNoOptionsThrows() {
         let parser = CommandParser()
         let cmd = MockCommand(name: "generate")
         try! parser.addCommand(cmd)
@@ -129,12 +157,21 @@ class ParserRuntimeTests : XCTestCase {
                      try parser.parse(arguments: ["generate", "--option"]))
     }
     
-    func testSendTwoOptionsWithCommandThatHasNoOptionsThrows() {
+    func testParseCommandWithTwoOptionsAsCommandThatHasNoOptionsThrows() {
         let parser = CommandParser()
         let cmd = MockCommand(name: "generate")
         try! parser.addCommand(cmd)
         AssertThrows(expectedError: CommandError.noOptions(cmd),
                      try parser.parse(arguments: ["generate", "--option", "--option2"]))
+    }
+    
+    func testParseCommandWithOptionThatRequiresArgumentNoArgThrows() {
+        let parser = CommandParser()
+        let option = MockOptionWithArgument(name: "option")
+        let cmd = MockCommand(name: "generate", options: [option])
+        try! parser.addCommand(cmd)
+        AssertThrows(expectedError: CommandError.optionRequiresArgument(command: cmd, option: option),
+                     try parser.parse(arguments: ["generate", "--option"]))
     }
     
     func testSendNoArgsWithCommandThatRequiresArgsThrows() {
@@ -146,12 +183,21 @@ class ParserRuntimeTests : XCTestCase {
                      try parser.parse(arguments: ["generate"]))
     }
     
-    func testSendOneArgWithCommandThatHasNoArgsThrows() {
+    func testSendOneArgWithCommandThatHasNoArgsNoSubCommandsThrows() {
         let parser = CommandParser()
         let cmd = MockCommand(name: "generate", args: [])
         try! parser.addCommand(cmd)
-        AssertThrows(expectedError: CommandError.invalidArguments(cmd),
-                     try parser.parse(arguments: ["generate","arg"]))
+        AssertThrows(expectedError: CommandError.noArgumentsOrSubCommands(cmd),
+                     try parser.parse(arguments: ["generate", "arg"]))
+    }
+    
+    func testSendOneArgWithCommandThatHasNoArgsNoSuchSubCommandThrows() {
+        let parser = CommandParser()
+        let subcmd = MockCommand(name: "foo")
+        let cmd = MockCommand(name: "generate", subCommands: [subcmd], args: [])
+        try! parser.addCommand(cmd)
+        AssertThrows(expectedError: CommandError.noSuchSubCommand(command: cmd, subCommandName: "bar"),
+                     try parser.parse(arguments: ["generate", "bar"]))
     }
     
     func testSendOneArgWithCommandThatRequiresTwoArgsThrows() {
@@ -164,22 +210,23 @@ class ParserRuntimeTests : XCTestCase {
                      try parser.parse(arguments: ["generate", "arg1"]))
     }
     
+    func testSendOneArgOneOptionAfterArgWithCommandThatRequiresTwoArgsThrows() {
+        let parser = CommandParser()
+        let arg1 = MockArgument(name:"arg1")
+        let arg2 = MockArgument(name:"arg2")
+        let cmd = MockCommand(name: "generate", args: [arg1, arg2])
+        try! parser.addCommand(cmd)
+        AssertThrows(expectedError: CommandError.invalidArguments(cmd),
+                     try parser.parse(arguments: ["generate", "arg1", "--option"]))
+    }
+    
     func testSendTwoArgsWithCommandThatHasOneArgThrows() {
         let parser = CommandParser()
         let arg = MockArgument()
         let cmd = MockCommand(name: "generate", args: [arg])
         try! parser.addCommand(cmd)
-        AssertThrows(expectedError: CommandError.invalidArguments(cmd),
+        AssertThrows(expectedError: CommandError.noSuchSubCommand(command: cmd, subCommandName: "arg2"),
                      try parser.parse(arguments: ["generate", "arg1", "arg2"]))
-    }
-    
-    func testSendCommandWithOptionThatRequiresArgumentNoArgThrows() {
-        let parser = CommandParser()
-        let option = MockOptionWithArgument(name: "option")
-        let cmd = MockCommand(name: "generate", options: [option])
-        try! parser.addCommand(cmd)
-        AssertThrows(expectedError: CommandError.optionRequiresArgument(command: cmd, option: option),
-                     try parser.parse(arguments: ["generate", "--option"]))
     }
     
     func testParseCommandWithSubcommandExtraArgThrows() {
@@ -188,7 +235,7 @@ class ParserRuntimeTests : XCTestCase {
         let subcmd = MockCommand(name: "subcommand", args: [subcmdarg])
         let cmd = MockCommand(name: "command", subCommands: [subcmd])
         try! parser.addCommand(cmd)
-        AssertThrows(expectedError: CommandError.invalidArguments(cmd),
+        AssertThrows(expectedError: CommandError.noSuchSubCommand(command: cmd, subCommandName: "somethingelse"),
                      try parser.parse(arguments: ["command", "subcommand", "mockargvalue", "somethingelse"]))
     }
     
