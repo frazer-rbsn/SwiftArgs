@@ -63,6 +63,7 @@ public protocol Command {
     
     /**
      Make the command grow legs and begin a light jog.
+     Or whatever you want it to do.
      */
     func run()
 }
@@ -75,10 +76,6 @@ public enum CommandError : Error {
 
 
 public extension Command {
-    
-    public var hasOptions : Bool {
-        return !options.isEmpty
-    }
 
     public var optionNames : [String] {
         return options.map() { $0.name }
@@ -86,6 +83,14 @@ public extension Command {
     
     public var optionLongForms : [String] {
         return options.map() { "--" + $0.name }
+    }
+    
+    public var setOptions : [Option] {
+        return options.filter( { $0.set == true })
+    }
+    
+    var hasOptions : Bool {
+        return !options.isEmpty
     }
     
     /**
@@ -98,7 +103,7 @@ public extension Command {
      
      - throws:      `CommandError.noSuchOption` if no option with `name` is found.
      */
-    public func getOption(_ name : String) throws -> Option {
+    func getOption(_ name : String) throws -> Option {
         guard let option = options.filter({ $0.name == name }).first
             else { throw CommandError.noSuchOption(command:self, optionName: name) }
         return option
@@ -113,7 +118,7 @@ public extension Command {
                 or the option has not been set, or nil if it is does not conform to
                 the `VariableOption` protocol.
      */
-    public mutating func setOption(_ o : String) throws {
+    mutating func setOption(_ o : String) throws {
         try setOption(o, value: nil)
     }
     
@@ -128,7 +133,7 @@ public extension Command {
                 or `CommandError.optionRequiresArgument` if option conforms to
                 `OptionWithArgument` protocol and `value` is nil.
      */
-    public mutating func setOption(_ o : String, value : String?) throws {
+    mutating func setOption(_ o : String, value : String?) throws {
         guard let i = optionLongForms.index(of: o)
             else { throw CommandError.noSuchOption(command:self, optionName: o) }
         if var op = options[i] as? OptionWithArgument {
@@ -138,32 +143,24 @@ public extension Command {
         options[i].set = true
     }
     
-    public var hasRequiredArguments : Bool {
-        return !arguments.isEmpty
-    }
-
-    public var argumentNames : [String] {
-        return arguments.map() { $0.name }
-    }
-    
     public var allArgumentsSet : Bool {
         let flags = arguments.map() { $0.value != nil }
         return !flags.contains(where: { $0 == false })
     }
     
-    public var hasSubcommands : Bool {
+    var hasRequiredArguments : Bool {
+        return !arguments.isEmpty
+    }
+
+    var argumentNames : [String] {
+        return arguments.map() { $0.name }
+    }
+    
+    var hasSubCommands : Bool {
         return !subCommands.isEmpty
     }
     
-    public var subCommandNames : [String] {
-        return subCommands.map() { $0.name }
-    }
-    
-    public func hasSubCommand(name : String) -> Bool {
-        return subCommandNames.contains(where: { $0 == name })
-    }
-    
-    public func getSubCommand(name : String) throws -> Command {
+    func getSubCommand(name : String) throws -> Command {
         guard let c = subCommands.filter({ $0.name == name }).first
             else { throw CommandError.noSuchSubCommand(command: self, subCommandName: name) }
         return c
@@ -224,10 +221,6 @@ public extension Option {
     
 }
 
-public func ==(lhs: Option, rhs: Option) -> Bool {
-    return lhs.name == rhs.name
-}
-
 /**
  For options that would be used as,  YourProgramName yourcommandname --youroptionname=<arg>
  For example, AwesomeScript make --directory=/mydir/mysubdir/
@@ -271,6 +264,3 @@ public protocol Argument {
     var value : String? { get set }
 }
 
-public func ==(lhs: Argument, rhs: Argument) -> Bool {
-    return lhs.name == rhs.name
-}

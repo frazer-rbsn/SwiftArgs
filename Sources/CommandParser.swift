@@ -171,7 +171,7 @@ public class CommandParser : HasDebugMode {
             (command, remainingTokens) = try parseCommandArguments(command, tkns: remainingTokens)
             guard command.allArgumentsSet else { throw ParserError.invalidArguments(command) }
         } else {
-            guard command.hasSubcommands else { throw ParserError.noArgumentsOrSubCommands(command) }
+            guard command.hasSubCommands else { throw ParserError.noArgumentsOrSubCommands(command) }
         }
         
         if remainingTokens.isEmpty {
@@ -202,7 +202,6 @@ public class CommandParser : HasDebugMode {
         return (command, tokens)
     }
     
-    //TODO: When parsing command arguments, check token is not an option
     private func parseCommandArguments(_ c : Command, tkns : [String]) throws -> (command: Command, remainingTokens : [String])  {
         var command = c
         var tokens = tkns
