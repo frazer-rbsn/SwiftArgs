@@ -36,7 +36,7 @@ public struct UsageInfoPrinter {
     }
     
     private func _printNameAndHelpText(for cmd: Command) {
-        print("    \(cmd.name)\t\(cmd.helptext)")
+        print("    \(cmd.name)    \(cmd.helptext)")
     }
     
     private func _printCommandUsage(_ cmd : Command) {

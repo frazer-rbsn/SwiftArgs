@@ -71,7 +71,7 @@ class CommandValidationTests: XCTestCase {
         let cmd2 = MockCommand(name: "generate")
         let parser = CommandParser()
         try! parser.addCommand(cmd1)
-        AssertThrows(expectedError: CommandParser.ParserError.duplicateCommand,
+        AssertThrows(expectedError: ParserError.duplicateCommand,
                      try parser.addCommand(cmd2))
     }
     

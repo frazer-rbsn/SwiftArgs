@@ -6,6 +6,21 @@
 //  Copyright © 2016 Frazer Robinson. All rights reserved.
 //
 
+public enum ParserError : Error {
+    case noCommands,
+        duplicateCommand,
+        commandNotSupplied,
+        noSuchCommand(String),
+        noOptions(Command),
+        noSuchOption(command:Command, option:String),
+        optionRequiresArgument(command:Command, option:Option),
+        optionNotAllowedHere(command : Command, option : String),
+        requiresArguments(Command),
+        invalidArguments(Command),
+        noArgumentsOrSubCommands(Command),
+        noSuchSubCommand(command:Command, subCommandName:String)
+}
+
 public class CommandParser : HasDebugMode {
 
     internal var commands : [Command] = []
@@ -19,14 +34,6 @@ public class CommandParser : HasDebugMode {
      If true, prints command usage help. Default value is `true`.
      */
     public var printHelp : Bool = true
-    
-    public enum ParserError : Error {
-        case duplicateCommand,
-        noCommands,
-        commandNotSupplied,
-        noSuchCommand(String),
-        optionNotAllowedHere(command : Command, option : String)
-    }
     
     /**
      Register a command with the parser, so that when the user supplies command line arguments 
@@ -52,10 +59,8 @@ public class CommandParser : HasDebugMode {
     
     /**
      Parses the input from the CommandLine and returns a `Command` object if successful.
-     - throws:  `ParserError` if no commands are registered or there is a problem with 
-                parsing the command.
-                Or `CommandError` if a valid command was supplied but invalid 
-                arguments/options were supplied.
+     - throws:  `ParserError` if no commands are registered or there is a problem with
+                parsing the command, or invalid arguments were supplied.
      */
     public func parseCommandLine() throws -> Command {
         return try parse(arguments: CommandLine.argumentsWithoutFilename)
@@ -65,9 +70,7 @@ public class CommandParser : HasDebugMode {
      Parses the supplied input and returns a `Command` object if successful.
      - parameter args: The arguments to be parsed.
      - throws:  `ParserError` if no commands are registered or there is a problem with 
-                parsing the command.
-                Or `CommandError` if a valid command was supplied but invalid 
-                arguments/options were supplied.
+                parsing the command, or invalid arguments were supplied.
     */
     public func parse(arguments : [String]) throws -> Command {
         do {
@@ -82,37 +85,46 @@ public class CommandParser : HasDebugMode {
             printHelp("Error: no such command \'\(name)\'")
             printCommands()
             throw ParserError.noSuchCommand("\(name)")
-
+            
+        } catch ParserError.noOptions(let command) {
+            printHelp("Error: command \'\(command.name)\' has no options.")
+            printUsageFor(command)
+            throw ParserError.noOptions(command)
+            
+        } catch CommandError.noSuchOption(let command, let option) {
+            printDebug("Error: command \'\(command.name)\' has no such option: \'\(option)\'")
+            throw ParserError.noSuchOption(command: command, option: option)
+            
         } catch ParserError.optionNotAllowedHere(let command, let option) {
             printHelp("Error: An option \'\(option)\' for command \'\(command.name)\' was found," +
                 "but it is not allowed here. Options must come before a command's required arguments.")
             printUsageFor(command)
             throw ParserError.optionNotAllowedHere(command: command, option: option)
             
-        } catch CommandError.requiresArguments(let command) {
-            printHelp("Error: command \'\(command.name)\' has required arguments but none were supplied.")
-            printUsageFor(command)
-            throw CommandError.requiresArguments(command)
-            
-        } catch CommandError.noOptions(let command) {
-            printHelp("Error: command \'\(command.name)\' has no options.")
-            printUsageFor(command)
-            throw CommandError.noOptions(command)
-            
         } catch CommandError.optionRequiresArgument(let command, let option) {
             printHelp("Error: expected argument for option \'\(option.name)\', but none found.")
             printUsageFor(command)
-            throw CommandError.optionRequiresArgument(command: command, option: option)
+            throw ParserError.optionRequiresArgument(command: command, option: option)
             
-        } catch CommandError.invalidArguments(let command) {
+        } catch ParserError.requiresArguments(let command) {
+            printHelp("Error: command \'\(command.name)\' has required arguments but none were supplied.")
+            printUsageFor(command)
+            throw ParserError.requiresArguments(command)
+
+        } catch ParserError.invalidArguments(let command) {
             printHelp("Error: invalid arguments for command \'\(command.name)\'")
             printUsageFor(command)
-            throw CommandError.invalidArguments(command)
+            throw ParserError.invalidArguments(command)
             
-        } catch CommandError.noArgumentsOrSubCommands(let command) {
+        } catch ParserError.noArgumentsOrSubCommands(let command) {
             printHelp("Error: command \'\(command.name)\' does not take arguments nor does it have any subcommands.")
             printUsageFor(command)
-            throw CommandError.noArgumentsOrSubCommands(command)
+            throw ParserError.noArgumentsOrSubCommands(command)
+            
+        } catch CommandError.noSuchSubCommand(let command, let subCommandName) {
+            printHelp("Error: command \'\(command.name)\' has no subcommand: \'\(subCommandName)\'")
+            printUsageFor(command)
+            throw ParserError.noSuchSubCommand(command:command, subCommandName:subCommandName)
         }
     }
     
@@ -131,7 +143,7 @@ public class CommandParser : HasDebugMode {
         remainingTokens.remove(at: 0) // Remove command name
         
         if remainingTokens.isEmpty {
-            guard !command.hasRequiredArguments else { throw CommandError.requiresArguments(command) }
+            guard !command.hasRequiredArguments else { throw ParserError.requiresArguments(command) }
             return (command, remainingTokens)
         }
         
@@ -145,21 +157,21 @@ public class CommandParser : HasDebugMode {
         
         // Options
         if isLongformOption(tokens[0]) {
-            guard command.hasOptions else { throw CommandError.noOptions(command) }
+            guard command.hasOptions else { throw ParserError.noOptions(command) }
             (command, remainingTokens) = try parseCommandOptions(command, tkns: remainingTokens)
         }
         
         if remainingTokens.isEmpty {
-            guard !command.hasRequiredArguments else { throw CommandError.requiresArguments(command) }
+            guard !command.hasRequiredArguments else { throw ParserError.requiresArguments(command) }
             return (command, remainingTokens)
         }
         
         // Arguments
         if command.hasRequiredArguments {
             (command, remainingTokens) = try parseCommandArguments(command, tkns: remainingTokens)
-            guard command.allArgumentsSet else { throw CommandError.invalidArguments(command) }
+            guard command.allArgumentsSet else { throw ParserError.invalidArguments(command) }
         } else {
-            guard command.hasSubcommands else { throw CommandError.noArgumentsOrSubCommands(command) }
+            guard command.hasSubcommands else { throw ParserError.noArgumentsOrSubCommands(command) }
         }
         
         if remainingTokens.isEmpty {
@@ -195,7 +207,7 @@ public class CommandParser : HasDebugMode {
         var command = c
         var tokens = tkns
         for var arg in command.arguments {
-            guard let argValue = tokens[safe:0] else { throw CommandError.invalidArguments(command) }
+            guard let argValue = tokens[safe:0] else { throw ParserError.invalidArguments(command) }
             guard argValue.firstChar != "-" else { throw ParserError.optionNotAllowedHere(command: command, option: argValue) }
             arg.value = argValue
             tokens.remove(at: 0)

@@ -69,12 +69,8 @@ public protocol Command {
 
 public enum CommandError : Error {
     case noSuchSubCommand(command:Command, subCommandName:String),
-        noOptions(Command),
-        noSuchOption(command:Command, optionName: String),
-        optionRequiresArgument(command:Command, option:Option),
-        requiresArguments(Command),
-        noArgumentsOrSubCommands(Command),
-        invalidArguments(Command)
+        noSuchOption(command:Command, optionName:String),
+        optionRequiresArgument(command:Command, option:Option)
 }
 
 
@@ -97,22 +93,25 @@ public extension Command {
      
      - parameter name: The "name" property of the option
      
-     - returns: a `Option` object if the option exists and
-     is a member of the Command's `options` property,
-     or nil if no option with `name` is found.
+     - returns:     a `Option` object if the option exists and
+                    is a member of the Command's `options` property.
+     
+     - throws:      `CommandError.noSuchOption` if no option with `name` is found.
      */
-    public func getOption(_ name : String) -> Option? {
-        return options.filter() { $0.name == name }.first
+    public func getOption(_ name : String) throws -> Option {
+        guard let option = options.filter({ $0.name == name }).first
+            else { throw CommandError.noSuchOption(command:self, optionName: name) }
+        return option
     }
     
     /**
-     Sets the option on the command. Use for setting flags/switches.
+     Sets the option on the command. Use for setting options that don't have arguments, like flags/switches.
      
      - parameter name: The "name" property of the option
      
-     - throws:  `CommandOptionError.NoSuchOption` if no option with `name` is found,
-     or the option has not been set, or nil if it is does not conform to
-     the `VariableOption` protocol.
+     - throws:  `CommandError.noSuchOption` if no option with `name` is found,
+                or the option has not been set, or nil if it is does not conform to
+                the `VariableOption` protocol.
      */
     public mutating func setOption(_ o : String) throws {
         try setOption(o, value: nil)
@@ -125,9 +124,9 @@ public extension Command {
      - parameter name: The `name` property of the option.
      - parameter value: The argument value to use with the option.
      
-     - throws:  `CommandOptionError.noSuchOption` if no option with `name` is found,
-     or `CommandOptionError.optionRequiresArgument` if option conforms to
-     `OptionWithArgument` protocol and `value` is nil.
+     - throws:  `CommandError.noSuchOption` if no option with `name` is found,
+                or `CommandError.optionRequiresArgument` if option conforms to
+                `OptionWithArgument` protocol and `value` is nil.
      */
     public mutating func setOption(_ o : String, value : String?) throws {
         guard let i = optionLongForms.index(of: o)
