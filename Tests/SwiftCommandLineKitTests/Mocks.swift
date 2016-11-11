@@ -60,3 +60,17 @@ class MockArgument : Argument {
     }
 }
 
+class MockCommandParserDelegate : CommandParserDelegate {
+    var commandNotSuppliedFlag : Bool = false
+    var receivedCommand : Bool = false
+    var command : Command?
+    
+    func commandNotSupplied() {
+        commandNotSuppliedFlag = true
+    }
+    
+    func receivedCommand(command: Command) {
+        self.command = command
+        receivedCommand = true
+    }
+}

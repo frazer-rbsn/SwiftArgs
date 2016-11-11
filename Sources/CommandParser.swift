@@ -25,6 +25,8 @@ public class CommandParser : HasDebugMode {
 
     internal var commands : [Command] = []
     
+    //public var delegate : CommandParserDelegate?
+    
     /**
      If `true`, prints debug information. Default value is `false`.
     */
@@ -34,6 +36,11 @@ public class CommandParser : HasDebugMode {
      If true, prints command usage help. Default value is `true`.
      */
     public var printHelp : Bool = true
+    
+    /**
+     If true, prints command usage info if user doesn't supply a command. Default value is `true`.
+     */
+    public var printHelpOnNoCommand : Bool = true
     
     public init() {}
     
@@ -62,29 +69,57 @@ public class CommandParser : HasDebugMode {
     // MARK: Parsing
     
     /**
-     Parses the input from the CommandLine and returns a `Command` object if successful.
+     Parses the input from the CommandLine.
      - throws:  `ParserError` if no commands are registered or there is a problem with
                 parsing the command, or invalid arguments were supplied.
      */
-    public func parseCommandLine() throws -> Command {
-        return try parse(arguments: CommandLine.argumentsWithoutFilename)
+    public func parseCommandLine() throws {
+        return try parse(arguments: CommandLine.argumentsWithoutFilename, delegate: nil)
     }
     
     /**
-     Parses the supplied input and returns a `Command` object if successful.
+     Parses the input from the CommandLine.
+     - throws:  `ParserError` if no commands are registered or there is a problem with
+                parsing the command, or invalid arguments were supplied.
+     */
+    public func parseCommandLine(delegate : CommandParserDelegate?) throws {
+        return try parse(arguments: CommandLine.argumentsWithoutFilename, delegate: delegate)
+    }
+    
+    /**
+     Parses the input from the CommandLine.
+     - throws:  `ParserError` if no commands are registered or there is a problem with
+                parsing the command, or invalid arguments were supplied.
+     */
+    public func parse(arguments : [String]) throws {
+        return try parse(arguments: arguments, delegate: nil)
+    }
+    
+    /**
+     Parses the supplied input.
      - parameter args: The arguments to be parsed.
      
      - throws:  `ParserError` if no commands are registered or there is a problem with 
                 parsing the command, or invalid arguments were supplied.
     */
-    public func parse(arguments : [String]) throws -> Command {
+    public func parse(arguments : [String], delegate : CommandParserDelegate?) throws {
+        
         do {
             let command = try _parse(arguments)
-            return command
-            
+            if let d = delegate {
+                d.receivedCommand(command: command)
+            }
         } catch ParserError.noCommands {
             printDebug("Error: no commands registered with the parser.")
             throw ParserError.noCommands
+            
+        } catch ParserError.commandNotSupplied {
+            if let d = delegate {
+                d.commandNotSupplied()
+            }
+            if printHelpOnNoCommand {
+                printCommands()
+            }
             
         } catch ParserError.noSuchCommand(let name) {
             printHelp("Error: no such command \'\(name)\'")
