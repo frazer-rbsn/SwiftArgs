@@ -25,7 +25,7 @@ public class CommandParser : HasDebugMode {
         noCommands,
         commandNotSupplied,
         noSuchCommand(String),
-        optionNotAllowedHere(String)
+        optionNotAllowedHere(command : Command, option : String)
     }
     
     /**
@@ -83,6 +83,12 @@ public class CommandParser : HasDebugMode {
             printCommands()
             throw ParserError.noSuchCommand("\(name)")
 
+        } catch ParserError.optionNotAllowedHere(let command, let option) {
+            printHelp("Error: An option \'\(option)\' for command \'\(command.name)\' was found," +
+                "but it is not allowed here. Options must come before a command's required arguments.")
+            printUsageFor(command)
+            throw ParserError.optionNotAllowedHere(command: command, option: option)
+            
         } catch CommandError.requiresArguments(let command) {
             printHelp("Error: command \'\(command.name)\' has required arguments but none were supplied.")
             printUsageFor(command)
@@ -140,7 +146,7 @@ public class CommandParser : HasDebugMode {
         // Options
         if isLongformOption(tokens[0]) {
             guard command.hasOptions else { throw CommandError.noOptions(command) }
-            (command, remainingTokens) = try parseCommandOptions(command, args: remainingTokens)
+            (command, remainingTokens) = try parseCommandOptions(command, tkns: remainingTokens)
         }
         
         if remainingTokens.isEmpty {
@@ -150,7 +156,7 @@ public class CommandParser : HasDebugMode {
         
         // Arguments
         if command.hasRequiredArguments {
-            (command, remainingTokens) = try parseCommandArguments(command, args: remainingTokens)
+            (command, remainingTokens) = try parseCommandArguments(command, tkns: remainingTokens)
             guard command.allArgumentsSet else { throw CommandError.invalidArguments(command) }
         } else {
             guard command.hasSubcommands else { throw CommandError.noArgumentsOrSubCommands(command) }
@@ -190,7 +196,7 @@ public class CommandParser : HasDebugMode {
         var tokens = tkns
         for var arg in command.arguments {
             guard let argValue = tokens[safe:0] else { throw CommandError.invalidArguments(command) }
-            guard argValue.firstChar != "-" else { throw ParserError.optionNotAllowedHere(argValue) }
+            guard argValue.firstChar != "-" else { throw ParserError.optionNotAllowedHere(command: command, option: argValue) }
             arg.value = argValue
             tokens.remove(at: 0)
         }

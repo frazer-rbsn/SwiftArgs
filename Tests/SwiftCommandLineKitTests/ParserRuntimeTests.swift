@@ -216,7 +216,7 @@ class ParserRuntimeTests : XCTestCase {
         let arg2 = MockArgument(name:"arg2")
         let cmd = MockCommand(name: "generate", args: [arg1, arg2])
         try! parser.addCommand(cmd)
-        AssertThrows(expectedError: CommandError.invalidArguments(cmd),
+        AssertThrows(expectedError: CommandParser.ParserError.optionNotAllowedHere(command: cmd, option: "--option"),
                      try parser.parse(arguments: ["generate", "arg1", "--option"]))
     }
     
