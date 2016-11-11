@@ -8,6 +8,8 @@
 
 public struct UsageInfoPrinter {
     
+    public init() {}
+    
     public func printCommands(_ cmds : [Command]) {
         guard !cmds.isEmpty else { return } // No registered commands
         print("\nCOMMANDS:")

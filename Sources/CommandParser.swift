@@ -35,6 +35,8 @@ public class CommandParser : HasDebugMode {
      */
     public var printHelp : Bool = true
     
+    public init() {}
+    
     /**
      Register a command with the parser, so that when the user supplies command line arguments 
      to your program, they will be recognised and parsed into objects.
