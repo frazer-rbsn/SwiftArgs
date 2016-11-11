@@ -25,8 +25,6 @@ public class CommandParser : HasDebugMode {
 
     internal var commands : [Command] = []
     
-    //public var delegate : CommandParserDelegate?
-    
     /**
      If `true`, prints debug information. Default value is `false`.
     */
@@ -104,7 +102,7 @@ public class CommandParser : HasDebugMode {
                 d.commandNotSupplied()
             }
             if printHelpOnNoCommand {
-                printCommands()
+                UsageInfoPrinter().printCommands(commands)
             }
             
         } catch ParserError.noSuchCommand(let name) {
