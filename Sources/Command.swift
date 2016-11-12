@@ -8,6 +8,11 @@
 
 import Foundation
 
+public enum CommandError : Error {
+    case noSuchSubCommand(command:Command, subCommandName:String),
+    noSuchOption(command:Command, optionName:String),
+    optionRequiresArgument(command:Command, option:Option)
+}
 
 // MARK: Command
 
@@ -68,13 +73,6 @@ public protocol Command {
     func run()
 }
 
-public enum CommandError : Error {
-    case noSuchSubCommand(command:Command, subCommandName:String),
-        noSuchOption(command:Command, optionName:String),
-        optionRequiresArgument(command:Command, option:Option)
-}
-
-
 extension Command {
 
     public var optionNames : [String] {
@@ -91,7 +89,7 @@ extension Command {
     /**
      Options that were used with the command at runtime.
     */
-    public var setOptions : [Option] {
+    public var usedOptions : [Option] {
         return options.filter( { $0.set == true })
     }
     

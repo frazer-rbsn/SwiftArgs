@@ -13,8 +13,8 @@ class ParserLogicTests: XCTestCase {
     
     func testGetOptionRaw() {
         let parser = CommandParser()
-        XCTAssertEqual(parser.getOptionRaw("--option"),"--option")
-        XCTAssertEqual(parser.getOptionRaw("--option="),"--option")
+        XCTAssertEqual(parser.getOptionName("--option"),"--option")
+        XCTAssertEqual(parser.getOptionName("--option="),"--option")
     }
     
     func testGetOptionArgument() {

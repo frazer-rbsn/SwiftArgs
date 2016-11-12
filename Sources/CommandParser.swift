@@ -214,10 +214,9 @@ public class CommandParser : HasDebugMode {
         var tokens = tkns
         for t in tkns {
             guard t.firstChar == "-" else { break }
-            let s = getOptionRaw(t)
+            let s = getOptionName(t)
             if optionHasArgument(t) {
-                let v = getOptionArgument(t)
-                try command.setOption(s, value: v)
+                try command.setOption(s, value: getOptionArgument(t))
             } else {
                 try command.setOption(s)
             }
@@ -252,7 +251,7 @@ public class CommandParser : HasDebugMode {
             && string.character(atIndex: 1) == "-"
     }
     
-    func getOptionRaw(_ string : String) -> String {
+    func getOptionName(_ string : String) -> String {
         return string.components(separatedBy: "=").first!
     }
     
@@ -260,8 +259,8 @@ public class CommandParser : HasDebugMode {
         return string.contains("=")
     }
     
-    func getOptionArgument(_ string : String) -> String {
-        return string.components(separatedBy: "=").last!
+    func getOptionArgument(_ string : String) -> String? {
+        return string.components(separatedBy: "=").last
     }
     
     
