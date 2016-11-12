@@ -1,6 +1,6 @@
 //
 //  CommandValidator.swift
-//  SwiftCommandLineKit
+//  SwiftArgs
 //
 //  Created by Frazer Robinson on 10/11/2016.
 //

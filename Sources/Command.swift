@@ -1,6 +1,6 @@
 //
 //  Command.swift
-//  SwiftCommandLineKit
+//  SwiftArgs
 //
 //  Created by Frazer Robinson on 30/10/2016.
 //  Copyright © 2016 Frazer Robinson. All rights reserved.

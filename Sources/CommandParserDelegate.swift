@@ -1,6 +1,6 @@
 //
 //  CommandParserDelegate.swift
-//  SwiftCommandLineKit
+//  SwiftArgs
 //
 //  Created by Frazer Robinson on 11/11/2016.
 //

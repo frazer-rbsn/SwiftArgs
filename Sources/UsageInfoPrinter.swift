@@ -1,6 +1,6 @@
 //
 //  UsageInfoPrinter.swift
-//  SwiftCommandLineKit
+//  SwiftArgs
 //
 //  Created by Frazer Robinson on 01/11/2016.
 //  Copyright © 2016 Frazer Robinson. All rights reserved.
