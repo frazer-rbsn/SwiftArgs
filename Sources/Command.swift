@@ -6,15 +6,12 @@
 //  Copyright © 2016 Frazer Robinson. All rights reserved.
 //
 
-import Foundation
-
 public enum CommandError : Error {
     case noSuchSubCommand(command:Command, subCommandName:String),
     noSuchOption(command:Command, optionName:String),
     optionRequiresArgument(command:Command, option:Option)
 }
 
-// MARK: Command
 
 /**
  Encapsulates a command sent to your Swift program.
@@ -145,96 +142,3 @@ extension Command {
 public func ==(lhs: Command, rhs: Command) -> Bool {
     return lhs.name == rhs.name
 }
-
-
-// MARK: Option
-
-/**
- Arguments that are optional when running the command.
- Come after the command name and before any required arguments.
- To make an option model, conform to this protocol.
- */
-public protocol Option {
-    
-    /**
-     Used for specifying the option in short form when running the associated command,
-     and the option's name in the usage information.
-     Must not contain spaces. 
-     Do not include dashes, these will be added for you.
-     */
-    //var shortName : Character { get }
-    
-    /**
-     Used for specifying the option in long form when running the associated command,
-     and the option's name in the usage information.
-     Must not contain spaces.
-     Do not include dashes, these will be added for you.
-     
-     Must be unique for the command.
-     */
-    var name : String { get }
-    
-    /**
-     Will be set to true if the option was specified when the command was run.
-     In your Option model, in normal cases you should set this value to false.
-     If you want though, you could set it to true to always have this option added
-     regardless of user input.
-     */
-    var set : Bool { get set }
-}
-
-public extension Option {
-    
-//    var shortFormName : Character {
-//        return "-\(shortName)"
-//    }
-    
-    var longFormName : String {
-        return "--\(name)"
-    }
-    
-}
-
-/**
- For options that would be used as,  yourcommandname --youroptionname=<arg>
- For example, make --directory=/mydir/mysubdir/
- */
-public protocol OptionWithArgument : Option {
-    
-    /**
-     Used when printing usage info.
-     */
-    var argumentName : String { get }
-    
-    /**
-     The value of the option's argument when set at command runtime.
-     */
-    var value : String? { get set }
-}
-
-
-// MARK: Argument
-
-/**
- A required argument when running the associated command. 
- Must come after any options when running the command.
- To make an argument model, conform to this protocol.
- */
-public protocol Argument {
-    
-    /**
-     Printed in usage information.
-     
-     Must be unique for the command.
-     */
-    var name : String { get }
-    
-    /**
-     The value of the argument at command runtime.
-     Normally, you should set this to nil in your Argument model.
-     However you can also set it to a default value that will be used if the user
-     does not supply the argument.
-     */
-    var value : String? { get set }
-}
-

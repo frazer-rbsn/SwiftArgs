@@ -21,6 +21,11 @@ public enum ParserError : Error {
         noSuchSubCommand(command:Command, subCommandName:String)
 }
 
+public protocol CommandParserDelegate {
+    func commandNotSupplied()
+    func receivedCommand(command : Command)
+}
+
 public class CommandParser : HasDebugMode {
 
     internal var commands : [Command] = []
@@ -259,8 +264,8 @@ public class CommandParser : HasDebugMode {
         return string.contains("=")
     }
     
-    func getOptionArgument(_ string : String) -> String? {
-        return string.components(separatedBy: "=").last
+    func getOptionArgument(_ string : String) -> String {
+        return string.components(separatedBy: "=").last!
     }
     
     
