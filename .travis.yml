@@ -3,6 +3,6 @@ osx_image: xcode8
 
 script:
   - swift package generate-xcodeproj
-  - xcodebuild -scheme SwiftCommandLineKit -sdk macosx -enableCodeCoverage YES test
+  - xcodebuild -scheme SwiftArgs -sdk macosx -enableCodeCoverage YES test
 after_success: 
   - bash <(curl -s https://codecov.io/bash)
