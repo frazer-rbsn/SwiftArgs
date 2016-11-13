@@ -17,7 +17,7 @@ public enum ParserError : Error {
         optionNotAllowedHere(command : Command, option : String),
         requiresArguments(Command),
         invalidArguments(Command),
-        noArgumentsOrSubCommands(Command),
+        invalidArgumentOrSubCommand(Command),
         noSuchSubCommand(command:Command, subCommandName:String)
 }
 
@@ -145,10 +145,10 @@ public class CommandParser : HasDebugMode {
             printUsageFor(command)
             throw ParserError.invalidArguments(command)
             
-        } catch ParserError.noArgumentsOrSubCommands(let command) {
+        } catch ParserError.invalidArgumentOrSubCommand(let command) {
             printHelp("Error: command \'\(command.name)\' does not take arguments nor does it have any subcommands.")
             printUsageFor(command)
-            throw ParserError.noArgumentsOrSubCommands(command)
+            throw ParserError.invalidArgumentOrSubCommand(command)
             
         } catch CommandError.noSuchSubCommand(let command, let subCommandName) {
             printHelp("Error: command \'\(command.name)\' has no subcommand: \'\(subCommandName)\'")
@@ -183,37 +183,22 @@ public class CommandParser : HasDebugMode {
     private func parseCommandTokens(_ c : Command, tokens : [String]) throws -> (command : Command, remainingTokens : [String]) {
         var command = c
         var remainingTokens = tokens
-        
         // Options
         if isLongformOption(tokens[0]) {
             guard command.hasOptions else { throw ParserError.noOptions(command) }
             (command, remainingTokens) = try parseCommandOptions(command, tkns: remainingTokens)
         }
-        
-        if remainingTokens.isEmpty {
-            guard !command.hasRequiredArguments else { throw ParserError.requiresArguments(command) }
-            return (command, remainingTokens)
-        }
-        
         // Arguments
         if command.hasRequiredArguments {
             (command, remainingTokens) = try parseCommandArguments(command, tkns: remainingTokens)
             guard command.allArgumentsSet else { throw ParserError.invalidArguments(command) }
-        } else {
-            guard command is CommandWithSubCommands else { throw ParserError.noArgumentsOrSubCommands(command) }
         }
-        
-        if remainingTokens.isEmpty {
-            return (command, remainingTokens)
+        // SubCommands
+        if let c = command as? CommandWithSubCommands {
+            (command, remainingTokens) = try parseSubCommand(c, tkns: remainingTokens)
         }
-        
-        // Subcommands
-        if var c = command as? CommandWithSubCommands {
-            var subCommand = try c.getSubCommand(name: remainingTokens[0])
-            (subCommand, remainingTokens) = try parseCommand(subCommand, tokens: remainingTokens)
-            c.usedSubCommand = subCommand
-            return (c, remainingTokens)
-        } else { throw ParserError.invalidArguments(command) } // Unexpected arguments
+        guard remainingTokens.isEmpty else { throw ParserError.invalidArgumentOrSubCommand(command) }
+        return (command, remainingTokens)
     }
     
     private func parseCommandOptions(_ c : Command, tkns : [String]) throws -> (command: Command, remainingTokens : [String]) {
@@ -244,6 +229,15 @@ public class CommandParser : HasDebugMode {
         return (command, tokens)
     }
     
+    private func parseSubCommand(_ c : CommandWithSubCommands, tkns : [String]) throws -> (command: Command, remainingTokens : [String]) {
+        var command = c
+        var tokens = tkns
+        var subCommand = try command.getSubCommand(name: tokens[0])
+        (subCommand, tokens) = try parseCommand(subCommand, tokens: tokens)
+        command.usedSubCommand = subCommand
+        return (command, tokens)
+    }
+    
     private func getCommand(_ name : String) throws -> Command {
         guard let c = commands.filter({ $0.name == name }).first else { throw ParserError.noSuchCommand(name) }
         return c
@@ -265,7 +259,7 @@ public class CommandParser : HasDebugMode {
     func optionHasArgument(_ string : String) -> Bool {
         return string.contains("=")
     }
-    
+
     func getOptionArgument(_ string : String) -> String {
         return string.components(separatedBy: "=").last!
     }

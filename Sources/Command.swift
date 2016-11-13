@@ -15,7 +15,7 @@ public enum CommandError : Error {
 
 /**
  Encapsulates a command sent to your Swift program.
- To make a command model, conform to this protocol.
+ To make a standard command model, conform to this protocol.
  */
 public protocol Command {
     
@@ -31,15 +31,16 @@ public protocol Command {
     var helptext : String { get }
     
     /**
-     The options that can be used when running the command. Order does not matter here.
-     Options are not required. Options are used BEFORE any of the command's
+     The options that can be used when running the command. Options are not required.
+     Options are used BEFORE any of the command's
      required arguments in the command line, if it has any.
+     Order does not matter here.
      */
     var options : [Option] { get set }
     
     /**
      The required arguments to be used when running the command.
-     Set these arguments in the order that you require them in.
+     Arguments are positional, so set them in the preferred order.
      Arguments come AFTER any options in the command line.
      */
     var arguments : [Argument] { get set }
@@ -116,11 +117,21 @@ protocol RunnableCommand : Command {
 
 /**
  So I heard you like commands...
+ 
  In the command line, subcommands can be used after a command. The subcommand must come AFTER any required arguments
  the command has.
  
  Subcommands are themselves Commands and the command logic is recursive, i.e. subcommands
  are processed in the same way as commands. They too can have options and required arguments.
+ Chaining commands like this can be useful for more complex operations, or reusable command models.
+ 
+ For example, you could have a Command model called "NewCommand" with the name "new". You could
+ reuse this command as a subcommand, e.g:-
+ ````
+ file new
+ project new
+ ````
+ Where `file` and `project` are commands, and your `new` command is a subcommand for both.
  */
 protocol CommandWithSubCommands : Command {
     

@@ -211,7 +211,7 @@ class ParserRuntimeTests : XCTestCase {
         let parser = CommandParser()
         let cmd = MockCommand(name: "generate", args: [])
         try! parser.addCommand(cmd)
-        AssertThrows(expectedError: ParserError.noArgumentsOrSubCommands(cmd),
+        AssertThrows(expectedError: ParserError.invalidArgumentOrSubCommand(cmd),
                      try parser.parse(arguments: ["generate", "arg"]))
     }
     
@@ -249,7 +249,7 @@ class ParserRuntimeTests : XCTestCase {
         let arg = MockArgument()
         let cmd = MockCommand(name: "generate", args: [arg])
         try! parser.addCommand(cmd)
-        AssertThrows(expectedError: ParserError.invalidArguments(cmd),
+        AssertThrows(expectedError: ParserError.invalidArgumentOrSubCommand(cmd),
                      try parser.parse(arguments: ["generate", "arg1", "arg2"]))
     }
     
@@ -259,7 +259,7 @@ class ParserRuntimeTests : XCTestCase {
         let subcmd = MockCommand(name: "subcommand", args: [subcmdarg])
         let cmd = MockCommandWithSubCommand(name: "command", subCommands: [subcmd])
         try! parser.addCommand(cmd)
-        AssertThrows(expectedError: ParserError.invalidArguments(cmd), //TODO: Should reflect that invalid arguments are for the subcommand
+        AssertThrows(expectedError: ParserError.invalidArgumentOrSubCommand(cmd), //TODO: Should reflect that invalid arguments are for the subcommand
                      try parser.parse(arguments: ["command", "subcommand", "mockargvalue", "somethingelse"]))
     }
     
