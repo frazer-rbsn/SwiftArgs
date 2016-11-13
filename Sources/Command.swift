@@ -43,49 +43,25 @@ public protocol Command {
      Arguments come AFTER any options in the command line.
      */
     var arguments : [Argument] { get set }
-    
-    /**
-     So I heard you like commands...
-     In the command line, subcommands can be used after a command. The subcommand must come AFTER any required arguments
-     the command has.
-     
-     Subcommands are themselves Commands and the command logic is recursive, i.e. subcommands 
-     are processed in the same way as commands. They too can have options and required arguments.
-     
-     This property says which subcommands the user can use on this command. The user can only pick one,
-     or none at all.
-     The subcommand that is used at runtime is set in `usedSubCommand`.
-     */
-    var subCommands : [Command] { get set }
-    
-    /**
-     If a subcommand was sent to the parser with this command, it will be stored in this property.
-    */
-    var usedSubCommand : Command? { get set }
-    
-    /**
-     Make the command grow legs and begin a light jog.
-     Or whatever you want it to do.
-     */
-    func run()
+
 }
 
 extension Command {
-
+    
     public var optionNames : [String] {
         return options.map() { $0.name }
     }
     
     /**
      Option names with the "--" prefix.
-    */
+     */
     public var optionLongForms : [String] {
         return options.map() { "--" + $0.name }
     }
     
     /**
      Options that were used with the command at runtime.
-    */
+     */
     public var usedOptions : [Option] {
         return options.filter( { $0.set == true })
     }
@@ -117,7 +93,7 @@ extension Command {
     internal var hasRequiredArguments : Bool {
         return !arguments.isEmpty
     }
-
+    
     internal var argumentNames : [String] {
         return arguments.map() { $0.name }
     }
@@ -126,17 +102,50 @@ extension Command {
         let flags = arguments.map() { $0.value != nil }
         return !flags.contains(where: { $0 == false })
     }
+}
+
+protocol RunnableCommand : Command {
     
-    internal var hasSubCommands : Bool {
-        return !subCommands.isEmpty
-    }
+    /**
+     Make the command grow legs and begin a light jog.
+     Or whatever you want it to do.
+     */
+    func run()
+
+}
+
+/**
+ So I heard you like commands...
+ In the command line, subcommands can be used after a command. The subcommand must come AFTER any required arguments
+ the command has.
+ 
+ Subcommands are themselves Commands and the command logic is recursive, i.e. subcommands
+ are processed in the same way as commands. They too can have options and required arguments.
+ */
+protocol CommandWithSubCommands : Command {
+    
+
+    /**
+     This property says which subcommands the user can use on this command. The user can only pick one,
+     or none at all.
+     The subcommand that was used at runtime, if any, is set in `usedSubCommand`.
+    */
+    var subCommands : [Command] { get set }
+    
+    /**
+     If a subcommand was sent to the parser with this command, it will be stored in this property.
+     */
+    var usedSubCommand : Command? { get set }
+    
+}
+
+extension CommandWithSubCommands {
     
     internal func getSubCommand(name : String) throws -> Command {
         guard let c = subCommands.filter({ $0.name == name }).first
             else { throw CommandError.noSuchSubCommand(command: self, subCommandName: name) }
         return c
     }
-    
 }
 
 public func ==(lhs: Command, rhs: Command) -> Bool {

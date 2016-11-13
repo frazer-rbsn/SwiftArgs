@@ -15,7 +15,7 @@ class CommandValidationTests: XCTestCase {
     // MARK: Valid scenarios
     
     func testAddValidCommand() {
-        let cmd = MockCommand(name: "mockcommand", helptext: "Blah blah!",
+        let cmd = MockCommand(name: "mockcommandFOO", helptext: "Blah blah!",
                               args: [MockArgument()], options: [MockOption(), MockOptionWithArgument()])
         let parser = CommandParser()
         try! parser.addCommand(cmd)

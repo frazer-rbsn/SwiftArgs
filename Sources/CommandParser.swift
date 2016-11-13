@@ -200,7 +200,7 @@ public class CommandParser : HasDebugMode {
             (command, remainingTokens) = try parseCommandArguments(command, tkns: remainingTokens)
             guard command.allArgumentsSet else { throw ParserError.invalidArguments(command) }
         } else {
-            guard command.hasSubCommands else { throw ParserError.noArgumentsOrSubCommands(command) }
+            guard command is CommandWithSubCommands else { throw ParserError.noArgumentsOrSubCommands(command) }
         }
         
         if remainingTokens.isEmpty {
@@ -208,10 +208,12 @@ public class CommandParser : HasDebugMode {
         }
         
         // Subcommands
-        var subCommand = try command.getSubCommand(name: remainingTokens[0])
-        (subCommand, remainingTokens) = try parseCommand(subCommand, tokens: remainingTokens)
-        command.usedSubCommand = subCommand
-        return (command, remainingTokens)
+        if var c = command as? CommandWithSubCommands {
+            var subCommand = try c.getSubCommand(name: remainingTokens[0])
+            (subCommand, remainingTokens) = try parseCommand(subCommand, tokens: remainingTokens)
+            c.usedSubCommand = subCommand
+            return (c, remainingTokens)
+        } else { throw ParserError.invalidArguments(command) } // Unexpected arguments
     }
     
     private func parseCommandOptions(_ c : Command, tkns : [String]) throws -> (command: Command, remainingTokens : [String]) {

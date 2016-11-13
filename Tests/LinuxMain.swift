@@ -1,6 +1,6 @@
 import XCTest
-@testable import SwiftCommandLineKitTests
+@testable import SwiftArgsTests
 
 XCTMain([
-     testCase(ParserTests.allTests),
+     testCase(ParserRuntimeTests.allTests),
 ])

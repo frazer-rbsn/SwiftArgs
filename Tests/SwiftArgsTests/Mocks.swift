@@ -6,19 +6,38 @@ class MockCommand : Command {
     var helptext = "Mock help text"
     var options : [Option] = []
     var arguments : [Argument] = []
+    
+    init(name : String = "mockcommand", helptext : String = "Mock help text",
+         args : [Argument] = [], options : [Option] = []) {
+        self.name = name
+        self.helptext = helptext
+        self.arguments = args
+        self.options = options
+    }
+}
+
+class MockCommandWithSubCommand : MockCommand, CommandWithSubCommands {
+    
     var subCommands: [Command] = []
     var usedSubCommand: Command?
     
     init(name : String = "mockcommand", helptext : String = "Mock help text",
-         subCommands : [Command] = [], args : [Argument] = [], options : [Option] = []) {
+         args : [Argument] = [], options : [Option] = [],
+         subCommands : [Command] = []) {
+        super.init()
         self.name = name
         self.helptext = helptext
-        self.subCommands = subCommands
         self.arguments = args
         self.options = options
+        self.subCommands = subCommands
     }
-    
-    func run() {}
+}
+
+class MockSubCommand : Command {
+    var name = "subcommand"
+    var helptext = "Mock help text"
+    var options : [Option] = []
+    var arguments : [Argument] = []
 }
 
 class MockOption : Option {

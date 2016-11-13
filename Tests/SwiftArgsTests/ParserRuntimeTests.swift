@@ -94,11 +94,11 @@ class ParserRuntimeTests : XCTestCase {
         let parser = CommandParser()
         let subcmdarg = MockArgument()
         let subcmd = MockCommand(name: "subcommand", args: [subcmdarg])
-        let cmd = MockCommand(name: "command", subCommands: [subcmd])
+        let cmd = MockCommandWithSubCommand(name: "command", subCommands: [subcmd])
         try! parser.addCommand(cmd)
         let delegate = MockCommandParserDelegate()
         try! parser.parse(arguments: ["command", "subcommand", "subcommandargvalue"], delegate: delegate)
-        let command = delegate.command!
+        let command = delegate.command! as! CommandWithSubCommands
         XCTAssert(command == cmd as Command)
         XCTAssertNotNil(command.usedSubCommand)
         XCTAssert(command.usedSubCommand! == subcmd as Command)
@@ -109,11 +109,11 @@ class ParserRuntimeTests : XCTestCase {
         let parser = CommandParser()
         let subcmd = MockCommand(name: "subcommand")
         let cmdarg = MockArgument()
-        let cmd = MockCommand(name: "command", subCommands: [subcmd], args: [cmdarg])
+        let cmd = MockCommandWithSubCommand(name: "command", args: [cmdarg], subCommands: [subcmd])
         try! parser.addCommand(cmd)
         let delegate = MockCommandParserDelegate()
         try! parser.parse(arguments: ["command", "commandargvalue", "subcommand"], delegate: delegate)
-        let command = delegate.command!
+        let command = delegate.command! as! CommandWithSubCommands
         XCTAssert(command == cmd as Command)
         XCTAssert(command.arguments[0].value! == "commandargvalue")
         XCTAssertNotNil(command.usedSubCommand)
@@ -125,11 +125,11 @@ class ParserRuntimeTests : XCTestCase {
         let subcmd = MockCommand(name: "subcommand")
         let cmdarg1 = MockArgument(name: "mockarg1")
         let cmdarg2 = MockArgument(name: "mockarg2")
-        let cmd = MockCommand(name: "command", subCommands: [subcmd], args: [cmdarg1, cmdarg2])
+        let cmd = MockCommandWithSubCommand(name: "command", args: [cmdarg1, cmdarg2], subCommands: [subcmd])
         try! parser.addCommand(cmd)
         let delegate = MockCommandParserDelegate()
         try! parser.parse(arguments: ["command", "arg1value", "arg2value", "subcommand"], delegate: delegate)
-        let command = delegate.command!
+        let command = delegate.command! as! CommandWithSubCommands
         XCTAssert(command == cmd as Command)
         XCTAssert(command.arguments[0].value! == "arg1value")
         XCTAssert(command.arguments[1].value! == "arg2value")
@@ -218,7 +218,7 @@ class ParserRuntimeTests : XCTestCase {
     func testSendOneArgWithCommandThatHasNoArgsNoSuchSubCommandThrows() {
         let parser = CommandParser()
         let subcmd = MockCommand(name: "foo")
-        let cmd = MockCommand(name: "generate", subCommands: [subcmd], args: [])
+        let cmd = MockCommandWithSubCommand(name: "generate", args: [], subCommands: [subcmd])
         try! parser.addCommand(cmd)
         AssertThrows(expectedError: ParserError.noSuchSubCommand(command: cmd, subCommandName: "bar"),
                      try parser.parse(arguments: ["generate", "bar"]))
@@ -249,7 +249,7 @@ class ParserRuntimeTests : XCTestCase {
         let arg = MockArgument()
         let cmd = MockCommand(name: "generate", args: [arg])
         try! parser.addCommand(cmd)
-        AssertThrows(expectedError: ParserError.noSuchSubCommand(command: cmd, subCommandName: "arg2"),
+        AssertThrows(expectedError: ParserError.invalidArguments(cmd),
                      try parser.parse(arguments: ["generate", "arg1", "arg2"]))
     }
     
@@ -257,9 +257,9 @@ class ParserRuntimeTests : XCTestCase {
         let parser = CommandParser()
         let subcmdarg = MockArgument()
         let subcmd = MockCommand(name: "subcommand", args: [subcmdarg])
-        let cmd = MockCommand(name: "command", subCommands: [subcmd])
+        let cmd = MockCommandWithSubCommand(name: "command", subCommands: [subcmd])
         try! parser.addCommand(cmd)
-        AssertThrows(expectedError: ParserError.noSuchSubCommand(command: cmd, subCommandName: "somethingelse"),
+        AssertThrows(expectedError: ParserError.invalidArguments(cmd), //TODO: Should reflect that invalid arguments are for the subcommand
                      try parser.parse(arguments: ["command", "subcommand", "mockargvalue", "somethingelse"]))
     }
     
