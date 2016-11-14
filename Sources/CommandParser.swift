@@ -22,7 +22,15 @@ public enum ParserError : Error {
 }
 
 public protocol CommandParserDelegate {
+    
+    /**
+     Called if there were no command line arguments supplied to your program.
+     */
     func commandNotSupplied()
+    
+    /**
+     Called if a command was parsed successfully.
+     */
     func receivedCommand(command : Command)
 }
 
@@ -48,14 +56,27 @@ public class CommandParser : HasDebugMode {
     public init() {}
     
     /**
-     Register a command with the parser, so that when the user supplies command line arguments 
+     Register commands with the parser, so that when the user supplies command line arguments
      to your program, they will be recognised and parsed into objects.
      
-     - parameter c: The command to be registered with the parser.
+     - throws:  `ParserError.duplicateCommand` if the command parser instance already has a
+                command registered with the same name as a command.
+                Or `CommandModelError.invalidCommand` if a command model or
+                any of it's option or argument models is invalid.
+     */
+    public func addCommands(_ commands : Command...) throws {
+        for c in commands {
+            try addCommand(c)
+        }
+    }
+    
+    /**
+     Register a command with the parser, so that when the user supplies command line arguments
+     to your program, they will be recognised and parsed into objects.
      
      - throws:  `ParserError.duplicateCommand` if the command parser instance already has a
                 command registered with the same name as the command.
-                Or `CommandValidator.ModelError.invalidCommand` if the command model or 
+                Or `CommandModelError.invalidCommand` if the command model or
                 any of it's option or argument models is invalid.
      */
     public func addCommand(_ c : Command) throws {
@@ -73,8 +94,9 @@ public class CommandParser : HasDebugMode {
     
     /**
      Parses the input from the CommandLine.
-     - throws:  `ParserError` if no commands are registered or there is a problem with
-                parsing the command, or invalid arguments were supplied.
+     
+     - throws:  Errors of type `ParserError` if no commands are registered, or there 
+                is a problem with parsing the command, or invalid arguments were supplied.
      */
     public func parseCommandLine(delegate : CommandParserDelegate?) throws {
         return try parse(arguments: CommandLine.argumentsWithoutFilename, delegate: delegate)
@@ -86,10 +108,14 @@ public class CommandParser : HasDebugMode {
     
     /**
      Parses the supplied input.
-     - parameter args: The arguments to be parsed.
      
-     - throws:  `ParserError` if no commands are registered or there is a problem with 
-                parsing the command, or invalid arguments were supplied.
+     - parameter arguments: The arguments to be parsed.
+     - parameter delegate:  If a command is successfully parsed, the delegate's `receivedCommand` func
+                            will be called. If the user doesn't supply a command, the delegate's
+                            `commandNotSupplied` func will be called.
+     
+     - throws:  Errors of type `ParserError` if no commands are registered, or there
+                is a problem with parsing the command, or invalid arguments were supplied.
     */
     public func parse(arguments : [String], delegate : CommandParserDelegate?) throws {
         

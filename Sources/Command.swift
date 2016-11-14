@@ -6,7 +6,7 @@
 //  Copyright © 2016 Frazer Robinson. All rights reserved.
 //
 
-public enum CommandError : Error {
+internal enum CommandError : Error {
     case noSuchSubCommand(command:Command, subCommandName:String),
     noSuchOption(command:Command, optionName:String),
     optionRequiresArgument(command:Command, option:Option)
@@ -14,7 +14,7 @@ public enum CommandError : Error {
 
 
 /**
- Encapsulates a command sent to your Swift program.
+ Encapsulates a command sent to your program.
  To make a standard command model, conform to this protocol.
  */
 public protocol Command {

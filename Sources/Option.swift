@@ -8,7 +8,7 @@
 
 /**
  Arguments that are optional when running the command.
- Come after the command name and before any required arguments.
+ They are positioned after the command name and before any required arguments.
  To make an option model, conform to this protocol.
  */
 public protocol Option {
@@ -26,13 +26,12 @@ public protocol Option {
      and the option's name in the usage information.
      Must not contain spaces.
      Do not include dashes, these will be added for you.
-     
      Must be unique for the command.
      */
     var name : String { get }
     
     /**
-     Will be set to true if the option was specified when the command was run.
+     Will be set to `true` if the option was specified when the command was run.
      In your Option model, in normal cases you should set this value to false.
      If you want though, you could set it to true to always have this option added
      regardless of user input.
@@ -46,6 +45,9 @@ public extension Option {
     //        return "-\(shortName)"
     //    }
     
+    /**
+     The option name with the "--" prefix.
+     */
     var longFormName : String {
         return "--\(name)"
     }
@@ -53,13 +55,21 @@ public extension Option {
 }
 
 /**
- For options that would be used as,  yourcommandname --youroptionname=<arg>
- For example, make --directory=/mydir/mysubdir/
+ Options that require a value to be passed to them when used.
+ Used as, for example:
+ ````
+ yourcommandname --youroptionname=<arg>
+ ````
+ ````
+ make --directory=/mydir/mysubdir/
+ ````
  */
 public protocol OptionWithArgument : Option {
     
     /**
      Used when printing usage info.
+     Must not contain spaces.
+     Must be unique for the command.
      */
     var argumentName : String { get }
     
