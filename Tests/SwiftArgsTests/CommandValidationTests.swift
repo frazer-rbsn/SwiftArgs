@@ -15,15 +15,15 @@ class CommandValidationTests: XCTestCase {
     // MARK: Valid scenarios
     
     func testAddValidCommand() {
-        let cmd = MockCommand(name: "mockcommandFOO", helptext: "Blah blah!",
-                              args: [MockArgument()], options: [MockOption(), MockOptionWithArgument()])
+        let cmd = MockCommandWithOptions(name: "mockcommandFOO", helptext: "Blah blah!",
+                              options: [MockOption(), MockOptionWithArgument()], arguments: [MockArgument()])
         let parser = CommandParser()
         try! parser.addCommand(cmd)
         XCTAssert(parser.commands.contains(where: { $0 == cmd }))
     }
     
     func testAddValidCommandWithTwoOptions() {
-        let cmd = MockCommand(name: "mockcommand", helptext: "Blah blah!",
+        let cmd = MockCommandWithOptions(name: "mockcommand", helptext: "Blah blah!",
                               options: [MockOption(name:"op1"),
                                         MockOption(name:"op2")])
         let parser = CommandParser()
@@ -33,17 +33,17 @@ class CommandValidationTests: XCTestCase {
     
     func testAddValidCommandWithTwoArgs() {
         let cmd = MockCommand(name: "mockcommand", helptext: "Blah blah!",
-                              args: [MockArgument(name:"mockarg1"), MockArgument(name:"mockarg2")])
+                              arguments: [MockArgument(name:"mockarg1"), MockArgument(name:"mockarg2")])
         let parser = CommandParser()
         try! parser.addCommand(cmd)
         XCTAssert(parser.commands.contains(where: { $0 == cmd }))
     }
     
     func testAddValidCommandWithOneOptionAndOneOptionWithArgAndOneArg() {
-        let cmd = MockCommand(name: "mockcommand", helptext: "Blah blah!",
-                              args: [MockArgument(name:"mockarg")],
+        let cmd = MockCommandWithOptions(name: "mockcommand", helptext: "Blah blah!",
                               options: [MockOption(name:"op"),
-                                        MockOptionWithArgument(name:"opwitharg")])
+                                        MockOptionWithArgument(name:"opwitharg")],
+                                      arguments: [MockArgument(name:"mockarg")])
         let parser = CommandParser()
         try! parser.addCommand(cmd)
         XCTAssert(parser.commands.contains(where: { $0 == cmd }))
@@ -78,7 +78,7 @@ class CommandValidationTests: XCTestCase {
     func testEmptyOptionNameThrows() {
         let parser = CommandParser()
         let op1 = MockOption(name:"")
-        let cmd = MockCommand(options: [op1])
+        let cmd = MockCommandWithOptions(options: [op1])
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
                      try parser.addCommand(cmd))
     }
@@ -86,7 +86,7 @@ class CommandValidationTests: XCTestCase {
     func testEmptyArgumentNameThrows() {
         let parser = CommandParser()
         let arg1 = MockArgument(name:"")
-        let cmd = MockCommand(args: [arg1])
+        let cmd = MockCommand(arguments: [arg1])
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
                      try parser.addCommand(cmd))
     }
@@ -95,7 +95,7 @@ class CommandValidationTests: XCTestCase {
         let parser = CommandParser()
         let op1 = MockOption(name:"option")
         let op2 = MockOption(name:"option")
-        let cmd = MockCommand(options: [op1, op2])
+        let cmd = MockCommandWithOptions(options: [op1, op2])
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
                      try parser.addCommand(cmd))
     }
@@ -104,7 +104,7 @@ class CommandValidationTests: XCTestCase {
         let parser = CommandParser()
         let arg1 = MockArgument(name:"arg")
         let arg2 = MockArgument(name:"arg")
-        let cmd = MockCommand(args: [arg1, arg2])
+        let cmd = MockCommand(arguments: [arg1, arg2])
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
                      try parser.addCommand(cmd))
     }
@@ -112,7 +112,7 @@ class CommandValidationTests: XCTestCase {
     func testOptionNameWithSpaceThrows() {
         let parser = CommandParser()
         let op1 = MockOption(name:"op tion")
-        let cmd = MockCommand(options: [op1])
+        let cmd = MockCommandWithOptions(options: [op1])
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
                      try parser.addCommand(cmd))
     }
@@ -120,7 +120,7 @@ class CommandValidationTests: XCTestCase {
     func testArgumentNameWithSpaceThrows() {
         let parser = CommandParser()
         let arg1 = MockArgument(name:"arg ument")
-        let cmd = MockCommand(args: [arg1])
+        let cmd = MockCommand(arguments: [arg1])
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
                      try parser.addCommand(cmd))
     }
@@ -128,7 +128,7 @@ class CommandValidationTests: XCTestCase {
     func testOptionNameWithHyphenThrows() {
         let parser = CommandParser()
         let op1 = MockOption(name:"op-tion")
-        let cmd = MockCommand(options: [op1])
+        let cmd = MockCommandWithOptions(options: [op1])
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
                      try parser.addCommand(cmd))
     }
@@ -136,7 +136,7 @@ class CommandValidationTests: XCTestCase {
     func testArgumentNameWithHyphenThrows() {
         let parser = CommandParser()
         let arg1 = MockArgument(name:"arg-ument")
-        let cmd = MockCommand(args: [arg1])
+        let cmd = MockCommand(arguments: [arg1])
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
                      try parser.addCommand(cmd))
     }

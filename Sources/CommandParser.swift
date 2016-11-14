@@ -211,8 +211,8 @@ public class CommandParser : HasDebugMode {
         var remainingTokens = tokens
         // Options
         if isLongformOption(tokens[0]) {
-            guard command.hasOptions else { throw ParserError.noOptions(command) }
-            (command, remainingTokens) = try parseCommandOptions(command, tkns: remainingTokens)
+            guard let c = command as? CommandWithOptions else { throw ParserError.noOptions(command) }
+            (command, remainingTokens) = try parseCommandOptions(c, tkns: remainingTokens)
         }
         // Arguments
         if command.hasRequiredArguments {
@@ -227,7 +227,7 @@ public class CommandParser : HasDebugMode {
         return (command, remainingTokens)
     }
     
-    private func parseCommandOptions(_ c : Command, tkns : [String]) throws -> (command: Command, remainingTokens : [String]) {
+    private func parseCommandOptions(_ c : CommandWithOptions, tkns : [String]) throws -> (command: Command, remainingTokens : [String]) {
         var command = c
         var tokens = tkns
         for t in tkns {

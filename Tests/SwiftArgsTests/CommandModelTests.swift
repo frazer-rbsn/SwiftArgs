@@ -15,7 +15,7 @@ class CommandModelTests: XCTestCase {
         let optionfoo = MockOption(name:"foo")
         let optionbar = MockOption(name:"bar")
         let optionbaz = MockOption(name:"baz")
-        let c = MockCommand(options:[optionfoo, optionbar, optionbaz])
+        let c = MockCommandWithOptions(options:[optionfoo, optionbar, optionbaz])
         XCTAssertEqual(try! c.getOption("bar").name, "bar")
     }
 
@@ -23,7 +23,7 @@ class CommandModelTests: XCTestCase {
         let optionfoo = MockOption(name:"foo")
         let optionbar = MockOption(name:"bar")
         let optionbaz = MockOption(name:"baz")
-        let c = MockCommand(options:[optionfoo, optionbar, optionbaz])
+        let c = MockCommandWithOptions(options:[optionfoo, optionbar, optionbaz])
         AssertThrows(expectedError: CommandError.noSuchOption(command: c, optionName: "fish"),
                      try c.getOption("fish"))
     }
@@ -32,7 +32,7 @@ class CommandModelTests: XCTestCase {
         let optionfoo = MockOption(name:"foo")
         let optionbar = MockOption(name:"bar")
         let optionbaz = MockOption(name:"baz")
-        var c = MockCommand(options:[optionfoo, optionbar, optionbaz])
+        var c = MockCommandWithOptions(options:[optionfoo, optionbar, optionbaz])
         AssertThrows(expectedError: CommandError.noSuchOption(command: c, optionName: "fish"),
                      try c.setOption("fish"))
     }

@@ -31,14 +31,6 @@ public protocol Command {
     var helptext : String { get }
     
     /**
-     The options that can be used when running the command. Options are not required.
-     Options are used BEFORE any of the command's
-     required arguments in the command line, if it has any.
-     Order does not matter here.
-     */
-    var options : [Option] { get set }
-    
-    /**
      The required arguments to be used when running the command.
      Arguments are positional, so set them in the preferred order.
      Arguments come AFTER any options in the command line.
@@ -48,6 +40,42 @@ public protocol Command {
 }
 
 extension Command {
+    
+    internal var hasRequiredArguments : Bool {
+        return !arguments.isEmpty
+    }
+    
+    internal var argumentNames : [String] {
+        return arguments.map() { $0.name }
+    }
+    
+    internal var allArgumentsSet : Bool {
+        let flags = arguments.map() { $0.value != nil }
+        return !flags.contains(where: { $0 == false })
+    }
+}
+
+protocol RunnableCommand : Command {
+    
+    /**
+     Make the command grow legs and begin a light jog.
+     Or whatever you want it to do.
+     */
+    func run()
+
+}
+
+protocol CommandWithOptions : Command {
+    /**
+     The options that can be used when running the command. Options are not required.
+     Options are used BEFORE any of the command's
+     required arguments in the command line, if it has any.
+     Order does not matter here.
+     */
+    var options : [Option] { get set }
+}
+
+extension CommandWithOptions {
     
     public var optionNames : [String] {
         return options.map() { $0.name }
@@ -90,31 +118,7 @@ extension Command {
         }
         options[i].set = true
     }
-    
-    internal var hasRequiredArguments : Bool {
-        return !arguments.isEmpty
-    }
-    
-    internal var argumentNames : [String] {
-        return arguments.map() { $0.name }
-    }
-    
-    internal var allArgumentsSet : Bool {
-        let flags = arguments.map() { $0.value != nil }
-        return !flags.contains(where: { $0 == false })
-    }
 }
-
-protocol RunnableCommand : Command {
-    
-    /**
-     Make the command grow legs and begin a light jog.
-     Or whatever you want it to do.
-     */
-    func run()
-
-}
-
 /**
  So I heard you like commands...
  

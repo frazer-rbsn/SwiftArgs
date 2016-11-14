@@ -20,80 +20,83 @@ struct CommandValidator : HasDebugMode {
     
     var debugMode : Bool
 
-    func validateCommand(_ c : Command) throws {
-        guard !c.name.contains(" ") else {
-            printDebug("Error: Invalid command model \'\(c)\'.")
-            printDebug("Command name: \'\(c.name)\'\nCommand names must not contain spaces.")
+    //TODO: Rename according to Swift API guidelines
+    func validateCommand(_ cmd: Command) throws {
+        guard !cmd.name.contains(" ") else {
+            printDebug("Error: Invalid command model \'\(cmd)\'.")
+            printDebug("Command name: \'\(cmd.name)\'\nCommand names must not contain spaces.")
             throw CommandModelError.invalidCommand
         }
-        guard c.name != "" else {
-            printDebug("Error: Invalid command model \'\(c)\'.")
-            printDebug("Command name: \'\(c.name)\'\nCommand name must not be empty.")
+        guard cmd.name != "" else {
+            printDebug("Error: Invalid command model \'\(cmd)\'.")
+            printDebug("Command name: \'\(cmd.name)\'\nCommand name must not be empty.")
             throw CommandModelError.invalidCommand
         }
-        try validateOptions(c)
-        try validateArguments(c)
-        if let cmd = c as? CommandWithSubCommands {
-            try validateSubCommands(cmd)
+        if let c = cmd as? CommandWithOptions {
+            try validateOptions(c)
+        }
+        try validateArguments(cmd)
+        if let c = cmd as? CommandWithSubCommands {
+            try validateSubCommands(c)
         }
     }
     
-    func validateOptions(_ c : Command) throws {
-        guard Set(c.optionNames).count == c.optionNames.count else {
-            printDebug("Error: Invalid options for command model \'\(c)\'.")
+    func validateOptions(_ cmd : CommandWithOptions) throws {
+        guard Set(cmd.optionNames).count == cmd.optionNames.count else {
+            printDebug("Error: Invalid options for command model \'\(cmd)\'.")
             printDebug("Two or more options have the same name.")
             throw CommandModelError.invalidCommand
         }
-        for o in c.options {
+        for o in cmd.options {
             guard !o.name.contains(" ") else {
-                printDebug("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
+                printDebug("Error: Invalid option model \'\(o)\' for command model \'\(cmd)\'.")
                 printDebug("Option names must not contain spaces.")
                 throw CommandModelError.invalidCommand
             }
             guard !o.name.contains("-") else {
-                printDebug("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
+                printDebug("Error: Invalid option model \'\(o)\' for command model \'\(cmd)\'.")
                 printDebug("Option names must not contain hyphens.")
                 throw CommandModelError.invalidCommand
             }
             guard o.name != "" else {
-                printDebug("Error: Invalid option model \'\(o)\' for command model \'\(c)\'.")
+                printDebug("Error: Invalid option model \'\(o)\' for command model \'\(cmd)\'.")
                 printDebug("Option names must not be empty.")
                 throw CommandModelError.invalidCommand
             }
         }
     }
     
-    func validateArguments(_ c : Command) throws {
-        guard Set(c.argumentNames).count == c.argumentNames.count else {
-            printDebug("Error: Invalid arguments for command model \'\(c)\'.")
+    func validateArguments(_ cmd : Command) throws {
+        guard Set(cmd.argumentNames).count == cmd.argumentNames.count else {
+            printDebug("Error: Invalid arguments for command model \'\(cmd)\'.")
             printDebug("Two or more arguments have the same name.")
             throw CommandModelError.invalidCommand
         }
-        for a in c.arguments {
+        for a in cmd.arguments {
             guard !a.name.contains(" ") else {
-                printDebug("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
+                printDebug("Error: Invalid argument model \'\(a)\' for command model \'\(cmd)\'.")
                 printDebug("Argument names must not contain spaces.")
                 throw CommandModelError.invalidCommand
             }
             guard !a.name.contains("-") else {
-                printDebug("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
+                printDebug("Error: Invalid argument model \'\(a)\' for command model \'\(cmd)\'.")
                 printDebug("Argument names must not contain hyphens.")
                 throw CommandModelError.invalidCommand
             }
             guard a.name != "" else {
-                printDebug("Error: Invalid argument model \'\(a)\' for command model \'\(c)\'.")
+                printDebug("Error: Invalid argument model \'\(a)\' for command model \'\(cmd)\'.")
                 printDebug("Argument names must not be empty.")
                 throw CommandModelError.invalidCommand
             }
         }
     }
     
-    func validateSubCommands(_ c : CommandWithSubCommands) throws {
-        guard !c.subCommands.isEmpty else {
-            printDebug("Error: Command model \(c) conforms to protocol CommandWithSubCommands. Property 'subCommands' must contain at least one subcommand")
+    func validateSubCommands(_ cmd : CommandWithSubCommands) throws {
+        guard !cmd.subCommands.isEmpty else {
+            printDebug("Error: Command model \(cmd) conforms to protocol CommandWithSubCommands. Property 'subCommands' must contain at least one subcommand")
             throw CommandModelError.invalidCommand
         }
-        for subcmd in c.subCommands {
+        for subcmd in cmd.subCommands {
             try validateCommand(subcmd)
         }
     }

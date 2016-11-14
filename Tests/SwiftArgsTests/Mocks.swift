@@ -1,43 +1,44 @@
 
 @testable import SwiftArgs
 
+
 class MockCommand : Command {
     var name = "mockcommand"
     var helptext = "Mock help text"
-    var options : [Option] = []
-    var arguments : [Argument] = []
+    var arguments: [Argument] = []
     
-    init(name : String = "mockcommand", helptext : String = "Mock help text",
-         args : [Argument] = [], options : [Option] = []) {
+    init(name : String = "mockcommand", helptext : String = "Mock help text", arguments: [Argument] = []) {
         self.name = name
         self.helptext = helptext
-        self.arguments = args
+        self.arguments = arguments
+    }
+}
+
+class MockCommandWithOptions : MockCommand, CommandWithOptions {
+    var options : [Option] = []
+    
+    init(name : String = "mockcommand", helptext : String = "Mock help text",
+         options : [Option] = [], arguments : [Argument] = []) {
+        super.init()
+        self.name = name
+        self.helptext = helptext
         self.options = options
+        self.arguments = arguments
     }
 }
 
 class MockCommandWithSubCommand : MockCommand, CommandWithSubCommands {
-    
     var subCommands: [Command] = []
     var usedSubCommand: Command?
     
     init(name : String = "mockcommand", helptext : String = "Mock help text",
-         args : [Argument] = [], options : [Option] = [],
-         subCommands : [Command] = []) {
+         arguments : [Argument] = [], subCommands : [Command] = []) {
         super.init()
         self.name = name
         self.helptext = helptext
-        self.arguments = args
-        self.options = options
+        self.arguments = arguments
         self.subCommands = subCommands
     }
-}
-
-class MockSubCommand : Command {
-    var name = "subcommand"
-    var helptext = "Mock help text"
-    var options : [Option] = []
-    var arguments : [Argument] = []
 }
 
 class MockOption : Option {
