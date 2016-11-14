@@ -43,13 +43,15 @@ public struct UsageInfoPrinter {
     
     private func _printCommandUsage(_ cmd : Command) {
         print("    \(cmd.name)", terminator:" ")
-        if let c = cmd as? CommandWithOptions{
+        if let c = cmd as? CommandWithOptions {
             for o in c.options {
                 print("[\(o.longFormName)", terminator:"] ")
             }
         }
-        for a in cmd.arguments {
-            print("<\(a.name)>", terminator: " ")
+        if let c = cmd as? CommandWithArguments {
+            for a in c.arguments {
+                print("<\(a.name)>", terminator: " ")
+            }
         }
     }
 }

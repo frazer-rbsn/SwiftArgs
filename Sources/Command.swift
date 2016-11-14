@@ -29,30 +29,6 @@ public protocol Command {
      Usage information for end users.
      */
     var helptext : String { get }
-    
-    /**
-     The required arguments to be used when running the command.
-     Arguments are positional, so set them in the preferred order.
-     Arguments come AFTER any options in the command line.
-     */
-    var arguments : [Argument] { get set }
-
-}
-
-extension Command {
-    
-    internal var hasRequiredArguments : Bool {
-        return !arguments.isEmpty
-    }
-    
-    internal var argumentNames : [String] {
-        return arguments.map() { $0.name }
-    }
-    
-    internal var allArgumentsSet : Bool {
-        let flags = arguments.map() { $0.value != nil }
-        return !flags.contains(where: { $0 == false })
-    }
 }
 
 protocol RunnableCommand : Command {
@@ -119,6 +95,30 @@ extension CommandWithOptions {
         options[i].set = true
     }
 }
+
+
+protocol CommandWithArguments : Command {
+    /**
+     The required arguments to be used when running the command.
+     Arguments are positional, so set them in the preferred order.
+     Arguments come AFTER any options in the command line.
+     */
+    var arguments : [Argument] { get set }
+}
+
+extension CommandWithArguments {
+
+    internal var argumentNames : [String] {
+        return arguments.map() { $0.name }
+    }
+    
+    internal var allArgumentsSet : Bool {
+        let flags = arguments.map() { $0.value != nil }
+        return !flags.contains(where: { $0 == false })
+    }
+}
+
+
 /**
  So I heard you like commands...
  

@@ -35,7 +35,9 @@ struct CommandValidator : HasDebugMode {
         if let c = cmd as? CommandWithOptions {
             try validateOptions(c)
         }
-        try validateArguments(cmd)
+        if let c = cmd as? CommandWithArguments {
+            try validateArguments(c)
+        }
         if let c = cmd as? CommandWithSubCommands {
             try validateSubCommands(c)
         }
@@ -70,7 +72,7 @@ struct CommandValidator : HasDebugMode {
         }
     }
     
-    func validateArguments(_ cmd : Command) throws {
+    func validateArguments(_ cmd : CommandWithArguments) throws {
         guard Set(cmd.argumentNames).count == cmd.argumentNames.count else {
             printDebug("Error: Invalid arguments for command model \'\(cmd)\'.")
             printDebug("Two or more arguments have the same name.")

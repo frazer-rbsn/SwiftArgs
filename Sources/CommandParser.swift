@@ -198,7 +198,7 @@ public class CommandParser : HasDebugMode {
         remainingTokens.remove(at: 0) // Remove command name
         
         if remainingTokens.isEmpty {
-            guard !command.hasRequiredArguments else { throw ParserError.requiresArguments(command) }
+            guard !(command is CommandWithArguments) else { throw ParserError.requiresArguments(command) }
             return (command, remainingTokens)
         }
         
@@ -215,9 +215,9 @@ public class CommandParser : HasDebugMode {
             (command, remainingTokens) = try parseCommandOptions(c, tkns: remainingTokens)
         }
         // Arguments
-        if command.hasRequiredArguments {
-            (command, remainingTokens) = try parseCommandArguments(command, tkns: remainingTokens)
-            guard command.allArgumentsSet else { throw ParserError.invalidArguments(command) }
+        if let c = command as? CommandWithArguments {
+            (command, remainingTokens) = try parseCommandArguments(c, tkns: remainingTokens)
+            guard (command as! CommandWithArguments).allArgumentsSet else { throw ParserError.invalidArguments(command) }
         }
         // SubCommands
         if let c = command as? CommandWithSubCommands {
@@ -243,7 +243,7 @@ public class CommandParser : HasDebugMode {
         return (command, tokens)
     }
     
-    private func parseCommandArguments(_ c : Command, tkns : [String]) throws -> (command: Command, remainingTokens : [String])  {
+    private func parseCommandArguments(_ c : CommandWithArguments, tkns : [String]) throws -> (command: Command, remainingTokens : [String])  {
         var command = c
         var tokens = tkns
         for var arg in command.arguments {

@@ -1,44 +1,50 @@
-
 @testable import SwiftArgs
 
-
 class MockCommand : Command {
-    var name = "mockcommand"
-    var helptext = "Mock help text"
-    var arguments: [Argument] = []
-    
-    init(name : String = "mockcommand", helptext : String = "Mock help text", arguments: [Argument] = []) {
-        self.name = name
-        self.helptext = helptext
-        self.arguments = arguments
-    }
+    var name : String = "mockcommand"
+    var helptext: String = "mockcommand help text"
 }
 
 class MockCommandWithOptions : MockCommand, CommandWithOptions {
-    var options : [Option] = []
-    
-    init(name : String = "mockcommand", helptext : String = "Mock help text",
-         options : [Option] = [], arguments : [Argument] = []) {
-        super.init()
-        self.name = name
-        self.helptext = helptext
-        self.options = options
-        self.arguments = arguments
-    }
+    var options: [Option] = [MockOption()]
 }
 
-class MockCommandWithSubCommand : MockCommand, CommandWithSubCommands {
-    var subCommands: [Command] = []
-    var usedSubCommand: Command?
-    
-    init(name : String = "mockcommand", helptext : String = "Mock help text",
-         arguments : [Argument] = [], subCommands : [Command] = []) {
-        super.init()
-        self.name = name
-        self.helptext = helptext
-        self.arguments = arguments
-        self.subCommands = subCommands
-    }
+class MockCommandWithArguments : MockCommand, CommandWithArguments {
+    var arguments: [Argument] = [MockArgument()]
+}
+
+class MockCommandWithOptionsAndArguments : MockCommand, CommandWithOptions, CommandWithArguments {
+    var options: [Option] = [MockOption()]
+    var arguments: [Argument] = [MockArgument()]
+}
+
+class MockSubCommand : Command {
+    var name : String = "mocksubcommand"
+    var helptext: String = "mocksubcommand help text"
+}
+
+class MockCommandWithSubCommands : MockCommand, CommandWithSubCommands {
+    var subCommands: [Command] = [MockSubCommand()]
+    var usedSubCommand: Command? = nil
+}
+
+class MockCommandWithOptionsAndSubCommands : MockCommand, CommandWithOptions, CommandWithSubCommands {
+    var options: [Option] = [MockOption()]
+    var subCommands: [Command] = [MockSubCommand()]
+    var usedSubCommand: Command? = nil
+}
+
+class MockCommandWithArgumentsAndSubCommands : MockCommand, CommandWithArguments, CommandWithSubCommands {
+    var arguments: [Argument] = [MockArgument()]
+    var subCommands: [Command] = [MockSubCommand()]
+    var usedSubCommand: Command? = nil
+}
+
+class MockCommandWithOptionsAndArgumentsAndSubCommands : MockCommand, CommandWithOptions, CommandWithArguments, CommandWithSubCommands {
+    var options: [Option] = [MockOption()]
+    var arguments: [Argument] = [MockArgument()]
+    var subCommands: [Command] = [MockSubCommand()]
+    var usedSubCommand: Command? = nil
 }
 
 class MockOption : Option {
