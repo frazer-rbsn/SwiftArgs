@@ -42,6 +42,10 @@ struct CommandValidator : HasDebugMode {
     }
     
     func validateOptions(_ cmd : CommandWithOptions) throws {
+        guard !cmd.options.isEmpty else {
+            printDebug("Error: Command model \(cmd) conforms to protocol CommandWithOptions. Property 'options' must contain at least one option.")
+            throw CommandModelError.invalidCommand
+        }
         guard Set(cmd.optionNames).count == cmd.optionNames.count else {
             printDebug("Error: Invalid options for command model \'\(cmd)\'.")
             printDebug("Two or more options have the same name.")
@@ -93,7 +97,7 @@ struct CommandValidator : HasDebugMode {
     
     func validateSubCommands(_ cmd : CommandWithSubCommands) throws {
         guard !cmd.subCommands.isEmpty else {
-            printDebug("Error: Command model \(cmd) conforms to protocol CommandWithSubCommands. Property 'subCommands' must contain at least one subcommand")
+            printDebug("Error: Command model \(cmd) conforms to protocol CommandWithSubCommands. Property 'subCommands' must contain at least one subcommand.")
             throw CommandModelError.invalidCommand
         }
         for subcmd in cmd.subCommands {
