@@ -8,4 +8,11 @@ A pure Swift library for making command line tools / interfaces.
 ![SPM](https://img.shields.io/badge/Swift%20Package%20Manager-Compatible-brightgreen.svg)
 ![Swift version](https://img.shields.io/badge/Swift-3-orange.svg)
 
-Early stages. Hasn't been tested on Linux. Doesn't support short-form option switches yet.
+
+This library is in early stages: breaking changes ahoy! 
+I'm aiming for a stable API by December 2016.
+
+### Limitations
+
+* Hasn't been tested on Linux yet.
+* Doesn't support short-form option switches yet.
