@@ -42,6 +42,7 @@ protocol RunnableCommand : Command {
 }
 
 protocol CommandWithOptions : Command {
+    
     /**
      The options that can be used when running the command. Options are not required.
      Options are used BEFORE any of the command's
@@ -98,6 +99,7 @@ extension CommandWithOptions {
 
 
 protocol CommandWithArguments : Command {
+    
     /**
      The required arguments to be used when running the command.
      Arguments are positional, so set them in the preferred order.
@@ -139,7 +141,6 @@ extension CommandWithArguments {
  */
 protocol CommandWithSubCommands : Command {
     
-
     /**
      This property says which subcommands the user can use on this command. The user can only pick one,
      or none at all.
