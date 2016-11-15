@@ -15,7 +15,7 @@ internal enum CommandError : Error {
 
 /**
  Encapsulates a command sent to your program.
- To make a standard command model, conform to this protocol.
+ To make a standard bare-bones command model, conform to this protocol.
  */
 public protocol Command {
     
@@ -38,16 +38,26 @@ protocol RunnableCommand : Command {
      Or whatever you want it to do.
      */
     func run()
-
 }
 
+/**
+ Options allow users to alter the operation of a command.
+ 
+ For example:
+ ````
+ makesquare --roundedcorners
+ ````
+ where `roundedcorners` is the name of the option.
+ 
+ One or more options can with the command, in any order, as long as they are placed 
+ BEFORE any of the command's required arguments in the command line, if it has any.
+ */
 protocol CommandWithOptions : Command {
     
     /**
-     The options that can be used when running the command. Options are not required.
-     Options are used BEFORE any of the command's
-     required arguments in the command line, if it has any.
+     The options that can be used when running the command.
      Order does not matter here.
+     Must not be empty.
      */
     var options : [Option] { get set }
 }
@@ -97,13 +107,24 @@ extension CommandWithOptions {
     }
 }
 
-
+/**
+ Commands that have required arguments.
+ 
+ For example:
+ ````
+ makeimage <width> <height>
+ ````
+ Where `width` and `height` are the arguments. This command would be used as follows:
+ ````
+ makeimage 200 300
+ ````
+ Arguments are positional, so set `arguments` with the desired order.
+ */
 protocol CommandWithArguments : Command {
     
     /**
-     The required arguments to be used when running the command.
-     Arguments are positional, so set them in the preferred order.
-     Arguments come AFTER any options in the command line.
+     Arguments are positional, so set them in the desired order.
+     Must not be empty.
      */
     var arguments : [Argument] { get set }
 }

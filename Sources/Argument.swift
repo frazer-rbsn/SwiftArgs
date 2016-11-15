@@ -22,9 +22,7 @@ public protocol Argument {
     
     /**
      The value of the argument at command runtime.
-     Normally, you should set this to nil in your Argument model.
-     However you can also set it to a default value that will be used if the user
-     does not supply the argument.
+     You should set this to nil in your Argument model.
      */
     var value : String? { get set }
 }
