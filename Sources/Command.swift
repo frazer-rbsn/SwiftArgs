@@ -29,6 +29,8 @@ public protocol Command {
      Usage information for end users.
      */
     var helptext : String { get }
+    
+    init()
 }
 
 protocol RunnableCommand : Command {

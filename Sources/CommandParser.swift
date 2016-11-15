@@ -6,6 +6,8 @@
 //  Copyright © 2016 Frazer Robinson. All rights reserved.
 //
 
+import Foundation
+
 public enum ParserError : Error {
     case noCommands,
         duplicateCommand,
@@ -82,7 +84,7 @@ public class CommandParser : HasDebugMode {
     public func addCommand(_ c : Command) throws {
         guard !commands.contains(where: { $0 == c }) else {
             printDebug("Error: Duplicate command model \'\(c)\'.")
-            printDebug("CommandParser already has a registered command with name: \'\(c.name)\'")
+            printDebug("CommandParser already has a registered command: \'\(c)\'")
             throw ParserError.duplicateCommand
         }
         try CommandValidator(debugMode: debugMode).validateCommand(c)
@@ -268,7 +270,6 @@ public class CommandParser : HasDebugMode {
         guard let c = commands.filter({ $0.name == name }).first else { throw ParserError.noSuchCommand(name) }
         return c
     }
-    
     
     // MARK: Token logic
     
