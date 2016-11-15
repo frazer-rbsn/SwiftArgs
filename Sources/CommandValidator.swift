@@ -73,6 +73,10 @@ struct CommandValidator : HasDebugMode {
     }
     
     func validateArguments(_ cmd : CommandWithArguments) throws {
+        guard !cmd.arguments.isEmpty else {
+            printDebug("Error: Command model \(cmd) conforms to protocol CommandWithArguments. Property 'arguments' must contain at least one argument.")
+            throw CommandModelError.invalidCommand
+        }
         guard Set(cmd.argumentNames).count == cmd.argumentNames.count else {
             printDebug("Error: Invalid arguments for command model \'\(cmd)\'.")
             printDebug("Two or more arguments have the same name.")

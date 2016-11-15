@@ -76,6 +76,30 @@ class CommandValidationTests: XCTestCase {
                      try parser.addCommand(cmd2))
     }
     
+    func testNoOptionsThrows() {
+        let parser = CommandParser()
+        let cmd = MockCommandWithOptions()
+        cmd.options = []
+        AssertThrows(expectedError:  CommandModelError.invalidCommand,
+                     try parser.addCommand(cmd))
+    }
+    
+    func testNoArgumentsThrows() {
+        let parser = CommandParser()
+        let cmd = MockCommandWithArguments()
+        cmd.arguments = []
+        AssertThrows(expectedError:  CommandModelError.invalidCommand,
+                     try parser.addCommand(cmd))
+    }
+    
+    func testNoSubCommandsThrows() {
+        let parser = CommandParser()
+        let cmd = MockCommandWithSubCommands()
+        cmd.subCommands = []
+        AssertThrows(expectedError:  CommandModelError.invalidCommand,
+                     try parser.addCommand(cmd))
+    }
+    
     func testEmptyOptionNameThrows() {
         let parser = CommandParser()
         let op1 = MockOption(name:"")

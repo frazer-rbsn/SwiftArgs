@@ -82,10 +82,6 @@ extension CommandWithOptions {
         return options.filter( { $0.set == true })
     }
     
-    internal var hasOptions : Bool {
-        return !options.isEmpty
-    }
-    
     internal func getOption(_ name : String) throws -> Option {
         guard let option = options.filter({ $0.name == name }).first
             else { throw CommandError.noSuchOption(command:self, optionName: name) }
