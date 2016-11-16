@@ -54,7 +54,7 @@ protocol RunnableCommand : Command {
  One or more options can with the command, in any order, as long as they are placed 
  BEFORE any of the command's required arguments in the command line, if it has any.
  */
-protocol CommandWithOptions : Command {
+public protocol CommandWithOptions : Command {
     
     /**
      The options that can be used when running the command.
@@ -118,7 +118,7 @@ extension CommandWithOptions {
  ````
  Arguments are positional, so set `arguments` with the desired order.
  */
-protocol CommandWithArguments : Command {
+public protocol CommandWithArguments : Command {
     
     /**
      Arguments are positional, so set them in the desired order.
@@ -158,7 +158,7 @@ extension CommandWithArguments {
  ````
  Where `file` and `project` are commands, and your `new` command is a subcommand for both.
  */
-protocol CommandWithSubCommands : Command {
+public protocol CommandWithSubCommands : Command {
     
     /**
      This property says which subcommands the user can use on this command. The user can only pick one,
