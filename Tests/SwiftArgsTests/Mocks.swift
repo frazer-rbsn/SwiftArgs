@@ -1,9 +1,9 @@
 @testable import SwiftArgs
 
 class MockCommand : Command {
-    var name : String = "mockcommand"
+    static var name : String = "mockcommand"
     var helptext: String = "mockcommand help text"
-    required init(){}
+    required init() {}
 }
 
 class MockCommandWithOptions : MockCommand, CommandWithOptions {
@@ -20,7 +20,7 @@ class MockCommandWithOptionsAndArguments : MockCommand, CommandWithOptions, Comm
 }
 
 class MockSubCommand : Command {
-    var name : String = "mocksubcommand"
+    static var name : String = "mocksubcommand"
     var helptext: String = "mocksubcommand help text"
     required init(){}
 }

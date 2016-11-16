@@ -23,7 +23,7 @@ public protocol Command {
      Used for running the command.
      Must not contain spaces.
      */
-    var name : String { get }
+    static var name : String { get }
     
     /**
      Usage information for end users.
@@ -177,12 +177,12 @@ protocol CommandWithSubCommands : Command {
 extension CommandWithSubCommands {
     
     internal func getSubCommand(name : String) throws -> Command {
-        guard let c = subCommands.filter({ $0.name == name }).first
+        guard let c = subCommands.filter({ type(of:$0).name == name }).first
             else { throw CommandError.noSuchSubCommand(command: self, subCommandName: name) }
         return c
     }
 }
 
 public func ==(lhs: Command, rhs: Command) -> Bool {
-    return lhs.name == rhs.name
+    return type(of:lhs).name == type(of:rhs).name
 }

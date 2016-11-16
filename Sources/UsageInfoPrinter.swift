@@ -9,6 +9,13 @@
 public struct UsageInfoPrinter {
     
     public init() {}
+
+    public func printCommands(_ cmds : [Command.Type]) {
+        guard !cmds.isEmpty else { return } // No registered commands
+        print("\nCOMMANDS:")
+        _printNameAndHelpText(for: cmds)
+        print("")
+    }
     
     public func printCommands(_ cmds : [Command]) {
         guard !cmds.isEmpty else { return } // No registered commands
@@ -37,12 +44,19 @@ public struct UsageInfoPrinter {
         }
     }
     
+    private func _printNameAndHelpText(for cmds : [Command.Type]) {
+        for c in cmds {
+            let command = c.init()
+            _printNameAndHelpText(for: command)
+        }
+    }
+    
     private func _printNameAndHelpText(for cmd: Command) {
-        print("    \(cmd.name)    \(cmd.helptext)")
+        print("    \(type(of:cmd).name)    \(cmd.helptext)")
     }
     
     private func _printCommandUsage(_ cmd : Command) {
-        print("    \(cmd.name)", terminator:" ")
+        print("    \(type(of:cmd).name)", terminator:" ")
         if let c = cmd as? CommandWithOptions {
             for o in c.options {
                 print("[\(o.longFormName)", terminator:"] ")

@@ -22,14 +22,14 @@ struct CommandValidator : HasDebugMode {
 
     //TODO: Rename according to Swift API guidelines
     func validateCommand(_ cmd: Command) throws {
-        guard !cmd.name.contains(" ") else {
+        guard !type(of:cmd).name.contains(" ") else {
             printDebug("Error: Invalid command model \'\(cmd)\'.")
-            printDebug("Command name: \'\(cmd.name)\'\nCommand names must not contain spaces.")
+            printDebug("Command name: \'\(type(of:cmd).name)\'\nCommand names must not contain spaces.")
             throw CommandModelError.invalidCommand
         }
-        guard cmd.name != "" else {
+        guard type(of:cmd).name != "" else {
             printDebug("Error: Invalid command model \'\(cmd)\'.")
-            printDebug("Command name: \'\(cmd.name)\'\nCommand name must not be empty.")
+            printDebug("Command name: \'\(type(of:cmd).name)\'\nCommand name must not be empty.")
             throw CommandModelError.invalidCommand
         }
         if let c = cmd as? CommandWithOptions {

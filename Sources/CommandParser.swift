@@ -38,7 +38,7 @@ public protocol CommandParserDelegate {
 
 public class CommandParser : HasDebugMode {
 
-    internal var commands : [Command] = []
+    internal var commands : [Command.Type] = []
     
     /**
      If `true`, prints debug information. Default value is `false`.
@@ -66,7 +66,7 @@ public class CommandParser : HasDebugMode {
                 Or `CommandModelError.invalidCommand` if a command model or
                 any of it's option or argument models is invalid.
      */
-    public func addCommands(_ commands : Command...) throws {
+    public func addCommands(_ commands : Command.Type...) throws {
         for c in commands {
             try addCommand(c)
         }
@@ -81,13 +81,18 @@ public class CommandParser : HasDebugMode {
                 Or `CommandModelError.invalidCommand` if the command model or
                 any of it's option or argument models is invalid.
      */
-    public func addCommand(_ c : Command) throws {
+    public func addCommand(_ c : Command.Type) throws {
         guard !commands.contains(where: { $0 == c }) else {
             printDebug("Error: Duplicate command model \'\(c)\'.")
             printDebug("CommandParser already has a registered command: \'\(c)\'")
             throw ParserError.duplicateCommand
         }
-        try CommandValidator(debugMode: debugMode).validateCommand(c)
+        guard !commands.contains(where: { $0.name == c.name }) else {
+            printDebug("Error: Duplicate command model \'\(c)\'.")
+            printDebug("CommandParser already has a registered command with name: \'\(c.name)\'")
+            throw ParserError.duplicateCommand
+        }
+        try CommandValidator(debugMode: debugMode).validateCommand(c.init())
         commands.append(c)
     }
     
@@ -144,16 +149,16 @@ public class CommandParser : HasDebugMode {
             throw ParserError.noSuchCommand("\(name)")
             
         } catch ParserError.noOptions(let command) {
-            printHelp("Error: command \'\(command.name)\' has no options.")
+            printHelp("Error: command \'\(type(of:command).name)\' has no options.")
             printUsageFor(command)
             throw ParserError.noOptions(command)
             
         } catch CommandError.noSuchOption(let command, let option) {
-            printDebug("Error: command \'\(command.name)\' has no such option: \'\(option)\'")
+            printDebug("Error: command \'\(type(of:command).name)\' has no such option: \'\(option)\'")
             throw ParserError.noSuchOption(command: command, option: option)
             
         } catch ParserError.optionNotAllowedHere(let command, let option) {
-            printHelp("Error: An option \'\(option)\' for command \'\(command.name)\' was found," +
+            printHelp("Error: An option \'\(option)\' for command \'\(type(of:command).name)\' was found," +
                 "but it is not allowed here. Options must come before a command's required arguments.")
             printUsageFor(command)
             throw ParserError.optionNotAllowedHere(command: command, option: option)
@@ -164,22 +169,22 @@ public class CommandParser : HasDebugMode {
             throw ParserError.optionRequiresArgument(command: command, option: option)
             
         } catch ParserError.requiresArguments(let command) {
-            printHelp("Error: command \'\(command.name)\' has required arguments but none were supplied.")
+            printHelp("Error: command \'\(type(of:command).name)\' has required arguments but none were supplied.")
             printUsageFor(command)
             throw ParserError.requiresArguments(command)
 
         } catch ParserError.invalidArguments(let command) {
-            printHelp("Error: invalid arguments for command \'\(command.name)\'")
+            printHelp("Error: invalid arguments for command \'\(type(of:command).name)\'")
             printUsageFor(command)
             throw ParserError.invalidArguments(command)
             
         } catch ParserError.invalidArgumentOrSubCommand(let command) {
-            printHelp("Error: command \'\(command.name)\' does not take arguments nor does it have any subcommands.")
+            printHelp("Error: command \'\(type(of:command).name)\' does not take arguments nor does it have any subcommands.")
             printUsageFor(command)
             throw ParserError.invalidArgumentOrSubCommand(command)
             
         } catch CommandError.noSuchSubCommand(let command, let subCommandName) {
-            printHelp("Error: command \'\(command.name)\' has no subcommand: \'\(subCommandName)\'")
+            printHelp("Error: command \'\(type(of:command).name)\' has no subcommand: \'\(subCommandName)\'")
             printUsageFor(command)
             throw ParserError.noSuchSubCommand(command:command, subCommandName:subCommandName)
         }
@@ -268,7 +273,7 @@ public class CommandParser : HasDebugMode {
     
     private func getCommand(_ name : String) throws -> Command {
         guard let c = commands.filter({ $0.name == name }).first else { throw ParserError.noSuchCommand(name) }
-        return c
+        return c.init()
     }
     
     // MARK: Token logic

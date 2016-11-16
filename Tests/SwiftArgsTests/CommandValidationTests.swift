@@ -7,170 +7,193 @@
 //
 
 import XCTest
+import Foundation
 @testable import SwiftArgs
 
 class CommandValidationTests: XCTestCase {
     
-    
     // MARK: Valid scenarios
     
     func testAddValidCommand() {
-        let cmd = MockCommand()
         let parser = CommandParser()
-        try! parser.addCommand(cmd)
-        XCTAssert(parser.commands.contains(where: { $0 == cmd }))
+        try! parser.addCommand(MockCommand.self)
+        XCTAssert(parser.commands.contains(where: { $0.name == MockCommand.name }))
     }
     
     func testAddValidCommandWithTwoOptions() {
-        let cmd = MockCommandWithOptions()
-        cmd.options = [MockOption(name:"op1"), MockOption(name:"op2")]
+        class C : MockCommand, CommandWithOptions {
+            var options : [Option] = [MockOption(name:"op1"), MockOption(name:"op2")]
+        }
         let parser = CommandParser()
-        try! parser.addCommand(cmd)
-        XCTAssert(parser.commands.contains(where: { $0 == cmd }))
+        try! parser.addCommand(C.self)
+        XCTAssert(parser.commands.contains(where: { $0.name == C.name }))
     }
     
-    func testAddValidCommandWithTwoArgs() {
-        let cmd = MockCommandWithArguments()
-        cmd.arguments = [MockArgument(name:"mockarg1"), MockArgument(name:"mockarg2")]
+    func testAddValidCommandWithTwoArguments() {
+        class C : MockCommand, CommandWithArguments {
+            var arguments : [Argument] = [MockArgument(name:"mockarg1"), MockArgument(name:"mockarg2")]
+        }
         let parser = CommandParser()
-        try! parser.addCommand(cmd)
-        XCTAssert(parser.commands.contains(where: { $0 == cmd }))
+        try! parser.addCommand(C.self)
+        XCTAssert(parser.commands.contains(where: { $0.name == C.name }))
     }
     
     func testAddValidCommandWithOneOptionAndOneOptionWithArgAndOneArg() {
-        let cmd = MockCommandWithOptionsAndArguments()
-        cmd.options = [MockOption(name:"op"), MockOptionWithArgument(name:"opwitharg")]
-        cmd.arguments = [MockArgument(name:"mockarg")]
+        class C : MockCommand, CommandWithOptions, CommandWithArguments {
+            var options : [Option] = [MockOption(name:"op"), MockOptionWithArgument(name:"opwitharg")]
+            var arguments : [Argument] = [MockArgument(name:"mockarg")]
+        }
         let parser = CommandParser()
-        try! parser.addCommand(cmd)
-        XCTAssert(parser.commands.contains(where: { $0 == cmd }))
+        try! parser.addCommand(C.self)
+        XCTAssert(parser.commands.contains(where: { $0.name == C.name }))
     }
     
     
     // MARK: Invalid scenarios
     
     func testAddCommandNameWithSpaceThrows() {
-        let cmd = MockCommand()
-        cmd.name = "gener ate"
+        struct C : Command {
+            static var name = "gener ate"
+            var helptext = ""
+        }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(cmd))
+                     try parser.addCommand(C.self))
     }
     
     func testAddEmptyCommandNameThrows() {
-        let cmd = MockCommand()
-        cmd.name = ""
+        struct C : Command {
+            static var name = ""
+            var helptext = ""
+        }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(cmd))
+                     try parser.addCommand(C.self))
+    }
+    
+    func testDuplicateCommandClassThrows() {
+        let parser = CommandParser()
+        try! parser.addCommand(MockCommand.self)
+        AssertThrows(expectedError: ParserError.duplicateCommand,
+                     try parser.addCommand(MockCommand.self))
     }
     
     func testDuplicateCommandNameThrows() {
-        let cmd1 = MockCommand()
-        cmd1.name = "foo"
-        let cmd2 = MockCommand()
-        cmd2.name = "foo"
+        struct C : Command {
+            static var name = "foo"
+            var helptext = ""
+        }
+        struct D : Command {
+            static var name = "foo"
+            var helptext = ""
+        }
         let parser = CommandParser()
-        try! parser.addCommand(cmd1)
+        try! parser.addCommand(C.self)
         AssertThrows(expectedError: ParserError.duplicateCommand,
-                     try parser.addCommand(cmd2))
+                     try parser.addCommand(D.self))
     }
     
     func testNoOptionsThrows() {
+        class C : MockCommand, CommandWithOptions {
+            var options : [Option] = []
+        }
         let parser = CommandParser()
-        let cmd = MockCommandWithOptions()
-        cmd.options = []
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(cmd))
+                     try parser.addCommand(C.self))
     }
     
     func testNoArgumentsThrows() {
+        class C : MockCommand, CommandWithArguments {
+            var arguments : [Argument] = []
+        }
         let parser = CommandParser()
         let cmd = MockCommandWithArguments()
         cmd.arguments = []
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(cmd))
+                     try parser.addCommand(C.self))
     }
     
     func testNoSubCommandsThrows() {
+        class C : MockCommand, CommandWithSubCommands {
+            var subCommands: [Command] = []
+            var usedSubCommand: Command?
+        }
         let parser = CommandParser()
         let cmd = MockCommandWithSubCommands()
         cmd.subCommands = []
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(cmd))
+                     try parser.addCommand(C.self))
     }
     
     func testEmptyOptionNameThrows() {
+        class C : MockCommand, CommandWithOptions {
+            var options : [Option] = [MockOption(name:"")]
+        }
         let parser = CommandParser()
-        let op1 = MockOption(name:"")
-        let cmd = MockCommandWithOptions()
-        cmd.options = [op1]
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(cmd))
+                     try parser.addCommand(C.self))
     }
     
     func testEmptyArgumentNameThrows() {
+        class C : MockCommand, CommandWithArguments {
+            var arguments : [Argument] = [MockArgument(name:"")]
+        }
         let parser = CommandParser()
-        let arg1 = MockArgument(name:"")
-        let cmd = MockCommandWithArguments()
-        cmd.arguments = [arg1]
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(cmd))
+                     try parser.addCommand(C.self))
     }
     
     func testDuplicateOptionNamesThrows() {
+        class C : MockCommand, CommandWithOptions {
+            var options : [Option] = [MockOption(),MockOption()]
+        }
         let parser = CommandParser()
-        let op1 = MockOption(name:"option")
-        let op2 = MockOption(name:"option")
-        let cmd = MockCommandWithOptions()
-        cmd.options = [op1,op2]
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(cmd))
+                     try parser.addCommand(C.self))
     }
     
     func testDuplicateArgumentNamesThrows() {
+        class C : MockCommand, CommandWithArguments {
+            var arguments : [Argument] = [MockArgument(),MockArgument()]
+        }
         let parser = CommandParser()
-        let arg1 = MockArgument(name:"arg")
-        let arg2 = MockArgument(name:"arg")
-        let cmd = MockCommandWithArguments()
-        cmd.arguments = [arg1,arg2]
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(cmd))
+                     try parser.addCommand(C.self))
     }
     
     func testOptionNameWithSpaceThrows() {
+        class C : MockCommand, CommandWithOptions {
+            var options : [Option] = [MockOption(name:"opt ion")]
+        }
         let parser = CommandParser()
-        let op1 = MockOption(name:"op tion")
-        let cmd = MockCommandWithOptions()
-        cmd.options = [op1]
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(cmd))
+                     try parser.addCommand(C.self))
     }
     
     func testArgumentNameWithSpaceThrows() {
+        class C : MockCommand, CommandWithArguments {
+            var arguments : [Argument] = [MockArgument(name:"arg ument")]
+        }
         let parser = CommandParser()
-        let arg1 = MockArgument(name:"arg ument")
-        let cmd = MockCommandWithArguments()
-        cmd.arguments = [arg1]
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(cmd))
+                     try parser.addCommand(C.self))
     }
     
     func testOptionNameWithHyphenThrows() {
+        class C : MockCommand, CommandWithOptions {
+            var options : [Option] = [MockOption(name:"opt-ion")]
+        }
         let parser = CommandParser()
-        let op1 = MockOption(name:"op-tion")
-        let cmd = MockCommandWithOptions()
-        cmd.options = [op1]
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(cmd))
+                     try parser.addCommand(C.self))
     }
     
     func testArgumentNameWithHyphenThrows() {
+        class C : MockCommand, CommandWithArguments {
+            var arguments : [Argument] = [MockArgument(name:"arg-ument")]
+        }
         let parser = CommandParser()
-        let arg1 = MockArgument(name:"arg-ument")
-        let cmd = MockCommandWithArguments()
-        cmd.arguments = [arg1]
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(cmd))
+                     try parser.addCommand(C.self))
     }
 }
