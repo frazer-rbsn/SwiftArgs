@@ -102,7 +102,9 @@ public class CommandParser : HasDebugMode {
                 is a problem with parsing the command, or invalid arguments were supplied.
      */
     public func parseCommandLine(delegate : CommandParserDelegate?) throws {
-        return try parse(arguments: CommandLine.argumentsWithoutFilename, delegate: delegate)
+        var args = CommandLine.arguments
+        args.remove(at: 0)
+        return try parse(arguments: args, delegate: delegate)
     }
 
     func parse(arguments : [String]) throws {

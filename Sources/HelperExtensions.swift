@@ -25,15 +25,6 @@ extension Array {
     }
 }
 
-extension CommandLine {
-    
-    static var argumentsWithoutFilename : [String] {
-        var args = CommandLine.arguments
-        args.remove(at: 0)
-        return args
-    }
-}
-
 protocol HasDebugMode {
     
     /**
