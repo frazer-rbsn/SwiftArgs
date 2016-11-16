@@ -17,7 +17,7 @@ class CommandValidationTests: XCTestCase {
     func testAddValidCommand() {
         let parser = CommandParser()
         try! parser.register(MockCommand.self)
-        XCTAssert(parser.commands.contains(where: { $0.name == MockCommand.name }))
+        XCTAssert(parser.commands.contains(where: { $0 == MockCommand.self }))
     }
     
     func testAddValidCommandWithTwoOptions() {
@@ -26,7 +26,7 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         try! parser.register(C.self)
-        XCTAssert(parser.commands.contains(where: { $0.name == C.name }))
+        XCTAssert(parser.commands.contains(where: { $0 == C.self }))
     }
     
     func testAddValidCommandWithTwoArguments() {
@@ -35,7 +35,7 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         try! parser.register(C.self)
-        XCTAssert(parser.commands.contains(where: { $0.name == C.name }))
+        XCTAssert(parser.commands.contains(where: { $0 == C.self }))
     }
     
     func testAddValidCommandWithOneOptionAndOneOptionWithArgAndOneArg() {
@@ -45,7 +45,7 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         try! parser.register(C.self)
-        XCTAssert(parser.commands.contains(where: { $0.name == C.name }))
+        XCTAssert(parser.commands.contains(where: { $0 == C.self }))
     }
     
     

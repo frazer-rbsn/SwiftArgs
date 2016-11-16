@@ -107,7 +107,7 @@ class ParserRuntimeTests : XCTestCase {
         let delegate = MockCommandParserDelegate()
         try! parser.parse(arguments: ["mockcommand", "mocksubcommand", "subcommandargvalue"], delegate: delegate)
         let command = delegate.command! as! CommandWithSubCommands
-        XCTAssert(type(of:command).name == C.name)
+        XCTAssert(type(of:command) == C.self)
         XCTAssertNotNil(command.usedSubCommand)
         XCTAssert(type(of:command.usedSubCommand!).name == SubCMD.name)
         XCTAssert((command.usedSubCommand! as! CommandWithArguments).arguments[0].value! == "subcommandargvalue")
@@ -124,7 +124,7 @@ class ParserRuntimeTests : XCTestCase {
         let delegate = MockCommandParserDelegate()
         try! parser.parse(arguments: ["mockcommand", "commandargvalue", "mocksubcommand"], delegate: delegate)
         let command = delegate.command! as! CommandWithSubCommands
-        XCTAssert(type(of:command).name == C.name)
+        XCTAssert(type(of:command) == C.self)
         XCTAssert((command as! CommandWithArguments).arguments[0].value! == "commandargvalue")
         XCTAssertNotNil(command.usedSubCommand)
         XCTAssert(type(of:command.usedSubCommand!).name == MockSubCommand.name)
@@ -141,7 +141,7 @@ class ParserRuntimeTests : XCTestCase {
         let delegate = MockCommandParserDelegate()
         try! parser.parse(arguments: ["mockcommand", "arg1value", "arg2value", "mocksubcommand"], delegate: delegate)
         let command = delegate.command! as! CommandWithSubCommands
-        XCTAssert(type(of:command).name == C.name)
+        XCTAssert(type(of:command) == C.self)
         XCTAssert((command as! CommandWithArguments).arguments[0].value! == "arg1value")
         XCTAssert((command as! CommandWithArguments).arguments[1].value! == "arg2value")
         XCTAssertNotNil(command.usedSubCommand)

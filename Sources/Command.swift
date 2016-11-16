@@ -183,6 +183,6 @@ extension CommandWithSubCommands {
     }
 }
 
-public func ==(lhs: Command, rhs: Command) -> Bool {
-    return type(of:lhs).name == type(of:rhs).name
+public func ==(l: Command.Type, r: Command.Type) -> Bool {
+    return l.name == r.name
 }

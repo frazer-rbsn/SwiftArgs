@@ -80,11 +80,6 @@ public class CommandParser : HasDebugMode {
     private func register(_ command : Command.Type) throws {
         guard !commands.contains(where: { $0 == command }) else {
             printDebug("Error: Duplicate command model \'\(command)\'.")
-            printDebug("CommandParser already has a registered command: \'\(command)\'")
-            throw ParserError.duplicateCommand
-        }
-        guard !commands.contains(where: { $0.name == command.name }) else {
-            printDebug("Error: Duplicate command model \'\(command)\'.")
             printDebug("CommandParser already has a registered command with name: \'\(command.name)\'")
             throw ParserError.duplicateCommand
         }
