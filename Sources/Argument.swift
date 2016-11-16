@@ -25,4 +25,6 @@ public protocol Argument {
      You should set this to nil in your Argument model.
      */
     var value : String? { get set }
+    
+    init()
 }

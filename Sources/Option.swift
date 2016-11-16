@@ -37,6 +37,8 @@ public protocol Option {
      regardless of user input.
      */
     var set : Bool { get set }
+    
+    init()
 }
 
 public extension Option {

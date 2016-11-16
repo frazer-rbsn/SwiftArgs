@@ -54,6 +54,8 @@ class MockOption : Option {
     var shortName = "o"
     var set = false
     
+    required init() {}
+    
     init(name : String = "mockoption", shortName : String = "o", set : Bool = false) {
         self.name = name
         self.shortName = shortName
@@ -68,6 +70,8 @@ class MockOptionWithArgument : OptionWithArgument {
     var set = false
     var value : String? = nil
     
+    required init() {}
+    
     init(name : String = "mockoptionwitharg", shortName : String = "a",
          argumentName : String = "", set : Bool = false, value : String? = nil) {
         self.name = name
@@ -81,6 +85,8 @@ class MockOptionWithArgument : OptionWithArgument {
 class MockArgument : Argument {
     var name = "mockarg"
     var value : String? = nil
+    
+    required init() {}
     
     init(name : String = "mockarg", value : String? = nil) {
         self.name = name
