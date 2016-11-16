@@ -58,8 +58,13 @@ public class CommandParser : HasDebugMode {
     public init() {}
     
     /**
-     Register commands with the parser, so that when the user supplies command line arguments
+     Register command models with the parser, so that when the user supplies command-line arguments
      to your program, they will be recognised and parsed into objects.
+     
+     - parameter commands: Classes or structs that conform to a `Command` protocol.
+                            Use as follows:
+     
+                            register(GenerateCommand.self, HelpCommand.self, AnotherCommand.self)
      
      - throws:  `ParserError.duplicateCommand` if the command parser instance already has a
                 command registered with the same name as a command.
@@ -72,15 +77,6 @@ public class CommandParser : HasDebugMode {
         }
     }
     
-    /**
-     Register a command with the parser, so that when the user supplies command line arguments
-     to your program, they will be recognised and parsed into objects.
-     
-     - throws:  `ParserError.duplicateCommand` if the command parser instance already has a
-                command registered with the same name as the command.
-                Or `CommandModelError.invalidCommand` if the command model or
-                any of it's option or argument models is invalid.
-     */
     private func register(_ command : Command.Type) throws {
         guard !commands.contains(where: { $0 == command }) else {
             printDebug("Error: Duplicate command model \'\(command)\'.")
