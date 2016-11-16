@@ -32,9 +32,6 @@ public protocol Option {
     
     /**
      Will be set to `true` if the option was specified when the command was run.
-     In your Option model, in normal cases you should set this value to false.
-     If you want though, you could set it to true to always have this option added
-     regardless of user input.
      */
     var set : Bool { get set }
     
