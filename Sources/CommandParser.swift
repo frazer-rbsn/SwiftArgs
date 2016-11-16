@@ -66,9 +66,9 @@ public class CommandParser : HasDebugMode {
                 Or `CommandModelError.invalidCommand` if a command model or
                 any of it's option or argument models is invalid.
      */
-    public func addCommands(_ commands : Command.Type...) throws {
+    public func register(_ commands : Command.Type...) throws {
         for c in commands {
-            try addCommand(c)
+            try register(c)
         }
     }
     
@@ -81,19 +81,19 @@ public class CommandParser : HasDebugMode {
                 Or `CommandModelError.invalidCommand` if the command model or
                 any of it's option or argument models is invalid.
      */
-    public func addCommand(_ c : Command.Type) throws {
-        guard !commands.contains(where: { $0 == c }) else {
-            printDebug("Error: Duplicate command model \'\(c)\'.")
-            printDebug("CommandParser already has a registered command: \'\(c)\'")
+    private func register(_ command : Command.Type) throws {
+        guard !commands.contains(where: { $0 == command }) else {
+            printDebug("Error: Duplicate command model \'\(command)\'.")
+            printDebug("CommandParser already has a registered command: \'\(command)\'")
             throw ParserError.duplicateCommand
         }
-        guard !commands.contains(where: { $0.name == c.name }) else {
-            printDebug("Error: Duplicate command model \'\(c)\'.")
-            printDebug("CommandParser already has a registered command with name: \'\(c.name)\'")
+        guard !commands.contains(where: { $0.name == command.name }) else {
+            printDebug("Error: Duplicate command model \'\(command)\'.")
+            printDebug("CommandParser already has a registered command with name: \'\(command.name)\'")
             throw ParserError.duplicateCommand
         }
-        try CommandValidator(debugMode: debugMode).validateCommand(c.init())
-        commands.append(c)
+        try CommandValidator(debugMode: debugMode).validateCommand(command.init())
+        commands.append(command)
     }
     
     

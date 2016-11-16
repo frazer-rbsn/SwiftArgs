@@ -16,7 +16,7 @@ class CommandValidationTests: XCTestCase {
     
     func testAddValidCommand() {
         let parser = CommandParser()
-        try! parser.addCommand(MockCommand.self)
+        try! parser.register(MockCommand.self)
         XCTAssert(parser.commands.contains(where: { $0.name == MockCommand.name }))
     }
     
@@ -25,7 +25,7 @@ class CommandValidationTests: XCTestCase {
             var options : [Option] = [MockOption(name:"op1"), MockOption(name:"op2")]
         }
         let parser = CommandParser()
-        try! parser.addCommand(C.self)
+        try! parser.register(C.self)
         XCTAssert(parser.commands.contains(where: { $0.name == C.name }))
     }
     
@@ -34,7 +34,7 @@ class CommandValidationTests: XCTestCase {
             var arguments : [Argument] = [MockArgument(name:"mockarg1"), MockArgument(name:"mockarg2")]
         }
         let parser = CommandParser()
-        try! parser.addCommand(C.self)
+        try! parser.register(C.self)
         XCTAssert(parser.commands.contains(where: { $0.name == C.name }))
     }
     
@@ -44,7 +44,7 @@ class CommandValidationTests: XCTestCase {
             var arguments : [Argument] = [MockArgument(name:"mockarg")]
         }
         let parser = CommandParser()
-        try! parser.addCommand(C.self)
+        try! parser.register(C.self)
         XCTAssert(parser.commands.contains(where: { $0.name == C.name }))
     }
     
@@ -58,7 +58,7 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(C.self))
+                     try parser.register(C.self))
     }
     
     func testAddEmptyCommandNameThrows() {
@@ -68,14 +68,14 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(C.self))
+                     try parser.register(C.self))
     }
     
     func testDuplicateCommandClassThrows() {
         let parser = CommandParser()
-        try! parser.addCommand(MockCommand.self)
+        try! parser.register(MockCommand.self)
         AssertThrows(expectedError: ParserError.duplicateCommand,
-                     try parser.addCommand(MockCommand.self))
+                     try parser.register(MockCommand.self))
     }
     
     func testDuplicateCommandNameThrows() {
@@ -88,9 +88,9 @@ class CommandValidationTests: XCTestCase {
             var helptext = ""
         }
         let parser = CommandParser()
-        try! parser.addCommand(C.self)
+        try! parser.register(C.self)
         AssertThrows(expectedError: ParserError.duplicateCommand,
-                     try parser.addCommand(D.self))
+                     try parser.register(D.self))
     }
     
     func testNoOptionsThrows() {
@@ -99,7 +99,7 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(C.self))
+                     try parser.register(C.self))
     }
     
     func testNoArgumentsThrows() {
@@ -110,7 +110,7 @@ class CommandValidationTests: XCTestCase {
         let cmd = MockCommandWithArguments()
         cmd.arguments = []
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(C.self))
+                     try parser.register(C.self))
     }
     
     func testNoSubCommandsThrows() {
@@ -122,7 +122,7 @@ class CommandValidationTests: XCTestCase {
         let cmd = MockCommandWithSubCommands()
         cmd.subCommands = []
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(C.self))
+                     try parser.register(C.self))
     }
     
     func testEmptyOptionNameThrows() {
@@ -131,7 +131,7 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(C.self))
+                     try parser.register(C.self))
     }
     
     func testEmptyArgumentNameThrows() {
@@ -140,7 +140,7 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(C.self))
+                     try parser.register(C.self))
     }
     
     func testDuplicateOptionNamesThrows() {
@@ -149,7 +149,7 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(C.self))
+                     try parser.register(C.self))
     }
     
     func testDuplicateArgumentNamesThrows() {
@@ -158,7 +158,7 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(C.self))
+                     try parser.register(C.self))
     }
     
     func testOptionNameWithSpaceThrows() {
@@ -167,7 +167,7 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(C.self))
+                     try parser.register(C.self))
     }
     
     func testArgumentNameWithSpaceThrows() {
@@ -176,7 +176,7 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(C.self))
+                     try parser.register(C.self))
     }
     
     func testOptionNameWithHyphenThrows() {
@@ -185,7 +185,7 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(C.self))
+                     try parser.register(C.self))
     }
     
     func testArgumentNameWithHyphenThrows() {
@@ -194,6 +194,6 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
-                     try parser.addCommand(C.self))
+                     try parser.register(C.self))
     }
 }
