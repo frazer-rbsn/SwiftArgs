@@ -7,7 +7,7 @@
 //
 
 internal enum CommandError : Error {
-    case noSuchSubCommand(command:Command, subCommandName:String),
+    case noSuchSubCommand(command:Command, subcommandName:String),
     noSuchOption(command:Command, optionName:String),
     optionRequiresArgument(command:Command, option:Option)
 }
@@ -24,11 +24,6 @@ public protocol Command {
      Must not contain spaces.
      */
     static var name : String { get }
-    
-    /**
-     Usage information for end users.
-     */
-    var helptext : String { get }
     
     init()
 }
@@ -163,22 +158,22 @@ public protocol CommandWithSubCommands : Command {
     /**
      This property says which subcommands the user can use on this command. The user can only pick one,
      or none at all.
-     The subcommand that was used at runtime, if any, is set in `usedSubCommand`.
+     The subcommand that was used at runtime, if any, is set in `usedSubcommand`.
     */
-    var subCommands : [Command] { get set }
+    var subcommands : [Command] { get set }
     
     /**
      If a subcommand was sent to the parser with this command, it will be stored in this property.
      */
-    var usedSubCommand : Command? { get set }
+    var usedSubcommand : Command? { get set }
     
 }
 
 extension CommandWithSubCommands {
     
     internal func getSubCommand(name : String) throws -> Command {
-        guard let c = subCommands.filter({ type(of:$0).name == name }).first
-            else { throw CommandError.noSuchSubCommand(command: self, subCommandName: name) }
+        guard let c = subcommands.filter({ type(of:$0).name == name }).first
+            else { throw CommandError.noSuchSubCommand(command: self, subcommandName: name) }
         return c
     }
 }
@@ -186,3 +181,11 @@ extension CommandWithSubCommands {
 public func ==(l: Command.Type, r: Command.Type) -> Bool {
     return l.name == r.name
 }
+
+public protocol HasHelpText {
+    /**
+     Usage information for users.
+     */
+    var helpText : String { get }
+}
+

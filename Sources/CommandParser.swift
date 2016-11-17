@@ -20,7 +20,7 @@ public enum ParserError : Error {
         requiresArguments(Command),
         invalidArguments(Command),
         invalidArgumentOrSubCommand(Command),
-        noSuchSubCommand(command:Command, subCommandName:String)
+        noSuchSubCommand(command:Command, subcommandName:String)
 }
 
 public protocol CommandParserDelegate {
@@ -176,10 +176,10 @@ public class CommandParser : HasDebugMode {
             printUsageFor(command)
             throw ParserError.invalidArgumentOrSubCommand(command)
             
-        } catch CommandError.noSuchSubCommand(let command, let subCommandName) {
-            printHelp("Error: command \'\(type(of:command).name)\' has no subcommand: \'\(subCommandName)\'")
+        } catch CommandError.noSuchSubCommand(let command, let subcommandName) {
+            printHelp("Error: command \'\(type(of:command).name)\' has no subcommand: \'\(subcommandName)\'")
             printUsageFor(command)
-            throw ParserError.noSuchSubCommand(command:command, subCommandName:subCommandName)
+            throw ParserError.noSuchSubCommand(command:command, subcommandName:subcommandName)
         }
     }
     
@@ -258,9 +258,9 @@ public class CommandParser : HasDebugMode {
     private func parseSubCommand(_ c : CommandWithSubCommands, tkns : [String]) throws -> (command: Command, remainingTokens : [String]) {
         var command = c
         var tokens = tkns
-        var subCommand = try command.getSubCommand(name: tokens[0])
-        (subCommand, tokens) = try parseCommand(subCommand, tokens: tokens)
-        command.usedSubCommand = subCommand
+        var subcommand = try command.getSubCommand(name: tokens[0])
+        (subcommand, tokens) = try parseCommand(subcommand, tokens: tokens)
+        command.usedSubcommand = subcommand
         return (command, tokens)
     }
     

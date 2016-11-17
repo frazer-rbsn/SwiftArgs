@@ -102,11 +102,11 @@ struct CommandValidator : HasDebugMode {
     }
     
     func validateSubCommands(_ cmd : CommandWithSubCommands) throws {
-        guard !cmd.subCommands.isEmpty else {
-            printDebug("Error: Command model \(cmd) conforms to protocol CommandWithSubCommands. Property 'subCommands' must contain at least one subcommand.")
+        guard !cmd.subcommands.isEmpty else {
+            printDebug("Error: Command model \(cmd) conforms to protocol CommandWithSubCommands. Property 'subcommands' must contain at least one subcommand.")
             throw CommandModelError.invalidCommand
         }
-        for subcmd in cmd.subCommands {
+        for subcmd in cmd.subcommands {
             try validateCommand(subcmd)
         }
     }

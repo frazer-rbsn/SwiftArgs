@@ -52,7 +52,10 @@ public struct UsageInfoPrinter {
     }
     
     private func _printNameAndHelpText(for cmd: Command) {
-        print("    \(type(of:cmd).name)    \(cmd.helptext)")
+        print("    \(type(of:cmd).name)", terminator: "")
+        if let c = cmd as? HasHelpText {
+            print("    \(c.helpText)")
+        }
     }
     
     private func _printCommandUsage(_ cmd : Command) {

@@ -99,8 +99,8 @@ class ParserRuntimeTests : XCTestCase {
             var arguments : [Argument] = [MockArgument()]
         }
         class C : MockCommand, CommandWithSubCommands {
-            var subCommands : [Command] = [SubCMD()]
-            var usedSubCommand : Command?
+            var subcommands : [Command] = [SubCMD()]
+            var usedSubcommand : Command?
         }
         let parser = CommandParser()
         try! parser.register(C.self)
@@ -108,16 +108,16 @@ class ParserRuntimeTests : XCTestCase {
         try! parser.parse(arguments: ["mockcommand", "mocksubcommand", "subcommandargvalue"], delegate: delegate)
         let command = delegate.command! as! CommandWithSubCommands
         XCTAssert(type(of:command) == C.self)
-        XCTAssertNotNil(command.usedSubCommand)
-        XCTAssert(type(of:command.usedSubCommand!).name == SubCMD.name)
-        XCTAssert((command.usedSubCommand! as! CommandWithArguments).arguments[0].value! == "subcommandargvalue")
+        XCTAssertNotNil(command.usedSubcommand)
+        XCTAssert(type(of:command.usedSubcommand!).name == SubCMD.name)
+        XCTAssert((command.usedSubcommand! as! CommandWithArguments).arguments[0].value! == "subcommandargvalue")
     }
     
     func testParseValidCommandWithArgumentWithSubcommand() {
         class C : MockCommand, CommandWithArguments, CommandWithSubCommands {
             var arguments : [Argument] = [MockArgument()]
-            var subCommands : [Command] = [MockSubCommand()]
-            var usedSubCommand : Command?
+            var subcommands : [Command] = [MockSubCommand()]
+            var usedSubcommand : Command?
         }
         let parser = CommandParser()
         try! parser.register(C.self)
@@ -126,15 +126,15 @@ class ParserRuntimeTests : XCTestCase {
         let command = delegate.command! as! CommandWithSubCommands
         XCTAssert(type(of:command) == C.self)
         XCTAssert((command as! CommandWithArguments).arguments[0].value! == "commandargvalue")
-        XCTAssertNotNil(command.usedSubCommand)
-        XCTAssert(type(of:command.usedSubCommand!).name == MockSubCommand.name)
+        XCTAssertNotNil(command.usedSubcommand)
+        XCTAssert(type(of:command.usedSubcommand!).name == MockSubCommand.name)
     }
     
     func testParseValidCommandWithTwoArgumentsWithSubcommand() {
         class C : MockCommand, CommandWithArguments, CommandWithSubCommands {
             var arguments : [Argument] = [MockArgument(name:"mockarg1"), MockArgument(name:"mockarg2")]
-            var subCommands : [Command] = [MockSubCommand()]
-            var usedSubCommand : Command?
+            var subcommands : [Command] = [MockSubCommand()]
+            var usedSubcommand : Command?
         }
         let parser = CommandParser()
         try! parser.register(C.self)
@@ -144,8 +144,8 @@ class ParserRuntimeTests : XCTestCase {
         XCTAssert(type(of:command) == C.self)
         XCTAssert((command as! CommandWithArguments).arguments[0].value! == "arg1value")
         XCTAssert((command as! CommandWithArguments).arguments[1].value! == "arg2value")
-        XCTAssertNotNil(command.usedSubCommand)
-        XCTAssert(type(of:command.usedSubCommand!).name == MockSubCommand.name)
+        XCTAssertNotNil(command.usedSubcommand)
+        XCTAssert(type(of:command.usedSubcommand!).name == MockSubCommand.name)
     }
     
     
@@ -219,13 +219,13 @@ class ParserRuntimeTests : XCTestCase {
     
     func testSendOneArgWithCommandThatHasNoArgsNoSuchSubCommandThrows() {
         class C : MockCommand, CommandWithSubCommands {
-            var subCommands : [Command] = [MockSubCommand()]
-            var usedSubCommand : Command?
+            var subcommands : [Command] = [MockSubCommand()]
+            var usedSubcommand : Command?
         }
         let parser = CommandParser()
         try! parser.register(C.self)
         let cmd = C.init()
-        AssertThrows(expectedError: ParserError.noSuchSubCommand(command: cmd, subCommandName: "bar"),
+        AssertThrows(expectedError: ParserError.noSuchSubCommand(command: cmd, subcommandName: "bar"),
                      try parser.parse(arguments: ["mockcommand", "notmocksubcommand"]))
     }
     
@@ -267,8 +267,8 @@ class ParserRuntimeTests : XCTestCase {
             var arguments : [Argument] = [MockArgument()]
         }
         class C : MockCommand, CommandWithSubCommands {
-            var subCommands : [Command] = [SubCMD()]
-            var usedSubCommand : Command?
+            var subcommands : [Command] = [SubCMD()]
+            var usedSubcommand : Command?
         }
         let parser = CommandParser()
         try! parser.register(C.self)

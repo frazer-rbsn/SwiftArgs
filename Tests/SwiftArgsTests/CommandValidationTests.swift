@@ -54,7 +54,7 @@ class CommandValidationTests: XCTestCase {
     func testAddCommandNameWithSpaceThrows() {
         struct C : Command {
             static var name = "gener ate"
-            var helptext = ""
+            var helpText = ""
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
@@ -64,7 +64,7 @@ class CommandValidationTests: XCTestCase {
     func testAddEmptyCommandNameThrows() {
         struct C : Command {
             static var name = ""
-            var helptext = ""
+            var helpText = ""
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
@@ -81,11 +81,11 @@ class CommandValidationTests: XCTestCase {
     func testDuplicateCommandNameThrows() {
         struct C : Command {
             static var name = "foo"
-            var helptext = ""
+            var helpText = ""
         }
         struct D : Command {
             static var name = "foo"
-            var helptext = ""
+            var helpText = ""
         }
         let parser = CommandParser()
         try! parser.register(C.self)
@@ -115,12 +115,12 @@ class CommandValidationTests: XCTestCase {
     
     func testNoSubCommandsThrows() {
         class C : MockCommand, CommandWithSubCommands {
-            var subCommands: [Command] = []
-            var usedSubCommand: Command?
+            var subcommands: [Command] = []
+            var usedSubcommand: Command?
         }
         let parser = CommandParser()
         let cmd = MockCommandWithSubCommands()
-        cmd.subCommands = []
+        cmd.subcommands = []
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
                      try parser.register(C.self))
     }
