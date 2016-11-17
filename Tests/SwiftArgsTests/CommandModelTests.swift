@@ -12,30 +12,27 @@ import XCTest
 class CommandModelTests: XCTestCase {
     
     func testGetOption() {
-        let optionfoo = MockOption(name:"foo")
-        let optionbar = MockOption(name:"bar")
-        let optionbaz = MockOption(name:"baz")
-        let c = MockCommandWithOptions()
-        c.options = [optionfoo, optionbar, optionbaz]
+        class C : MockCommand, CommandWithOptions {
+            var options : [Option] = [MockOption(name:"foo"), MockOption(name:"bar"), MockOption(name:"baz")]
+        }
+        let c = C.init()
         XCTAssertEqual(try! c.getOption("bar").name, "bar")
     }
 
     func testGetNonExistantOptionThrows() {
-        let optionfoo = MockOption(name:"foo")
-        let optionbar = MockOption(name:"bar")
-        let optionbaz = MockOption(name:"baz")
-        let c = MockCommandWithOptions()
-        c.options = [optionfoo, optionbar, optionbaz]
+        class C : MockCommand, CommandWithOptions {
+            var options : [Option] = [MockOption(name:"foo")]
+        }
+        let c = C.init()
         AssertThrows(expectedError: CommandError.noSuchOption(command: c, optionName: "fish"),
                      try c.getOption("fish"))
     }
 
     func testSetNonExistantOptionThrows() {
-        let optionfoo = MockOption(name:"foo")
-        let optionbar = MockOption(name:"bar")
-        let optionbaz = MockOption(name:"baz")
-        var c = MockCommandWithOptions()
-        c.options = [optionfoo, optionbar, optionbaz]
+        class C : MockCommand, CommandWithOptions {
+            var options : [Option] = [MockOption(name:"foo")]
+        }
+        var c = C.init()
         AssertThrows(expectedError: CommandError.noSuchOption(command: c, optionName: "fish"),
                      try c.setOption("fish"))
     }

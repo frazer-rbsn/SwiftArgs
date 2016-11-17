@@ -33,6 +33,7 @@ class ParserRuntimeTests : XCTestCase {
         XCTAssertNotNil(delegate.command)
         let c = delegate.command as! CommandWithOptions
         XCTAssertFalse(c.options[0].set)
+        XCTAssert(c.usedOptions.count == 0)
     }
     
     func testParseValidCommandWithOptionWithArgumentEmptyArg() {
@@ -47,6 +48,7 @@ class ParserRuntimeTests : XCTestCase {
         let c = delegate.command as! CommandWithOptions
         XCTAssert(c.options[0].set)
         XCTAssert((c.options[0] as! OptionWithArgument).value! == "")
+        XCTAssert(c.usedOptions.count == 1)
     }
     
     func testParseValidCommandWithTwoOptions() {
@@ -61,6 +63,7 @@ class ParserRuntimeTests : XCTestCase {
         let c = delegate.command as! CommandWithOptions
         XCTAssert(c.options[0].set)
         XCTAssert(c.options[1].set)
+        XCTAssert(c.usedOptions.count == 2)
     }
     
     func testParseValidCommandWithTwoArgs() {
@@ -75,6 +78,7 @@ class ParserRuntimeTests : XCTestCase {
         let c = delegate.command as! CommandWithArguments
         XCTAssertEqual(c.arguments[0].value!, "arg1value")
         XCTAssertEqual(c.arguments[1].value!, "arg2value")
+        XCTAssert(c.allArgumentsSet)
     }
     
     func testParseValidCommandWithOneOptionAndOneOptionWithArgAndOneArg() {

@@ -6,47 +6,10 @@ class MockCommand : Command {
     required init() {}
 }
 
-class MockCommandWithOptions : MockCommand, CommandWithOptions {
-    var options: [Option] = [MockOption()]
-}
-
-class MockCommandWithArguments : MockCommand, CommandWithArguments {
-    var arguments: [Argument] = [MockArgument()]
-}
-
-class MockCommandWithOptionsAndArguments : MockCommand, CommandWithOptions, CommandWithArguments {
-    var options: [Option] = [MockOption()]
-    var arguments: [Argument] = [MockArgument()]
-}
-
 class MockSubCommand : Command {
     static var name : String = "mocksubcommand"
     var helpText: String = "mocksubcommand help text"
     required init(){}
-}
-
-class MockCommandWithSubCommands : MockCommand, CommandWithSubCommands {
-    var subcommands: [Command] = [MockSubCommand()]
-    var usedSubcommand: Command? = nil
-}
-
-class MockCommandWithOptionsAndSubCommands : MockCommand, CommandWithOptions, CommandWithSubCommands {
-    var options: [Option] = [MockOption()]
-    var subcommands: [Command] = [MockSubCommand()]
-    var usedSubcommand: Command? = nil
-}
-
-class MockCommandWithArgumentsAndSubCommands : MockCommand, CommandWithArguments, CommandWithSubCommands {
-    var arguments: [Argument] = [MockArgument()]
-    var subcommands: [Command] = [MockSubCommand()]
-    var usedSubcommand: Command? = nil
-}
-
-class MockCommandWithOptionsAndArgumentsAndSubCommands : MockCommand, CommandWithOptions, CommandWithArguments, CommandWithSubCommands {
-    var options: [Option] = [MockOption()]
-    var arguments: [Argument] = [MockArgument()]
-    var subcommands: [Command] = [MockSubCommand()]
-    var usedSubcommand: Command? = nil
 }
 
 class MockOption : Option {

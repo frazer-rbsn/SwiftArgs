@@ -107,8 +107,6 @@ class CommandValidationTests: XCTestCase {
             var arguments : [Argument] = []
         }
         let parser = CommandParser()
-        let cmd = MockCommandWithArguments()
-        cmd.arguments = []
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
                      try parser.register(C.self))
     }
@@ -119,8 +117,6 @@ class CommandValidationTests: XCTestCase {
             var usedSubcommand: Command?
         }
         let parser = CommandParser()
-        let cmd = MockCommandWithSubCommands()
-        cmd.subcommands = []
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
                      try parser.register(C.self))
     }
