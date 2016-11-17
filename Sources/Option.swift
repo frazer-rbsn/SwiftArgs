@@ -34,8 +34,7 @@ public protocol Option {
      Will be set to `true` if the option was specified when the command was run.
      */
     var set : Bool { get set }
-    
-    init()
+
 }
 
 public extension Option {
