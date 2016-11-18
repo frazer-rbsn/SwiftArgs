@@ -28,7 +28,7 @@ public protocol Command {
     init()
 }
 
-protocol RunnableCommand : Command {
+public protocol RunnableCommand : Command {
     
     /**
      Make the command grow legs and begin a light jog.
@@ -61,13 +61,13 @@ public protocol CommandWithOptions : Command {
 
 public struct OptionArray {
     var options : [OptionUsed] = []
-    init(_ options : Option...) {
+    public init(_ options : Option...) {
         for o in options {
             let x = OptionUsed(o)
             self.options.append(x)
         }
     }
-    subscript(index: Int) -> OptionUsed {
+    public subscript(index: Int) -> OptionUsed {
         get {
             return options[index]
         }
