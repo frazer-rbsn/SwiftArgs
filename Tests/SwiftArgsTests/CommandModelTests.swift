@@ -13,7 +13,7 @@ class CommandModelTests: XCTestCase {
     
     func testGetOption() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOption(name:"foo"), MockOption(name:"bar"), MockOption(name:"baz"))
+            var options = OptionArray(MockOption(name:"foo"), MockOption(name:"bar"), MockOption(name:"baz"))
         }
         let c = C.init()
         XCTAssertEqual(try! c.getOption("bar").name, "bar")
@@ -21,7 +21,7 @@ class CommandModelTests: XCTestCase {
 
     func testOptionLongForms() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOption(name:"foo"), MockOption(name:"bar"), MockOption(name:"baz"))
+            var options = OptionArray(MockOption(name:"foo"), MockOption(name:"bar"), MockOption(name:"baz"))
         }
         let c = C.init()
         XCTAssertEqual(c.optionLongForms,["--foo","--bar","--baz"])
@@ -29,7 +29,7 @@ class CommandModelTests: XCTestCase {
     
     func testSetOption() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOption(name:"foo"))
+            var options = OptionArray(MockOption(name:"foo"))
         }
         var c = C.init()
         XCTAssert(c.usedOptions.count == 0)
@@ -39,7 +39,7 @@ class CommandModelTests: XCTestCase {
     
     func testSetOptionWithArg() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOptionWithArgument(name:"fish"))
+            var options = OptionArray(MockOptionWithArgument(name:"fish"))
         }
         var c = C.init()
         XCTAssert(c.usedOptions.count == 0)
@@ -51,7 +51,7 @@ class CommandModelTests: XCTestCase {
     
     func testGetNonExistantOptionThrows() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOption(name:"foo"))
+            var options = OptionArray(MockOption(name:"foo"))
         }
         let c = C.init()
         AssertThrows(expectedError: CommandError.noSuchOption(command: c, optionName: "fish"),
@@ -60,7 +60,7 @@ class CommandModelTests: XCTestCase {
 
     func testSetNonExistantOptionThrows() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOption(name:"foo"))
+            var options = OptionArray(MockOption(name:"foo"))
         }
         var c = C.init()
         AssertThrows(expectedError: CommandError.noSuchOption(command: c, optionName: "fish"),

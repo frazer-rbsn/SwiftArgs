@@ -22,7 +22,7 @@ class CommandValidationTests: XCTestCase {
     
     func testAddValidCommandWithTwoOptions() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOption(name:"op1"), MockOption(name:"op2"))
+            var options = OptionArray(MockOption(name:"op1"), MockOption(name:"op2"))
         }
         let parser = CommandParser()
         try! parser.register(C.self)
@@ -40,7 +40,7 @@ class CommandValidationTests: XCTestCase {
     
     func testAddValidCommandWithOneOptionAndOneOptionWithArgAndOneArg() {
         class C : MockCommand, CommandWithOptions, CommandWithArguments {
-            var options = OptionSet(MockOption(name:"op"), MockOptionWithArgument(name:"opwitharg"))
+            var options = OptionArray(MockOption(name:"op"), MockOptionWithArgument(name:"opwitharg"))
             var arguments : [Argument] = [MockArgument(name:"mockarg")]
         }
         let parser = CommandParser()
@@ -95,7 +95,7 @@ class CommandValidationTests: XCTestCase {
     
     func testNoOptionsThrows() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet()
+            var options = OptionArray()
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
@@ -123,7 +123,7 @@ class CommandValidationTests: XCTestCase {
     
     func testEmptyOptionNameThrows() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOption(name:""))
+            var options = OptionArray(MockOption(name:""))
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
@@ -141,7 +141,7 @@ class CommandValidationTests: XCTestCase {
     
     func testDuplicateOptionNamesThrows() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOption(),MockOption())
+            var options = OptionArray(MockOption(),MockOption())
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
@@ -159,7 +159,7 @@ class CommandValidationTests: XCTestCase {
     
     func testOptionNameWithSpaceThrows() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOption(name:"opt ion"))
+            var options = OptionArray(MockOption(name:"opt ion"))
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,
@@ -177,7 +177,7 @@ class CommandValidationTests: XCTestCase {
     
     func testOptionNameWithHyphenThrows() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOption(name:"opt-ion"))
+            var options = OptionArray(MockOption(name:"opt-ion"))
         }
         let parser = CommandParser()
         AssertThrows(expectedError:  CommandModelError.invalidCommand,

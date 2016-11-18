@@ -56,10 +56,10 @@ public protocol CommandWithOptions : Command {
      Order does not matter here.
      Must not be empty.
      */
-    var options : OptionSet { get set }
+    var options : OptionArray { get set }
 }
 
-public struct OptionSet {
+public struct OptionArray {
     var options : [OptionUsed] = []
     init(_ options : Option...) {
         for o in options {

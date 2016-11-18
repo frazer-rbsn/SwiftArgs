@@ -24,7 +24,7 @@ class ParserRuntimeTests : XCTestCase {
     
     func testParseValidCommandOptionNotSet() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOption())
+            var options = OptionArray(MockOption())
         }
         let parser = CommandParser()
         try! parser.register(C.self)
@@ -38,7 +38,7 @@ class ParserRuntimeTests : XCTestCase {
     
     func testParseValidCommandWithOptionWithArgumentEmptyArg() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOptionWithArgument())
+            var options = OptionArray(MockOptionWithArgument())
         }
         let parser = CommandParser()
         try! parser.register(C.self)
@@ -53,7 +53,7 @@ class ParserRuntimeTests : XCTestCase {
     
     func testParseValidCommandWithTwoOptions() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOption(name:"op1"), MockOption(name:"op2"))
+            var options = OptionArray(MockOption(name:"op1"), MockOption(name:"op2"))
         }
         let parser = CommandParser()
         try! parser.register(C.self)
@@ -83,7 +83,7 @@ class ParserRuntimeTests : XCTestCase {
     
     func testParseValidCommandWithOneOptionAndOneOptionWithArgAndOneArg() {
         class C : MockCommand, CommandWithOptions, CommandWithArguments {
-            var options = OptionSet(MockOption(), MockOptionWithArgument())
+            var options = OptionArray(MockOption(), MockOptionWithArgument())
             var arguments : [Argument] = [MockArgument()]
         }
         let parser = CommandParser()
@@ -170,7 +170,7 @@ class ParserRuntimeTests : XCTestCase {
     
     func testParseCommandWithIncorrectOptionNameThrows() {
         class C : MockCommand, CommandWithOptions {
-            var options = OptionSet(MockOption(name:"foo"))
+            var options = OptionArray(MockOption(name:"foo"))
         }
         let parser = CommandParser()
         try! parser.register(C.self)
@@ -190,9 +190,9 @@ class ParserRuntimeTests : XCTestCase {
     func testParseCommandWithOptionThatRequiresArgumentNoArgThrows() {
         class C : MockCommand, CommandWithOptions {
             var op = MockOptionWithArgument(name:"op")
-            var options : OptionSet
+            var options : OptionArray
             required init() {
-                options = OptionSet(op)
+                options = OptionArray(op)
             }
         }
         let parser = CommandParser()
