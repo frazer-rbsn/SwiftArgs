@@ -24,7 +24,7 @@ class ParserRuntimeTests : XCTestCase {
     
     func testParseValidCommandOptionNotSet() {
         class C : MockCommand, CommandWithOptions {
-            var options : [Option] = [MockOption()]
+            var options = OptionSet(MockOption())
         }
         let parser = CommandParser()
         try! parser.register(C.self)
@@ -32,13 +32,13 @@ class ParserRuntimeTests : XCTestCase {
         try! parser.parse(arguments: ["mockcommand"], delegate: delegate)
         XCTAssertNotNil(delegate.command)
         let c = delegate.command as! CommandWithOptions
-        XCTAssertFalse(c.options[0].set)
+        XCTAssertFalse(c.options[0].used)
         XCTAssert(c.usedOptions.count == 0)
     }
     
     func testParseValidCommandWithOptionWithArgumentEmptyArg() {
         class C : MockCommand, CommandWithOptions {
-            var options : [Option] = [MockOptionWithArgument()]
+            var options = OptionSet(MockOptionWithArgument())
         }
         let parser = CommandParser()
         try! parser.register(C.self)
@@ -46,14 +46,14 @@ class ParserRuntimeTests : XCTestCase {
         try! parser.parse(arguments: ["mockcommand", "--mockoptionwitharg="], delegate: delegate)
         XCTAssertNotNil(delegate.command)
         let c = delegate.command as! CommandWithOptions
-        XCTAssert(c.options[0].set)
-        XCTAssert((c.options[0] as! OptionWithArgument).value! == "")
+        XCTAssert(c.options[0].used)
+        XCTAssert((c.options[0].option as! OptionWithArgument).value! == "")
         XCTAssert(c.usedOptions.count == 1)
     }
     
     func testParseValidCommandWithTwoOptions() {
         class C : MockCommand, CommandWithOptions {
-            var options : [Option] = [MockOption(name:"op1"), MockOption(name:"op2")]
+            var options = OptionSet(MockOption(name:"op1"), MockOption(name:"op2"))
         }
         let parser = CommandParser()
         try! parser.register(C.self)
@@ -61,8 +61,8 @@ class ParserRuntimeTests : XCTestCase {
         try! parser.parse(arguments: ["mockcommand", "--op1", "--op2"], delegate: delegate)
         XCTAssertNotNil(delegate.command)
         let c = delegate.command as! CommandWithOptions
-        XCTAssert(c.options[0].set)
-        XCTAssert(c.options[1].set)
+        XCTAssert(c.options[0].used)
+        XCTAssert(c.options[1].used)
         XCTAssert(c.usedOptions.count == 2)
     }
     
@@ -83,7 +83,7 @@ class ParserRuntimeTests : XCTestCase {
     
     func testParseValidCommandWithOneOptionAndOneOptionWithArgAndOneArg() {
         class C : MockCommand, CommandWithOptions, CommandWithArguments {
-            var options : [Option] = [MockOption(), MockOptionWithArgument()]
+            var options = OptionSet(MockOption(), MockOptionWithArgument())
             var arguments : [Argument] = [MockArgument()]
         }
         let parser = CommandParser()
@@ -92,9 +92,9 @@ class ParserRuntimeTests : XCTestCase {
         try! parser.parse(arguments: ["mockcommand", "--mockoption", "--mockoptionwitharg=value", "argumentvalue"], delegate: delegate)
         XCTAssertNotNil(delegate.command)
         let c = delegate.command as! CommandWithOptions
-        XCTAssert(c.options[0].set)
-        XCTAssert(c.options[1].set)
-        XCTAssert((c.options[1] as! OptionWithArgument).value! == "value")
+        XCTAssert(c.options[0].used)
+        XCTAssert(c.options[1].used)
+        XCTAssert((c.options[1].option as! OptionWithArgument).value! == "value")
         XCTAssertEqual((delegate.command as! CommandWithArguments).arguments[0].value!, "argumentvalue")
     }
     
@@ -170,7 +170,7 @@ class ParserRuntimeTests : XCTestCase {
     
     func testParseCommandWithIncorrectOptionNameThrows() {
         class C : MockCommand, CommandWithOptions {
-            var options : [Option] = [MockOption(name:"foo")]
+            var options = OptionSet(MockOption(name:"foo"))
         }
         let parser = CommandParser()
         try! parser.register(C.self)
@@ -190,9 +190,9 @@ class ParserRuntimeTests : XCTestCase {
     func testParseCommandWithOptionThatRequiresArgumentNoArgThrows() {
         class C : MockCommand, CommandWithOptions {
             var op = MockOptionWithArgument(name:"op")
-            var options : [Option]
+            var options : OptionSet
             required init() {
-                options = [op]
+                options = OptionSet(op)
             }
         }
         let parser = CommandParser()

@@ -29,12 +29,6 @@ public protocol Option {
      Must be unique for the command.
      */
     var name : String { get }
-    
-    /**
-     Will be set to `true` if the option was specified when the command was run.
-     */
-    var set : Bool { get set }
-
 }
 
 public extension Option {

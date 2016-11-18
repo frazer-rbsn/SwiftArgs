@@ -56,31 +56,57 @@ public protocol CommandWithOptions : Command {
      Order does not matter here.
      Must not be empty.
      */
-    var options : [Option] { get set }
+    var options : OptionSet { get set }
+}
+
+public struct OptionSet {
+    var options : [OptionUsed] = []
+    init(_ options : Option...) {
+        for o in options {
+            let x = OptionUsed(o)
+            self.options.append(x)
+        }
+    }
+    subscript(index: Int) -> OptionUsed {
+        get {
+            return options[index]
+        }
+        set(newValue) {
+            options[index] = newValue
+        }
+    }
+}
+
+internal struct OptionUsed {
+    var option : Option
+    var used : Bool = false
+    init(_ option: Option) {
+        self.option = option
+    }
 }
 
 extension CommandWithOptions {
     
     public var optionNames : [String] {
-        return options.map() { $0.name }
+        return options.options.map() { $0.option.name }
     }
     
     /**
      Option names with the "--" prefix.
      */
     public var optionLongForms : [String] {
-        return options.map() { "--" + $0.name }
+        return options.options.map() { "--" + $0.option.name }
     }
     
     /**
      Options that were used with the command at runtime.
      */
     public var usedOptions : [Option] {
-        return options.filter( { $0.set == true })
+        return options.options.filter( { $0.used == true }).map() { $0.option }
     }
     
     internal func getOption(_ name : String) throws -> Option {
-        guard let option = options.filter({ $0.name == name }).first
+        guard let option = options.options.filter({ $0.option.name == name }).first?.option
             else { throw CommandError.noSuchOption(command:self, optionName: name) }
         return option
     }
@@ -92,11 +118,11 @@ extension CommandWithOptions {
     internal mutating func setOption(_ o : String, value : String?) throws {
         guard let i = optionLongForms.index(of: o)
             else { throw CommandError.noSuchOption(command:self, optionName: o) }
-        if var op = options[i] as? OptionWithArgument {
+        if var op = options.options[i].option as? OptionWithArgument {
             guard let v = value else { throw CommandError.optionRequiresArgument(command:self, option: op) }
             op.value = v
         }
-        options[i].set = true
+        options.options[i].used = true
     }
 }
 

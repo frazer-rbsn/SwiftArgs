@@ -44,7 +44,7 @@ struct CommandValidator : HasDebugMode {
     }
     
     func validateOptions(_ cmd : CommandWithOptions) throws {
-        guard !cmd.options.isEmpty else {
+        guard !cmd.options.options.isEmpty else {
             printDebug("Error: Command model \(cmd) conforms to protocol CommandWithOptions. Property 'options' must contain at least one option.")
             throw CommandModelError.invalidCommand
         }
@@ -53,18 +53,18 @@ struct CommandValidator : HasDebugMode {
             printDebug("Two or more options have the same name.")
             throw CommandModelError.invalidCommand
         }
-        for o in cmd.options {
-            guard !o.name.contains(" ") else {
+        for o in cmd.options.options {
+            guard !o.option.name.contains(" ") else {
                 printDebug("Error: Invalid option model \'\(o)\' for command model \'\(cmd)\'.")
                 printDebug("Option names must not contain spaces.")
                 throw CommandModelError.invalidCommand
             }
-            guard !o.name.contains("-") else {
+            guard !o.option.name.contains("-") else {
                 printDebug("Error: Invalid option model \'\(o)\' for command model \'\(cmd)\'.")
                 printDebug("Option names must not contain hyphens.")
                 throw CommandModelError.invalidCommand
             }
-            guard o.name != "" else {
+            guard o.option.name != "" else {
                 printDebug("Error: Invalid option model \'\(o)\' for command model \'\(cmd)\'.")
                 printDebug("Option names must not be empty.")
                 throw CommandModelError.invalidCommand
