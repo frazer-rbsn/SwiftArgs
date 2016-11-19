@@ -67,7 +67,7 @@ public struct OptionArray {
             self.options.append(x)
         }
     }
-    public subscript(index: Int) -> OptionUsed {
+    subscript(index: Int) -> OptionUsed {
         get {
             return options[index]
         }
@@ -77,7 +77,7 @@ public struct OptionArray {
     }
 }
 
-internal struct OptionUsed {
+struct OptionUsed {
     var option : Option
     var used : Bool = false
     init(_ option: Option) {
