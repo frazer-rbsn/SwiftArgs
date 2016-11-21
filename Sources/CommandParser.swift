@@ -36,6 +36,17 @@ public protocol CommandParserDelegate {
     func receivedCommand(command : Command)
 }
 
+/**
+ Recieves and processes arguments sent to your program.
+ 
+ How to use:
+ 
+ 1. Create an object that conforms to the `CommandParserDelegate` protocol.
+ 2. Create a `CommandParser` instance
+ 3. Add your command models to the parser using `CommandParser.registerCommand(_:)`
+ 4. Call `CommandParser.parseCommandLine(delegate:)` and pass your delegate object.
+ 5. Be sure to catch any errors. For possible errors see `ParserError`
+ */
 public class CommandParser : HasDebugMode {
 
     internal var commands : [Command.Type] = []
@@ -129,12 +140,8 @@ public class CommandParser : HasDebugMode {
             throw ParserError.noCommands
             
         } catch ParserError.commandNotSupplied {
-            if let d = delegate {
-                d.commandNotSupplied()
-            }
-            if printHelpOnNoCommand {
-                UsageInfoPrinter().printCommands(commands)
-            }
+            if let d = delegate { d.commandNotSupplied() }
+            if printHelpOnNoCommand { UsageInfoPrinter().printCommands(commands) }
             
         } catch ParserError.noSuchCommand(let name) {
             printHelp("Error: no such command \'\(name)\'")

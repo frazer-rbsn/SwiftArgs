@@ -111,11 +111,7 @@ extension CommandWithOptions {
         return option
     }
     
-    internal mutating func setOption(_ o : String) throws {
-        try setOption(o, value: nil)
-    }
-    
-    internal mutating func setOption(_ o : String, value : String?) throws {
+    internal mutating func setOption(_ o : String, value : String? = nil) throws {
         guard let i = optionLongForms.index(of: o)
             else { throw CommandError.noSuchOption(command:self, optionName: o) }
         if var op = options.options[i].option as? OptionWithArgument {
