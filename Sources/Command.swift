@@ -38,7 +38,7 @@ public protocol RunnableCommand : Command {
 }
 
 /**
- Options allow users to alter the operation of a command.
+ A command that has optional parameters. Options allow users to alter the operation of a command.
  
  For example:
  ````
@@ -47,7 +47,7 @@ public protocol RunnableCommand : Command {
  where `roundedcorners` is the name of the option.
  
  One or more options can with the command, in any order, as long as they are placed 
- BEFORE any of the command's required arguments in the command line, if it has any.
+ BEFORE any of the command's required arguments in the command-line, if it has any.
  */
 public protocol CommandWithOptions : Command {
     
@@ -60,26 +60,28 @@ public protocol CommandWithOptions : Command {
 }
 
 public struct OptionArray {
+    
     var options : [OptionUsed] = []
+    
     public init(_ options : Option...) {
         for o in options {
             let x = OptionUsed(o)
             self.options.append(x)
         }
     }
+    
     subscript(index: Int) -> OptionUsed {
         get {
             return options[index]
-        }
-        set(newValue) {
-            options[index] = newValue
         }
     }
 }
 
 struct OptionUsed {
+    
     var option : Option
     var used : Bool = false
+    
     init(_ option: Option) {
         self.option = option
     }
@@ -123,7 +125,7 @@ extension CommandWithOptions {
 }
 
 /**
- Commands that have required arguments.
+ A command that has required positional arguments.
  
  For example:
  ````
@@ -160,7 +162,7 @@ extension CommandWithArguments {
 /**
  So I heard you like commands...
  
- In the command line, subcommands can be used after a command. The subcommand must come AFTER any required arguments
+ In the command-line, subcommands can be used after a command. The subcommand must come AFTER any required arguments
  the command has.
  
  Subcommands are themselves Commands and the command logic is recursive, i.e. subcommands
@@ -204,6 +206,9 @@ public func ==(l: Command.Type, r: Command.Type) -> Bool {
     return l.name == r.name
 }
 
+/**
+ Has text that can be printed as part of usage information.
+ */
 public protocol HasHelpText {
     /**
      Usage information for users.

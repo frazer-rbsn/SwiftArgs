@@ -1,11 +1,3 @@
-//
-//  ParserLogicTests.swift
-//  SwiftArgs
-//
-//  Created by Frazer Robinson on 10/11/2016.
-//
-//
-
 import XCTest
 @testable import SwiftArgs
 

@@ -1,11 +1,3 @@
-//
-//  CommandModelTests.swift
-//  SwiftArgs
-//
-//  Created by Frazer Robinson on 11/11/2016.
-//
-//
-
 import XCTest
 @testable import SwiftArgs
 

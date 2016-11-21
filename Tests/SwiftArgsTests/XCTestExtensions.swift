@@ -1,9 +1,8 @@
 import XCTest
 
 /// Implement pattern matching for ErrorType
-public func ~=(lhs: Error, rhs: Error) -> Bool {
-    return lhs._domain == rhs._domain
-        && lhs._code   == rhs._code
+public func ~=(l: Error, r: Error) -> Bool {
+    return l._domain == r._domain && l._code == r._code
 }
 
 

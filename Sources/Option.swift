@@ -7,9 +7,13 @@
 //
 
 /**
- Arguments that are optional when running the command.
- They are positioned after the command name and before any required arguments.
- To make an option model, conform to this protocol.
+ And optional parameter for a command.
+ In the command-line, options are positioned after the command name and before any required arguments.
+ For example:
+ ````
+ makesquare --roundedcorners
+ ````
+ where `roundedcorners` is the name of the option.
  */
 public protocol Option {
     
@@ -52,9 +56,13 @@ public extension Option {
  ````
  yourcommandname --youroptionname=<arg>
  ````
+
  ````
  make --directory=/mydir/mysubdir/
  ````
+ 
+ After running this command, the `value` property of the `directory` option object would contain
+ "/mydir/mysubdir/"
  */
 public protocol OptionWithArgument : Option {
     

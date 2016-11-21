@@ -26,7 +26,7 @@ public enum ParserError : Error {
 public protocol CommandParserDelegate {
     
     /**
-     Called if there were no command line arguments supplied to your program.
+     Called if there were no command-line arguments supplied to your program.
      */
     func commandNotSupplied()
     
@@ -43,7 +43,7 @@ public protocol CommandParserDelegate {
  
  1. Create an object that conforms to the `CommandParserDelegate` protocol.
  2. Create a `CommandParser` instance
- 3. Add your command models to the parser using `CommandParser.registerCommand(_:)`
+ 3. Add your command models to the parser using `CommandParser.register(_:)`
  4. Call `CommandParser.parseCommandLine(delegate:)` and pass your delegate object.
  5. Be sure to catch any errors. For possible errors see `ParserError`
  */
