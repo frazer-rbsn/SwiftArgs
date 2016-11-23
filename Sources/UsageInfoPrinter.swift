@@ -72,5 +72,14 @@ public struct UsageInfoPrinter {
                 print("<\(a.name)>", terminator: " ")
             }
         }
+        if let c = cmd as? CommandWithSubCommands {
+            print("\n\nSUBCOMMANDS:")
+            for s in c.subcommands {
+                print("    \(type(of:s).name)", terminator: " ")
+                if let sht = s as? HasHelpText {
+                    print("    \(sht.helpText)")
+                } else { print() }
+            }
+        }
     }
 }
