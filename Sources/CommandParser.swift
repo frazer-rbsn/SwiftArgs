@@ -219,25 +219,26 @@ public class CommandParser : HasDebugMode {
         // Options
         if isLongformOption(tokens[0]) {
             guard let c = command as? CommandWithOptions else { throw ParserError.noOptions(command) }
-            (command, remainingTokens) = try parseCommandOptions(c, tkns: remainingTokens)
+            (command, remainingTokens) = try parseCommandOptions(c, remainingTokens)
         }
         // Arguments
         if let c = command as? CommandWithArguments {
-            (command, remainingTokens) = try parseCommandArguments(c, tkns: remainingTokens)
+            (command, remainingTokens) = try parseCommandArguments(c, remainingTokens)
             guard (command as! CommandWithArguments).allArgumentsSet else { throw ParserError.invalidArguments(command) }
         }
         // SubCommands
         if let c = command as? CommandWithSubCommands {
-            (command, remainingTokens) = try parseSubCommand(c, tkns: remainingTokens)
+            (command, remainingTokens) = try parseSubCommand(c, remainingTokens)
         }
         guard remainingTokens.isEmpty else { throw ParserError.invalidArgumentOrSubCommand(command) }
         return (command, remainingTokens)
     }
     
-    private func parseCommandOptions(_ c : CommandWithOptions, tkns : [String]) throws -> (command: Command, remainingTokens : [String]) {
+    private func parseCommandOptions(_ c : CommandWithOptions, _ tkns : [String]) throws -> (command: Command, remainingTokens : [String]) {
         var command = c
         var tokens = tkns
-        for t in tkns {
+        for t in tokens {
+            guard tokens.index(of: t) != nil else { break } // Check this element hasn't been removed. We're looping through a buffer, not the actual array.
             guard t.firstChar == "-" else { break }
             let s = getOptionName(t)
             let o = try command.getOption(s)
@@ -245,8 +246,8 @@ public class CommandParser : HasDebugMode {
                 if t.contains("=") {
                     try command.setOption(s, value: t.components(separatedBy: "=").last!)
                 } else {
-                    let i = tkns.index(after: tkns.index(of: t)!)
-                    try command.setOption(s, value: tkns[safe:UInt(i)])
+                    let i = tokens.index(after: tokens.index(of: t)!)
+                    try command.setOption(s, value: tokens[safe:UInt(i)])
                     tokens.remove(at: i)
                 }
             } else {
@@ -257,7 +258,7 @@ public class CommandParser : HasDebugMode {
         return (command, tokens)
     }
     
-    private func parseCommandArguments(_ c : CommandWithArguments, tkns : [String]) throws -> (command: Command, remainingTokens : [String])  {
+    private func parseCommandArguments(_ c : CommandWithArguments, _ tkns : [String]) throws -> (command: Command, remainingTokens : [String])  {
         var command = c
         var tokens = tkns
         for var arg in command.arguments {
@@ -269,7 +270,7 @@ public class CommandParser : HasDebugMode {
         return (command, tokens)
     }
     
-    private func parseSubCommand(_ c : CommandWithSubCommands, tkns : [String]) throws -> (command: Command, remainingTokens : [String]) {
+    private func parseSubCommand(_ c : CommandWithSubCommands, _ tkns : [String]) throws -> (command: Command, remainingTokens : [String]) {
         var command = c
         var tokens = tkns
         var subcommand = try command.getSubCommand(name: tokens[0])

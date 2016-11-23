@@ -36,6 +36,36 @@ class ParserRuntimeTests : XCTestCase {
         XCTAssert(c.usedOptions.count == 0)
     }
     
+    func testParseValidCommandWithOptionWithArgument() {
+        class C : MockCommand, CommandWithOptions {
+            var options = OptionArray(MockOptionWithArgument())
+        }
+        let parser = CommandParser()
+        try! parser.register(C.self)
+        let delegate = MockCommandParserDelegate()
+        try! parser.parse(arguments: ["mockcommand", "--mockoptionwitharg=arg"], delegate: delegate)
+        XCTAssertNotNil(delegate.command)
+        let c = delegate.command as! CommandWithOptions
+        XCTAssert(c.options[0].used)
+        XCTAssert((c.options[0].option as! OptionWithArgument).value! == "arg")
+        XCTAssert(c.usedOptions.count == 1)
+    }
+    
+    func testParseValidCommandWithOptionWithArgumentStartsWithHypen() {
+        class C : MockCommand, CommandWithOptions {
+            var options = OptionArray(MockOptionWithArgument())
+        }
+        let parser = CommandParser()
+        try! parser.register(C.self)
+        let delegate = MockCommandParserDelegate()
+        try! parser.parse(arguments: ["mockcommand", "--mockoptionwitharg=-arg"], delegate: delegate)
+        XCTAssertNotNil(delegate.command)
+        let c = delegate.command as! CommandWithOptions
+        XCTAssert(c.options[0].used)
+        XCTAssert((c.options[0].option as! OptionWithArgument).value! == "-arg")
+        XCTAssert(c.usedOptions.count == 1)
+    }
+    
     func testParseValidCommandWithOptionWithArgumentNoEqualsSign() {
         class C : MockCommand, CommandWithOptions {
             var options = OptionArray(MockOptionWithArgument())
@@ -48,6 +78,21 @@ class ParserRuntimeTests : XCTestCase {
         let c = delegate.command as! CommandWithOptions
         XCTAssert(c.options[0].used)
         XCTAssert((c.options[0].option as! OptionWithArgument).value! == "arg")
+        XCTAssert(c.usedOptions.count == 1)
+    }
+    
+    func testParseValidCommandWithOptionWithArgumentNoEqualsSignArgStartsWithHyphen() {
+        class C : MockCommand, CommandWithOptions {
+            var options = OptionArray(MockOptionWithArgument())
+        }
+        let parser = CommandParser()
+        try! parser.register(C.self)
+        let delegate = MockCommandParserDelegate()
+        try! parser.parse(arguments: ["mockcommand", "--mockoptionwitharg", "-arg"], delegate: delegate)
+        XCTAssertNotNil(delegate.command)
+        let c = delegate.command as! CommandWithOptions
+        XCTAssert(c.options[0].used)
+        XCTAssert((c.options[0].option as! OptionWithArgument).value! == "-arg")
         XCTAssert(c.usedOptions.count == 1)
     }
     
