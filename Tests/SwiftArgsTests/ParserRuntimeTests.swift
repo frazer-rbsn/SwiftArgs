@@ -36,6 +36,21 @@ class ParserRuntimeTests : XCTestCase {
         XCTAssert(c.usedOptions.count == 0)
     }
     
+    func testParseValidCommandWithOptionWithArgumentNoEqualsSign() {
+        class C : MockCommand, CommandWithOptions {
+            var options = OptionArray(MockOptionWithArgument())
+        }
+        let parser = CommandParser()
+        try! parser.register(C.self)
+        let delegate = MockCommandParserDelegate()
+        try! parser.parse(arguments: ["mockcommand", "--mockoptionwitharg", "arg"], delegate: delegate)
+        XCTAssertNotNil(delegate.command)
+        let c = delegate.command as! CommandWithOptions
+        XCTAssert(c.options[0].used)
+        XCTAssert((c.options[0].option as! OptionWithArgument).value! == "arg")
+        XCTAssert(c.usedOptions.count == 1)
+    }
+    
     func testParseValidCommandWithOptionWithArgumentEmptyArg() {
         class C : MockCommand, CommandWithOptions {
             var options = OptionArray(MockOptionWithArgument())
@@ -152,6 +167,24 @@ class ParserRuntimeTests : XCTestCase {
         XCTAssert(type(of:command.usedSubcommand!).name == MockSubCommand.name)
     }
     
+    func testParseValidCommandWithOneOptionWithArgAndSubcommand() {
+        class C : MockCommand, CommandWithOptions, CommandWithSubCommands {
+            var options = OptionArray(MockOptionWithArgument())
+            var subcommands : [Command] = [MockSubCommand()]
+            var usedSubcommand : Command?
+        }
+        let parser = CommandParser()
+        try! parser.register(C.self)
+        let delegate = MockCommandParserDelegate()
+        try! parser.parse(arguments: ["mockcommand", "--mockoptionwitharg", "arg", "mocksubcommand"], delegate: delegate)
+        XCTAssertNotNil(delegate.command)
+        let c = delegate.command as! CommandWithOptions
+        XCTAssert(c.options[0].used)
+        XCTAssert((c.options[0].option as! OptionWithArgument).value! == "arg")
+        let cs = delegate.command as! CommandWithSubCommands
+        XCTAssertNotNil(cs.usedSubcommand)
+        XCTAssert(type(of:cs.usedSubcommand!).name == MockSubCommand.name)
+    }
     
     // MARK: Invalid scenarios
     

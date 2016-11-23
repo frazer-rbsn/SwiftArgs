@@ -107,20 +107,25 @@ extension CommandWithOptions {
         return options.options.filter( { $0.used == true }).map() { $0.option }
     }
     
-    internal func getOption(_ name : String) throws -> Option {
-        guard let option = options.options.filter({ $0.option.name == name }).first?.option
-            else { throw CommandError.noSuchOption(command:self, optionName: name) }
-        return option
+    internal func getOption(_ longFormName : String) throws -> Option {
+        guard let i = optionLongForms.index(of: longFormName)
+            else { throw CommandError.noSuchOption(command:self, optionName: longFormName) }
+        return options.options[i].option
     }
     
-    internal mutating func setOption(_ o : String, value : String? = nil) throws {
-        guard let i = optionLongForms.index(of: o)
-            else { throw CommandError.noSuchOption(command:self, optionName: o) }
-        if var op = options.options[i].option as? OptionWithArgument {
-            guard let v = value else { throw CommandError.optionRequiresArgument(command:self, option: op) }
-            op.value = v
+    private func getOptionIndex(_ longFormName : String) throws -> Int {
+        guard let i = optionLongForms.index(of: longFormName)
+            else { throw CommandError.noSuchOption(command:self, optionName: longFormName) }
+        return i
+    }
+    
+    internal mutating func setOption(_ longFormName : String, value : String? = nil) throws {
+        let op = try getOption(longFormName)
+        if var owa = op as? OptionWithArgument {
+            guard let v = value else { throw CommandError.optionRequiresArgument(command:self, option: owa) }
+            owa.value = v
         }
-        options.options[i].used = true
+        options.options[try getOptionIndex(longFormName)].used = true
     }
 }
 

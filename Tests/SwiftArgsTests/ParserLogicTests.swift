@@ -9,11 +9,11 @@ class ParserLogicTests: XCTestCase {
         XCTAssertEqual(parser.getOptionName("--option="),"--option")
     }
     
-    func testGetOptionArgument() {
-        let parser = CommandParser()
-        XCTAssertEqual(parser.getOptionArgument("--option=arg"),"arg")
-        XCTAssertEqual(parser.getOptionArgument("--option="),"")
-    }
+//    func testGetOptionArgument() {
+//        let parser = CommandParser()
+//        XCTAssertEqual(parser.getOptionArgument("--option=arg"),"arg")
+//        XCTAssertEqual(parser.getOptionArgument("--option="),"")
+//    }
     
     func testIsOption() {
         let parser = CommandParser()

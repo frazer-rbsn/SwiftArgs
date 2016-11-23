@@ -8,7 +8,7 @@ class CommandModelTests: XCTestCase {
             var options = OptionArray(MockOption(name:"foo"), MockOption(name:"bar"), MockOption(name:"baz"))
         }
         let c = C.init()
-        XCTAssertEqual(try! c.getOption("bar").name, "bar")
+        XCTAssertEqual(try! c.getOption("--bar").name, "bar")
     }
 
     func testOptionLongForms() {

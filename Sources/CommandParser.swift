@@ -240,8 +240,15 @@ public class CommandParser : HasDebugMode {
         for t in tkns {
             guard t.firstChar == "-" else { break }
             let s = getOptionName(t)
-            if optionHasArgument(t) {
-                try command.setOption(s, value: getOptionArgument(t))
+            let o = try command.getOption(s)
+            if o is OptionWithArgument {
+                if t.contains("=") {
+                    try command.setOption(s, value: t.components(separatedBy: "=").last!)
+                } else {
+                    let i = tkns.index(after: tkns.index(of: t)!)
+                    try command.setOption(s, value: tkns[safe:UInt(i)])
+                    tokens.remove(at: i)
+                }
             } else {
                 try command.setOption(s)
             }
@@ -286,14 +293,6 @@ public class CommandParser : HasDebugMode {
     
     func getOptionName(_ string : String) -> String {
         return string.components(separatedBy: "=").first!
-    }
-    
-    func optionHasArgument(_ string : String) -> Bool {
-        return string.contains("=")
-    }
-
-    func getOptionArgument(_ string : String) -> String {
-        return string.components(separatedBy: "=").last!
     }
     
     
