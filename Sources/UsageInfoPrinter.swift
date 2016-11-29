@@ -73,9 +73,33 @@ public struct UsageInfoPrinter {
             }
         }
         if let c = cmd as? CommandWithSubCommands {
+            print("[sub-command]")
+        }
+    }
+    
+    private func _printCommandElementInfo(_ cmd : Command) {
+        if let c = cmd as? CommandWithOptions {
+            print("\n\nOPTIONS:")
+            for o in c.options.options {
+                print("\(o.option.longFormName)", terminator: "")
+                if let oht = o as? HasHelpText {
+                    print("    \(oht.helpText)")
+                } else { print() }
+            }
+        }
+        if let c = cmd as? CommandWithArguments {
+            print("\n\nARGUMENTS:")
+            for a in c.arguments {
+                print("\(a.name)", terminator: "")
+                if let aht = a as? HasHelpText {
+                    print("    \(aht.helpText)")
+                } else { print() }
+            }
+        }
+        if let c = cmd as? CommandWithSubCommands {
             print("\n\nSUBCOMMANDS:")
             for s in c.subcommands {
-                print("    \(type(of:s).name)", terminator: " ")
+                print("    \(type(of:s).name)", terminator: "")
                 if let sht = s as? HasHelpText {
                     print("    \(sht.helpText)")
                 } else { print() }
