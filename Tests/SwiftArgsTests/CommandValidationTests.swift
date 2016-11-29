@@ -105,7 +105,7 @@ class CommandValidationTests: XCTestCase {
     
     func testNoSubCommandsThrows() {
         class C : MockCommand, CommandWithSubCommands {
-            var subcommands: [Command] = []
+            var subcommands: SubcommandArray = SubcommandArray()
             var usedSubcommand: Command?
         }
         let parser = CommandParser()

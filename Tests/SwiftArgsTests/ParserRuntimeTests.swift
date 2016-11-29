@@ -163,7 +163,7 @@ class ParserRuntimeTests : XCTestCase {
             var arguments : [Argument] = [MockArgument()]
         }
         class C : MockCommand, CommandWithSubCommands {
-            var subcommands : [Command] = [SubCMD()]
+            var subcommands = SubcommandArray(SubCMD())
             var usedSubcommand : Command?
         }
         let parser = CommandParser()
@@ -180,7 +180,7 @@ class ParserRuntimeTests : XCTestCase {
     func testParseValidCommandWithArgumentWithSubcommand() {
         class C : MockCommand, CommandWithArguments, CommandWithSubCommands {
             var arguments : [Argument] = [MockArgument()]
-            var subcommands : [Command] = [MockSubCommand()]
+            var subcommands = SubcommandArray(MockSubCommand())
             var usedSubcommand : Command?
         }
         let parser = CommandParser()
@@ -197,7 +197,7 @@ class ParserRuntimeTests : XCTestCase {
     func testParseValidCommandWithTwoArgumentsWithSubcommand() {
         class C : MockCommand, CommandWithArguments, CommandWithSubCommands {
             var arguments : [Argument] = [MockArgument(name:"mockarg1"), MockArgument(name:"mockarg2")]
-            var subcommands : [Command] = [MockSubCommand()]
+            var subcommands = SubcommandArray(MockSubCommand())
             var usedSubcommand : Command?
         }
         let parser = CommandParser()
@@ -215,7 +215,7 @@ class ParserRuntimeTests : XCTestCase {
     func testParseValidCommandWithOneOptionWithArgAndSubcommand() {
         class C : MockCommand, CommandWithOptions, CommandWithSubCommands {
             var options = OptionArray(MockOptionWithArgument())
-            var subcommands : [Command] = [MockSubCommand()]
+            var subcommands = SubcommandArray(MockSubCommand())
             var usedSubcommand : Command?
         }
         let parser = CommandParser()
@@ -301,7 +301,7 @@ class ParserRuntimeTests : XCTestCase {
     
     func testSendOneArgWithCommandThatHasNoArgsNoSuchSubCommandThrows() {
         class C : MockCommand, CommandWithSubCommands {
-            var subcommands : [Command] = [MockSubCommand()]
+            var subcommands = SubcommandArray(MockSubCommand())
             var usedSubcommand : Command?
         }
         let parser = CommandParser()
@@ -349,7 +349,7 @@ class ParserRuntimeTests : XCTestCase {
             var arguments : [Argument] = [MockArgument()]
         }
         class C : MockCommand, CommandWithSubCommands {
-            var subcommands : [Command] = [SubCMD()]
+            var subcommands = SubcommandArray(SubCMD())
             var usedSubcommand : Command?
         }
         let parser = CommandParser()

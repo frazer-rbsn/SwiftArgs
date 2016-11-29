@@ -275,7 +275,7 @@ public class CommandParser : HasDebugMode {
         var tokens = tkns
         var subcommand = try command.getSubCommand(name: tokens[0])
         (subcommand, tokens) = try parseCommand(subcommand, tokens: tokens)
-        command.usedSubcommand = subcommand
+        command.subcommands.usedSubcommand = subcommand
         return (command, tokens)
     }
     

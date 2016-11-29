@@ -106,7 +106,7 @@ struct CommandValidator : HasDebugMode {
             printDebug("Error: Command model \(cmd) conforms to protocol CommandWithSubCommands. Property 'subcommands' must contain at least one subcommand.")
             throw CommandModelError.invalidCommand
         }
-        for subcmd in cmd.subcommands {
+        for subcmd in cmd.subcommands.commands {
             try validateCommand(subcmd)
         }
     }

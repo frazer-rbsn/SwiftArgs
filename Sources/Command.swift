@@ -189,21 +189,39 @@ public protocol CommandWithSubCommands : Command {
      or none at all.
      The subcommand that was used at runtime, if any, is set in `usedSubcommand`.
     */
-    var subcommands : [Command] { get set }
+    var subcommands : SubcommandArray { get set }
+}
+
+public struct SubcommandArray {
     
-    /**
-     If a subcommand was sent to the parser with this command, it will be stored in this property.
-     */
-    var usedSubcommand : Command? { get set }
+    var commands : [Command] = []
+    var usedSubcommand : Command?
     
+    public init(_ commands : Command...) {
+        self.commands = commands
+    }
+    
+    subscript(index: Int) -> Command {
+        get {
+            return commands[index]
+        }
+    }
+    
+    var isEmpty : Bool {
+        return commands.isEmpty
+    }
 }
 
 extension CommandWithSubCommands {
     
     internal func getSubCommand(name : String) throws -> Command {
-        guard let c = subcommands.filter({ type(of:$0).name == name }).first
+        guard let c = subcommands.commands.filter({ type(of:$0).name == name }).first
             else { throw CommandError.noSuchSubCommand(command: self, subcommandName: name) }
         return c
+    }
+    
+    var usedSubcommand : Command? {
+        return subcommands.usedSubcommand
     }
 }
 
