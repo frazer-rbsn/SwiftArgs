@@ -25,6 +25,7 @@ dependencies: [
 
 ### Use
 
+#### Registering commands with the parser
 
 If you only need to define commands by keywords, i.e. without required arguments, option switches 
 or usage documentation, you can use SwiftArgs as follows:
@@ -33,7 +34,49 @@ or usage documentation, you can use SwiftArgs as follows:
 let parser = CommandParser()
 
 try! parser.register("run", "new", "old")
+```
 
+Otherwise, you can define Command models that conform to a Command protocol, as follows:
+
+```swift
+struct RunCommand : Command {
+    let name = "run"
+}
+
+let parser = CommandParser()
+
+try! parser.register(RunCommand())
+```
+
+#### Command Models
+
+You can decorate your command with more functionality by conforming to other protocols. 
+
+For example, if you want to add usage information to a command, conform to the `HasHelpText` protocol.
+If the user runs the command with invalid arguments, the `helpText` will be printed.
+
+```swift
+struct RunCommand : Command, HasHelpText {
+    let name = "run"
+    let helpText "Helpful usage information goes here."
+}
+```
+
+You can specify a command to have arguments, in the form of `command x y`, 
+where `x` and `y` are required arguments and will be parsed as `Argument` models. 
+
+```swift
+struct MoveCommand : CommandWithArguments {
+    let name = "move"
+    let arguments : [Argument] = [BasicArgument("x"), BasicArgument("y")]
+}
+```
+
+#### Parsing the command line
+
+In order to act upon runtime commands, create a `CommandParserDelegate` and pass it to the parser.
+
+```swift
 struct ParserDelegate : CommandParserDelegate {
 
     func receivedCommand(command: Command) {
@@ -47,38 +90,6 @@ struct ParserDelegate : CommandParserDelegate {
 
 try! parser.parseCommandLine(delegate: ParserDelegate())
 ```
-
-Otherwise, you can define Command models that conform to the `Command` protocol, as follows:
-
-```swift
-struct RunCommand : Command {
-    let name = "run"
-}
-```
-
-You can decorate your command with more functionality by conforming to other protocols. 
-
-For example:
-
-```swift
-struct RunCommand : Command, HasHelpText {
-    let name = "run"
-    let helpText "Helpful usage information goes here."
-}
-```
-
-#### Commands with arguments
-
-You can specify a command to have required ordered arguments, in the form of `command x y z`, 
-where `x`, `y` and `y` are arguments and will be parsed as `Argument` models. 
-
-```swift
-struct MoveCommand : CommandWithArguments {
-    let name = "move"
-    let arguments : [Argument] = [BasicArgument("x"), BasicArgument("y")]
-}
-```
-
 
 ### Build
 
