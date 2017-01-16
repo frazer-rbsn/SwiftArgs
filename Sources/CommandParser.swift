@@ -96,7 +96,7 @@ public class CommandParser : HasDebugMode {
             printDebug("CommandParser already has a registered command with name: \'\(command.name)\'")
             throw ParserError.duplicateCommand
         }
-        try CommandValidator(debugMode: debugMode).validateCommand(command)
+        try CommandValidator(debugMode: debugMode).validate(command)
         commands.append(command)
     }
     
