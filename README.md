@@ -8,11 +8,25 @@ A minimal, pure Swift library for making command line tools / interfaces.
 ![SPM](https://img.shields.io/badge/Swift%20Package%20Manager-Compatible-brightgreen.svg)
 ![Swift version](https://img.shields.io/badge/Swift-3-orange.svg)
 
-
-This library is in early stages: breaking changes ahoy! 
-I'm aiming for a stable API by December 2016.
-
 ### Limitations
 
-* Hasn't been tested on Linux yet.
-* Doesn't support short-form option switches yet.
+* Hasn't been tested on Linux.
+* Doesn't support short-form option switches yet, e.g. mycommand -o
+
+### Installation
+
+Using Swift Package Manager:
+
+````
+dependencies: [
+    .Package(url: "https://github.com/frazer-rbsn/SwiftArgs", majorVersion: 0),
+]
+
+````
+
+### Build
+
+Clone the repository, and run `swift build`. Unit tests can be run with `swift test`.
+
+
+Contributions welcome.
