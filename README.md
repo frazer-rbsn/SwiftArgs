@@ -11,7 +11,7 @@ A minimal, pure Swift library for making command line tools / interfaces.
 ### Limitations
 
 * Hasn't been tested on Linux.
-* Doesn't support short-form option switches yet, e.g. mycommand -o
+* Doesn't support short-form option switches yet, e.g. `mycommand -o`
 
 ### Installation
 
@@ -21,8 +21,8 @@ Using Swift Package Manager:
 dependencies: [
     .Package(url: "https://github.com/frazer-rbsn/SwiftArgs", majorVersion: 0),
 ]
-
 ````
+
 ### Use
 
 
