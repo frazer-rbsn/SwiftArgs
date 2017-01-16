@@ -26,16 +26,12 @@ public protocol Command {
     var name : String { get }
 }
 
-public protocol InitialisableCommand : Command {
-    init()
-}
-
 public struct BasicCommand : Command {
     
     public var name : String
     
     public init() {
-        self.name = ""
+        self.name = "" //Note: This consitutes an invalid command.
     }
     
     public init(name : String) {
@@ -239,10 +235,6 @@ extension CommandWithSubCommands {
         return subcommands.usedSubcommand
     }
 }
-
-//public func ==(l: Command.Type, r: Command.Type) -> Bool {
-//    return l.init().name == r.init().name
-//}
 
 public func ==(l: Command, r: Command) -> Bool {
     return l.name == r.name

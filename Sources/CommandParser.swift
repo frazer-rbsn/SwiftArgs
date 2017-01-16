@@ -37,7 +37,7 @@ public protocol CommandParserDelegate {
 }
 
 /**
- Recieves and processes arguments sent to your program.
+ Receives and processes arguments sent to your program.
  
  How to use:
  
@@ -69,15 +69,18 @@ public class CommandParser : HasDebugMode {
     
     public init() {}
     
+    
     /**
      Register command models with the parser, so that when the user supplies command-line arguments
      to your program, they will be recognised and parsed into objects.
      
      - parameter commands:  Classes or structs that conform to a `Command` protocol.
      
-                            Use as follows:
+     Use as follows:
      
-                            register(GenerateCommand.self, HelpCommand.self, AnotherCommand.self)
+     ````
+     register(GenerateCommand.self, HelpCommand.self, AnotherCommand.self)
+     ````
      
      - throws:  `ParserError.duplicateCommand` if the command parser instance already has a
                 command registered with the same name as a command.
@@ -100,6 +103,22 @@ public class CommandParser : HasDebugMode {
         commands.append(command)
     }
     
+    /**
+     Register command names with the parser, so that when the user supplies command-line arguments
+     to your program, they will be recognised and parsed into objects.
+     
+     - parameter commandNames:  Each string will correspond to a command keyboard.
+     
+     Use as follows:
+     ````
+     register("run", "help", "new")
+     ````
+
+     - throws:  `ParserError.duplicateCommand` if the command parser instance already has a
+     command registered with the same name as a command.
+     Or `CommandModelError.invalidCommand` if a command model or
+     any of it's option or argument models is invalid.
+     */
     public func register(_ commandNames : String...) throws {
         for n in commandNames {
             let c = BasicCommand(name: n)
