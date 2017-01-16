@@ -26,3 +26,16 @@ public protocol Argument {
      */
     var value : String? { get set }
 }
+
+/**
+ A standard, bare-bones Argument object.
+ */
+public struct BasicArgument : Argument {
+
+    public let name : String
+    public var value : String?
+    
+    public init(_ name : String) {
+        self.name = name
+    }
+}

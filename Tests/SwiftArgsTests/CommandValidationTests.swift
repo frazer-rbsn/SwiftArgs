@@ -6,7 +6,13 @@ class CommandValidationTests: XCTestCase {
     
     // MARK: Valid scenarios
     
-    func testAddValidCommand() {
+    func testAddCommandsByStrings() {
+        let parser = CommandParser()
+        try! parser.register("run", "move", "new")
+        XCTAssert(parser.commands.count == 3)
+    }
+    
+    func testAddValidCommandModel() {
         let parser = CommandParser()
         try! parser.register(MockCommand())
         XCTAssert(parser.commands.contains(where: { $0 == MockCommand() }))

@@ -15,7 +15,6 @@ internal enum CommandError : Error {
 
 /**
  Encapsulates a command sent to your program.
- To make a standard bare-bones command model, conform to this protocol.
  */
 public protocol Command {
     
@@ -26,13 +25,12 @@ public protocol Command {
     var name : String { get }
 }
 
+/**
+  A standard bare-bones command model.
+ */
 public struct BasicCommand : Command {
     
-    public var name : String
-    
-    public init() {
-        self.name = "" //Note: This consitutes an invalid command.
-    }
+    public let name : String
     
     public init(name : String) {
         self.name = name
@@ -159,7 +157,7 @@ public protocol CommandWithArguments : Command {
      Arguments are positional, so set them in the desired order.
      Must not be empty.
      */
-    var arguments : [Argument] { get set }
+    var arguments : [Argument] { get }
 }
 
 extension CommandWithArguments {
