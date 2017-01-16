@@ -17,11 +17,11 @@ A minimal, pure Swift library for making command line tools / interfaces.
 
 Using Swift Package Manager:
 
-````
+```swift
 dependencies: [
     .Package(url: "https://github.com/frazer-rbsn/SwiftArgs", majorVersion: 0),
 ]
-````
+```
 
 ### Use
 
@@ -29,7 +29,7 @@ dependencies: [
 If you only need to define commands by keywords, i.e. without required arguments, option switches 
 or usage documentation, you can use SwiftArgs as follows:
 
-````
+```swift
 let parser = CommandParser()
 
 try! parser.register("run", "new", "old")
@@ -46,38 +46,38 @@ struct ParserDelegate : CommandParserDelegate {
 }
 
 try! parser.parseCommandLine(delegate: ParserDelegate())
-````
+```
 
 Otherwise, you can define Command models that conform to the `Command` protocol, as follows:
 
-````
+```swift
 struct RunCommand : Command {
     let name = "run"
 }
-````
+```
 
 You can decorate your command with more functionality by conforming to other protocols. 
 
 For example:
 
-````
+```swift
 struct RunCommand : Command, HasHelpText {
     let name = "run"
     let helpText "Helpful usage information goes here."
 }
-````
+```
 
 #### Commands with arguments
 
 You can specify a command to have required ordered arguments, in the form of `command x y z`, 
 where `x`, `y` and `y` are arguments and will be parsed as `Argument` models. 
 
-````
+```swift
 struct MoveCommand : CommandWithArguments {
     let name = "move"
     let arguments : [Argument] = [BasicArgument("x"), BasicArgument("y")]
 }
-````
+```
 
 
 ### Build
