@@ -10,13 +10,6 @@ public struct UsageInfoPrinter {
     
     public init() {}
 
-    public func printCommands(_ cmds : [Command.Type]) {
-        guard !cmds.isEmpty else { return } // No registered commands
-        print("\nCOMMANDS:")
-        _printNameAndHelpText(for: cmds)
-        print()
-    }
-    
     public func printCommands(_ cmds : [Command]) {
         guard !cmds.isEmpty else { return } // No registered commands
         print("\nCOMMANDS:")
@@ -45,23 +38,15 @@ public struct UsageInfoPrinter {
         }
     }
     
-    private func _printNameAndHelpText(for cmds : [Command.Type]) {
-        for c in cmds {
-            let command = c.init()
-            _printNameAndHelpText(for: command)
-            print()
-        }
-    }
-    
     private func _printNameAndHelpText(for cmd: Command) {
-        print("    \(type(of:cmd).name)", terminator: "")
+        print("    \(cmd.name)", terminator: "")
         if let c = cmd as? HasHelpText {
             print("    \(c.helpText)")
         }
     }
     
     private func _printCommandUsage(_ cmd : Command) {
-        print("    \(type(of:cmd).name)", terminator:" ")
+        print("    \(cmd.name)", terminator:" ")
         if let c = cmd as? CommandWithOptions {
             for o in c.options.options {
                 print("[\(o.option.longFormName)", terminator:"] ")
@@ -72,7 +57,7 @@ public struct UsageInfoPrinter {
                 print("<\(a.name)>", terminator: " ")
             }
         }
-        if let c = cmd as? CommandWithSubCommands {
+        if let c = cmd as? CommandWithSubCommands { //TODO:
             print("[sub-command]")
         }
     }
@@ -99,7 +84,7 @@ public struct UsageInfoPrinter {
         if let c = cmd as? CommandWithSubCommands {
             print("\n\nSUBCOMMANDS:")
             for s in c.subcommands.commands {
-                print("    \(type(of:s).name)", terminator: "")
+                print("    \(s.name)", terminator: "")
                 if let sht = s as? HasHelpText {
                     print("    \(sht.helpText)")
                 } else { print() }

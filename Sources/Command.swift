@@ -23,9 +23,24 @@ public protocol Command {
      Used for running the command.
      Must not contain spaces.
      */
-    static var name : String { get }
-    
+    var name : String { get }
+}
+
+public protocol InitialisableCommand : Command {
     init()
+}
+
+public struct BasicCommand : Command {
+    
+    public var name : String
+    
+    public init() {
+        self.name = ""
+    }
+    
+    public init(name : String) {
+        self.name = name
+    }
 }
 
 public protocol RunnableCommand : Command {
@@ -215,7 +230,7 @@ public struct SubcommandArray {
 extension CommandWithSubCommands {
     
     internal func getSubCommand(name : String) throws -> Command {
-        guard let c = subcommands.commands.filter({ type(of:$0).name == name }).first
+        guard let c = subcommands.commands.filter({ $0.name == name }).first
             else { throw CommandError.noSuchSubCommand(command: self, subcommandName: name) }
         return c
     }
@@ -225,7 +240,11 @@ extension CommandWithSubCommands {
     }
 }
 
-public func ==(l: Command.Type, r: Command.Type) -> Bool {
+//public func ==(l: Command.Type, r: Command.Type) -> Bool {
+//    return l.init().name == r.init().name
+//}
+
+public func ==(l: Command, r: Command) -> Bool {
     return l.name == r.name
 }
 

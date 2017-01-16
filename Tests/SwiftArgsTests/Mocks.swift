@@ -1,13 +1,13 @@
 @testable import SwiftArgs
 
 class MockCommand : Command {
-    static var name : String = "mockcommand"
+    var name : String = "mockcommand"
     var helpText: String = "mockcommand help text"
     required init() {}
 }
 
 class MockSubCommand : Command {
-    static var name : String = "mocksubcommand"
+    var name : String = "mocksubcommand"
     var helpText: String = "mocksubcommand help text"
     required init(){}
 }
