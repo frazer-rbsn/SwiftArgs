@@ -1,6 +1,6 @@
 # SwiftArgs
 
-A minimal, pure Swift library for making command line tools / interfaces.
+A minimal, pure Swift library for making commandline tools / interfaces.
 
 [![Travis build status](https://travis-ci.org/frazer-rbsn/SwiftArgs.svg?branch=master)](https://travis-ci.org/frazer-rbsn/SwiftArgs)
 [![codebeat](https://codebeat.co/badges/50ae3c45-d0f4-4a10-be51-0b33831d6ad0)](https://codebeat.co/projects/github-com-frazer-rbsn-swiftargs)
