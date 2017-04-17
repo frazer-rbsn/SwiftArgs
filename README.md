@@ -58,7 +58,7 @@ If the user runs the command with invalid arguments, the `helpText` will be prin
 ```swift
 struct RunCommand : Command, HasHelpText {
     let name = "run"
-    let helpText "Helpful usage information goes here."
+    let helpText = "Helpful usage information goes here."
 }
 ```
 
