@@ -287,7 +287,7 @@ public class CommandParser : HasDebugMode {
     }
     
     private func parseCommandArguments(_ c : CommandWithArguments, _ tkns : [String]) throws -> (command: Command, remainingTokens : [String])  {
-        var command = c
+        let command = c
         var tokens = tkns
         for var arg in command.arguments {
             guard let argValue = tokens[safe:0] else { throw ParserError.invalidArguments(command) }
