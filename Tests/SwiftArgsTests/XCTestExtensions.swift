@@ -5,7 +5,6 @@ public func ~=(l: Error, r: Error) -> Bool {
     return l._domain == r._domain && l._code == r._code
 }
 
-
 func AssertThrows<R>(expectedError: Error, _ closure: @autoclosure () throws -> R) -> () {
     do {
         try closure()

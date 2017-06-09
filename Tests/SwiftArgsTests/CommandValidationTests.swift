@@ -72,7 +72,7 @@ class CommandValidationTests: XCTestCase {
     func testDuplicateCommandClassThrows() {
         let parser = CommandParser()
         try! parser.register(MockCommand())
-        AssertThrows(expectedError: ParserError.duplicateCommand,
+        AssertThrows(expectedError: CommandParserError.duplicateCommand,
                      try parser.register(MockCommand()))
     }
     
@@ -87,7 +87,7 @@ class CommandValidationTests: XCTestCase {
         }
         let parser = CommandParser()
         try! parser.register(C())
-        AssertThrows(expectedError: ParserError.duplicateCommand,
+        AssertThrows(expectedError: CommandParserError.duplicateCommand,
                      try parser.register(D()))
     }
     
