@@ -7,9 +7,9 @@
 //
 
 internal enum CommandError : Error {
-    case noSuchSubCommand(command:Command, subcommandName:String),
-    noSuchOption(command:Command, optionName:String),
-    optionRequiresArgument(command:Command, option:Option)
+  case noSuchSubCommand(command:Command, subcommandName:String),
+  noSuchOption(command:Command, optionName:String),
+  optionRequiresArgument(command:Command, option:Option)
 }
 
 
@@ -17,34 +17,37 @@ internal enum CommandError : Error {
  Encapsulates a command sent to your program.
  */
 public protocol Command {
-    
-    /**
-     Used for running the command.
-     Must not contain spaces.
-     */
-    var name : String { get }
+  
+  /**
+   Used for running the command.
+   Must not contain spaces.
+   */
+  var name : String { get }
 }
+
 
 /**
-  A standard bare-bones command model.
+ A standard bare-bones command model.
  */
 public struct BasicCommand : Command {
-    
-    public let name : String
-    
-    public init(name : String) {
-        self.name = name
-    }
+  
+  public let name : String
+  
+  public init(name : String) {
+    self.name = name
+  }
 }
 
+
 public protocol RunnableCommand : Command {
-    
-    /**
-     Make the command grow legs and begin a light jog.
-     Or whatever you want it to do.
-     */
-    func run()
+  
+  /**
+   Make the command grow legs and begin a light jog.
+   Or whatever you want it to do.
+   */
+  func run()
 }
+
 
 /**
  A command that has optional parameters. Options allow users to alter the operation of a command.
@@ -59,84 +62,88 @@ public protocol RunnableCommand : Command {
  BEFORE any of the command's required arguments in the command-line, if it has any.
  */
 public protocol CommandWithOptions : Command {
-    
-    /**
-     The options that can be used when running the command.
-     Order does not matter here.
-     Must not be empty.
-     */
-    var options : OptionArray { get set }
+  
+  /**
+   The options that can be used when running the command.
+   Order does not matter here.
+   Must not be empty.
+   */
+  var options : OptionArray { get set }
 }
+
 
 public struct OptionArray {
-    
-    var options : [OptionUsed] = []
-    
-    public init(_ options : Option...) {
-        for o in options {
-            let x = OptionUsed(o)
-            self.options.append(x)
-        }
+  
+  var options : [OptionUsed] = []
+  
+  public init(_ options : Option...) {
+    for o in options {
+      let x = OptionUsed(o)
+      self.options.append(x)
     }
-    
-    subscript(index: Int) -> OptionUsed {
-        get {
-            return options[index]
-        }
+  }
+  
+  subscript(index: Int) -> OptionUsed {
+    get {
+      return options[index]
     }
+  }
 }
+
 
 struct OptionUsed {
-    
-    var option : Option
-    var used : Bool = false
-    
-    init(_ option: Option) {
-        self.option = option
-    }
+  
+  var option : Option
+  var used : Bool = false
+  
+  init(_ option: Option) {
+    self.option = option
+  }
 }
 
+
 extension CommandWithOptions {
-    
-    public var optionNames : [String] {
-        return options.options.map() { $0.option.name }
+  
+  public var optionNames : [String] {
+    return options.options.map() { $0.option.name }
+  }
+  
+  /**
+   Option names with the "--" prefix.
+   */
+  public var optionLongForms : [String] {
+    return options.options.map() { "--" + $0.option.name }
+  }
+  
+  /**
+   Options that were used with the command at runtime.
+   */
+  public var usedOptions : [Option] {
+    return options.options.filter( { $0.used == true }).map() { $0.option }
+  }
+  
+  internal func getOption(_ longFormName : String) throws -> Option {
+    guard let i = optionLongForms.index(of: longFormName)
+      else { throw CommandError.noSuchOption(command:self, optionName: longFormName) }
+    return options.options[i].option
+  }
+  
+  private func getOptionIndex(_ longFormName : String) throws -> Int {
+    guard let i = optionLongForms.index(of: longFormName)
+      else { throw CommandError.noSuchOption(command:self, optionName: longFormName) }
+    return i
+  }
+  
+  internal mutating func setOption(_ longFormName : String, value : String? = nil) throws {
+    let op = try getOption(longFormName)
+    if var owa = op as? OptionWithArgument {
+      guard let v = value else { throw CommandError.optionRequiresArgument(command:self, option: owa) }
+      owa.value = v
     }
-    
-    /**
-     Option names with the "--" prefix.
-     */
-    public var optionLongForms : [String] {
-        return options.options.map() { "--" + $0.option.name }
-    }
-    
-    /**
-     Options that were used with the command at runtime.
-     */
-    public var usedOptions : [Option] {
-        return options.options.filter( { $0.used == true }).map() { $0.option }
-    }
-    
-    internal func getOption(_ longFormName : String) throws -> Option {
-        guard let i = optionLongForms.index(of: longFormName)
-            else { throw CommandError.noSuchOption(command:self, optionName: longFormName) }
-        return options.options[i].option
-    }
-    
-    private func getOptionIndex(_ longFormName : String) throws -> Int {
-        guard let i = optionLongForms.index(of: longFormName)
-            else { throw CommandError.noSuchOption(command:self, optionName: longFormName) }
-        return i
-    }
-    
-    internal mutating func setOption(_ longFormName : String, value : String? = nil) throws {
-        let op = try getOption(longFormName)
-        if var owa = op as? OptionWithArgument {
-            guard let v = value else { throw CommandError.optionRequiresArgument(command:self, option: owa) }
-            owa.value = v
-        }
-        options.options[try getOptionIndex(longFormName)].used = true
-    }
+    options.options[try getOptionIndex(longFormName)].used = true
+  }
 }
+
 
 /**
  A command that has required positional arguments.
@@ -152,24 +159,24 @@ extension CommandWithOptions {
  Arguments are positional, so set `arguments` with the desired order.
  */
 public protocol CommandWithArguments : Command {
-    
-    /**
-     Arguments are positional, so set them in the desired order.
-     Must not be empty.
-     */
-    var arguments : [Argument] { get }
+  
+  /**
+   Arguments are positional, so set them in the desired order.
+   Must not be empty.
+   */
+  var arguments : [Argument] { get }
 }
 
 extension CommandWithArguments {
-
-    internal var argumentNames : [String] {
-        return arguments.map() { $0.name }
-    }
-    
-    internal var allArgumentsSet : Bool {
-        let flags = arguments.map() { $0.value != nil }
-        return !flags.contains(where: { $0 == false })
-    }
+  
+  internal var argumentNames : [String] {
+    return arguments.map() { $0.name }
+  }
+  
+  internal var allArgumentsSet : Bool {
+    let flags = arguments.map() { $0.value != nil }
+    return !flags.contains(where: { $0 == false })
+  }
 }
 
 
@@ -192,59 +199,60 @@ extension CommandWithArguments {
  Where `file` and `project` are commands, and your `new` command is a subcommand for both.
  */
 public protocol CommandWithSubCommands : Command {
-    
-    /**
-     This property says which subcommands the user can use on this command. The user can only pick one,
-     or none at all.
-     The subcommand that was used at runtime, if any, is set in `usedSubcommand`.
-    */
-    var subcommands : SubcommandArray { get set }
+  
+  /**
+   This property says which subcommands the user can use on this command. The user can only pick one,
+   or none at all.
+   The subcommand that was used at runtime, if any, is set in `usedSubcommand`.
+   */
+  var subcommands : SubcommandArray { get set }
 }
 
 public struct SubcommandArray {
-    
-    var commands : [Command] = []
-    var usedSubcommand : Command?
-    
-    public init(_ commands : Command...) {
-        self.commands = commands
+  
+  var commands : [Command] = []
+  var usedSubcommand : Command?
+  
+  public init(_ commands : Command...) {
+    self.commands = commands
+  }
+  
+  subscript(index: Int) -> Command {
+    get {
+      return commands[index]
     }
-    
-    subscript(index: Int) -> Command {
-        get {
-            return commands[index]
-        }
-    }
-    
-    var isEmpty : Bool {
-        return commands.isEmpty
-    }
+  }
+  
+  var isEmpty : Bool {
+    return commands.isEmpty
+  }
 }
 
 extension CommandWithSubCommands {
-    
-    internal func getSubCommand(name : String) throws -> Command {
-        guard let c = subcommands.commands.filter({ $0.name == name }).first
-            else { throw CommandError.noSuchSubCommand(command: self, subcommandName: name) }
-        return c
-    }
-    
-    var usedSubcommand : Command? {
-        return subcommands.usedSubcommand
-    }
+  
+  internal func getSubCommand(name : String) throws -> Command {
+    guard let c = subcommands.commands.filter({ $0.name == name }).first
+      else { throw CommandError.noSuchSubCommand(command: self, subcommandName: name) }
+    return c
+  }
+  
+  var usedSubcommand : Command? {
+    return subcommands.usedSubcommand
+  }
 }
 
+
 public func ==(l: Command, r: Command) -> Bool {
-    return l.name == r.name
+  return l.name == r.name
 }
+
 
 /**
  Has text that can be printed as part of usage information.
  */
 public protocol HasHelpText {
-    /**
-     Usage information for users.
-     */
-    var helpText : String { get }
+  /**
+   Usage information for users.
+   */
+  var helpText : String { get }
 }
-

@@ -7,39 +7,37 @@
 //
 
 extension String {
-    
-    var firstChar : Character {
-        return self[self.startIndex]
-    }
-    
-    func character(atIndex : Int) -> Character {
-        let index = self.index(self.startIndex, offsetBy: atIndex)
-        return self[index]
-    }
+  
+  var firstChar : Character {
+    return self[self.startIndex]
+  }
+  
+  func character(atIndex : Int) -> Character {
+    let index = self.index(self.startIndex, offsetBy: atIndex)
+    return self[index]
+  }
 }
 
 extension Array {
-    
-    subscript (safe index: UInt) -> Element? {
-        return Int(index) < count ? self[Int(index)] : nil
-    }
+  
+  subscript (safe index: UInt) -> Element? {
+    return Int(index) < count ? self[Int(index)] : nil
+  }
 }
 
 protocol HasDebugMode {
-    
-    /**
-     If `true`, prints debug information. Default value is `false`.
-     */
-    var debugMode : Bool { get set }
+  
+  /**
+   If `true`, prints debug information. Default value is `false`.
+   */
+  var debugMode : Bool { get set }
 }
 
 extension HasDebugMode {
-    
-    func printDebug(_ s : String) {
-        if debugMode {
-            print(s)
-        }
+  
+  func printDebug(_ s : String) {
+    if debugMode {
+      print(s)
     }
+  }
 }
-
-
