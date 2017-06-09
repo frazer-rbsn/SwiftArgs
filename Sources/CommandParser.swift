@@ -50,7 +50,7 @@ public protocol CommandParserDelegate {
  2. Create a `CommandParser` instance
  3. Add your command models to the parser using `CommandParser.register(_:)`
  4. Call `CommandParser.parseCommandLine(delegate:)` and pass your delegate object.
- 5. Be sure to catch any errors. For possible errors see `ParserError`
+ 5. For possible errors that can be received by `CommandParserDelegate.parserError(_:)`, see `CommandParserError`
  */
 public final class CommandParser : HasDebugMode {
   
@@ -150,44 +150,52 @@ public final class CommandParser : HasDebugMode {
     parse(arguments: arguments, delegate: nil)
   }
   
-  private func parserErrorThrown(error : CommandParserError, delegate : CommandParserDelegate?) {
-    switch error {
-    case .noCommands:
-      printDebug("Error: no commands registered with the parser.")
-    case .commandNotSupplied:
-      delegate?.commandNotSupplied()
-      printCommands()
-      return
-    case .noSuchCommand(let name):
-      printHelp("Error: no such command '\(name)'")
-      printCommands()
-    case .noOptions(let command):
-      printHelp("Error: command \'\(command.name)\' has no options.")
-      printUsageFor(command)
-    case .noSuchOption(let command, let option):
-      printDebug("Error: command \'\(command.name)\' has no such option: \'\(option)\'")
-    case .optionNotAllowedHere(let command, let option):
-      printHelp("Error: An option \'\(option)\' for command \'\(command.name)\' was found," +
-        "but it is not allowed here. Options must come before a command's required arguments.")
-      printUsageFor(command)
-    case .optionRequiresArgument(let command, let option):
-      printHelp("Error: command \'\(command.name)\' with option \'\(option.name)\' has required arguments but none were supplied.")
-      printUsageFor(command)
-    case .requiresArguments(let command):
-      printHelp("Error: command \'\(command.name)\' has required arguments but none were supplied.")
-      printUsageFor(command)
-    case .invalidArguments(let command):
-      printHelp("Error: invalid arguments for command \'\(command.name)\'")
-      printUsageFor(command)
-    case .invalidArgumentOrSubCommand(let command):
-      printHelp("Error: command \'\(command.name)\' does not take arguments nor does it have any subcommands.")
-      printUsageFor(command)
-    case .noSuchSubCommand(let command, let subcommandName):
-      printHelp("Error: command \'\(command.name)\' has no subcommand: \'\(subcommandName)\'")
-      printUsageFor(command)
-    default: break
+  private func parserErrorThrown(error : Error, delegate : CommandParserDelegate?) {
+    if let error = error as? CommandParserError {
+      switch error {
+      case .noCommands:
+        printDebug("Error: no commands registered with the parser.")
+      case .commandNotSupplied:
+        delegate?.commandNotSupplied()
+        printCommands()
+        return
+      case .noSuchCommand(let name):
+        printHelp("Error: no such command '\(name)'")
+        printCommands()
+      case .noOptions(let command):
+        printHelp("Error: command \'\(command.name)\' has no options.")
+        printUsageFor(command)
+      case .optionNotAllowedHere(let command, let option):
+        printHelp("Error: An option \'\(option)\' for command \'\(command.name)\' was found," +
+          "but it is not allowed here. Options must come before a command's required arguments.")
+        printUsageFor(command)
+      case .requiresArguments(let command):
+        printHelp("Error: command \'\(command.name)\' has required arguments but none were supplied.")
+        printUsageFor(command)
+      case .invalidArguments(let command):
+        printHelp("Error: invalid arguments for command \'\(command.name)\'")
+        printUsageFor(command)
+      case .invalidArgumentOrSubCommand(let command):
+        printHelp("Error: command \'\(command.name)\' does not take arguments nor does it have any subcommands.")
+        printUsageFor(command)
+      default: fatalError() //TODO:
+      }
+      delegate?.parserError(error: error)
+    } else if let error = error as? CommandError {
+      switch error {
+      case .noSuchOption(let command, let option):
+        printDebug("Error: command \'\(command.name)\' has no such option: \'\(option)\'")
+        delegate?.parserError(error: .noSuchOption(command: command, option: option))
+      case .noSuchSubCommand(let command, let subcommandName):
+        printHelp("Error: command \'\(command.name)\' has no subcommand: \'\(subcommandName)\'")
+        printUsageFor(command)
+        delegate?.parserError(error: .noSuchSubCommand(command: command, subcommandName: subcommandName))
+      case .optionRequiresArgument(let command, let option):
+        printHelp("Error: command \'\(command.name)\' with option \'\(option.name)\' has required arguments but none were supplied.")
+        printUsageFor(command)
+        delegate?.parserError(error: .optionRequiresArgument(command: command, option: option))
+      }
     }
-    delegate?.parserError(error: error)
   }
   
   /**
@@ -208,9 +216,7 @@ public final class CommandParser : HasDebugMode {
         d.receivedCommand(command: command)
       }
     } catch {
-      if let error = error as? CommandParserError {
-        parserErrorThrown(error: error, delegate: delegate)
-      }
+      parserErrorThrown(error: error, delegate: delegate)
     }
   }
   

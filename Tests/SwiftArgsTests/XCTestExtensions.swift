@@ -7,14 +7,13 @@ public func ~=(l: Error, r: Error) -> Bool {
 
 func AssertThrows<R>(expectedError: Error, _ closure: @autoclosure () throws -> R) -> () {
     do {
-        try closure()
-        XCTFail("ASSERTTHROWS: Expected error \"\(expectedError)\", "
+        let _ = try closure()
+        XCTFail("AssertThrows: Expected error \"\(expectedError)\", "
             + "but closure succeeded.")
     } catch expectedError {
         // Expected.
     } catch {
-        XCTFail("ASSERTTHROWS: Caught error \"\(error)\", "
-            + "but not from the expected type "
-            + "\"\(expectedError)\".")
+        XCTFail("AssertThrows: Caught error \"\(error)\", "
+            + "but not from the expected type \"\(expectedError)\".")
     }
 }

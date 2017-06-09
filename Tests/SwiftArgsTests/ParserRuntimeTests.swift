@@ -1,7 +1,7 @@
 import XCTest
 @testable import SwiftArgs
 
-class ParserRuntimeTests : XCTestCase {
+final class ParserRuntimeTests : XCTestCase {
   
   // MARK: - Valid scenarios
   
@@ -275,9 +275,12 @@ class ParserRuntimeTests : XCTestCase {
     let parser = CommandParser()
     try! parser.register(MockCommand())
     let cmd = MockCommand.init()
-    
-    AssertThrows(expectedError: CommandParserError.noOptions(cmd),
-                 try parser.parse(arguments: ["mockcommand", "--option"]))
+    let delegate = MockCommandParserDelegate()
+    parser.parse(arguments: ["mockcommand", "--option"], delegate: delegate)
+    guard let error = delegate.error else { XCTFail(); return }
+    if case error = CommandParserError.noOptions(cmd) {} else {
+      XCTFail()
+    }
   }
   
   func testParseCommandWithOptionThatRequiresArgumentNoArgThrows() {
@@ -291,8 +294,12 @@ class ParserRuntimeTests : XCTestCase {
     let parser = CommandParser()
     try! parser.register(C())
     let cmd = C.init()
-    AssertThrows(expectedError: CommandParserError.optionRequiresArgument(command: cmd, option: cmd.op),
-                 try parser.parse(arguments: ["mockcommand", "--op"]))
+    let delegate = MockCommandParserDelegate()
+    parser.parse(arguments: ["mockcommand", "--op"], delegate: delegate)
+    guard let error = delegate.error else { XCTFail(); return }
+    if case error = CommandParserError.optionRequiresArgument(command: cmd, option: cmd.op) {} else {
+      XCTFail()
+    }
   }
   
   func testSendNoArgsWithCommandThatRequiresArgsThrows() {
@@ -302,16 +309,24 @@ class ParserRuntimeTests : XCTestCase {
     let parser = CommandParser()
     try! parser.register(C())
     let cmd = C.init()
-    AssertThrows(expectedError: CommandParserError.requiresArguments(cmd),
-                 try parser.parse(arguments: ["mockcommand"]))
+    let delegate = MockCommandParserDelegate()
+    parser.parse(arguments: ["mockcommand"], delegate: delegate)
+    guard let error = delegate.error else { XCTFail(); return }
+    if case error = CommandParserError.requiresArguments(cmd) {} else {
+      XCTFail()
+    }
   }
   
   func testSendOneArgWithCommandThatHasNoArgsNoSubCommandsThrows() {
     let parser = CommandParser()
     try! parser.register(MockCommand())
     let cmd = MockCommand.init()
-    AssertThrows(expectedError: CommandParserError.invalidArgumentOrSubCommand(cmd),
-                 try parser.parse(arguments: ["mockcommand", "arg"]))
+    let delegate = MockCommandParserDelegate()
+    parser.parse(arguments: ["mockcommand", "arg"], delegate: delegate)
+    guard let error = delegate.error else { XCTFail(); return }
+    if case error = CommandParserError.invalidArgumentOrSubCommand(cmd) {} else {
+      XCTFail()
+    }
   }
   
   func testSendOneArgWithCommandThatHasNoArgsNoSuchSubCommandThrows() {
@@ -322,8 +337,12 @@ class ParserRuntimeTests : XCTestCase {
     let parser = CommandParser()
     try! parser.register(C())
     let cmd = C.init()
-    AssertThrows(expectedError: CommandParserError.noSuchSubCommand(command: cmd, subcommandName: "bar"),
-                 try parser.parse(arguments: ["mockcommand", "notmocksubcommand"]))
+    let delegate = MockCommandParserDelegate()
+    parser.parse(arguments: ["mockcommand", "notmocksubcommand"], delegate: delegate)
+    guard let error = delegate.error else { XCTFail(); return }
+    if case error = CommandParserError.noSuchSubCommand(command: cmd, subcommandName: "bar") {} else {
+      XCTFail()
+    }
   }
   
   func testSendOneArgWithCommandThatRequiresTwoArgsThrows() {
@@ -333,8 +352,12 @@ class ParserRuntimeTests : XCTestCase {
     let parser = CommandParser()
     try! parser.register(C())
     let cmd = C.init()
-    AssertThrows(expectedError: CommandParserError.invalidArguments(cmd),
-                 try parser.parse(arguments: ["mockcommand", "arg1"]))
+    let delegate = MockCommandParserDelegate()
+    parser.parse(arguments: ["mockcommand", "arg1"], delegate: delegate)
+    guard let error = delegate.error else { XCTFail(); return }
+    if case error = CommandParserError.invalidArguments(cmd) {} else {
+      XCTFail()
+    }
   }
   
   func testSendOneArgOneOptionAfterArgWithCommandThatRequiresTwoArgsThrows() {
@@ -344,8 +367,12 @@ class ParserRuntimeTests : XCTestCase {
     let parser = CommandParser()
     try! parser.register(C())
     let cmd = C.init()
-    AssertThrows(expectedError: CommandParserError.optionNotAllowedHere(command: cmd, option: "--option"),
-                 try parser.parse(arguments: ["mockcommand", "arg1", "--option"]))
+    let delegate = MockCommandParserDelegate()
+    parser.parse(arguments: ["mockcommand", "arg1", "--option"], delegate: delegate)
+    guard let error = delegate.error else { XCTFail(); return }
+    if case error = CommandParserError.optionNotAllowedHere(command: cmd, option: "--option") {} else {
+      XCTFail()
+    }
   }
   
   func testSendTwoArgsWithCommandThatHasOneArgThrows() {
@@ -355,9 +382,12 @@ class ParserRuntimeTests : XCTestCase {
     let parser = CommandParser()
     try! parser.register(C())
     let cmd = C.init()
-    
-    AssertThrows(expectedError: CommandParserError.invalidArgumentOrSubCommand(cmd),
-                 try parser.parse(arguments: ["mockcommand", "arg1", "arg2"]))
+    let delegate = MockCommandParserDelegate()
+    parser.parse(arguments: ["mockcommand", "arg1", "arg2"], delegate: delegate)
+    guard let error = delegate.error else { XCTFail(); return }
+    if case error = CommandParserError.invalidArgumentOrSubCommand(cmd) {} else {
+      XCTFail()
+    }
   }
   
   func testParseCommandWithSubcommandExtraArgThrows() {
@@ -371,8 +401,12 @@ class ParserRuntimeTests : XCTestCase {
     let parser = CommandParser()
     try! parser.register(C())
     let cmd = C.init()
-    AssertThrows(expectedError: CommandParserError.invalidArgumentOrSubCommand(cmd), //TODO: Should reflect that invalid arguments are for the subcommand
-      try parser.parse(arguments: ["mockcommand", "mocksubcommand", "mockargvalue", "somethingelse"]))
+    let delegate = MockCommandParserDelegate()
+    parser.parse(arguments: ["mockcommand", "mocksubcommand", "mockargvalue", "somethingelse"], delegate: delegate)
+    guard let error = delegate.error else { XCTFail(); return } //TODO: Should reflect that invalid arguments are for the subcommand
+    if case error = CommandParserError.invalidArgumentOrSubCommand(cmd) {} else {
+      XCTFail()
+    }
   }
   
   //TODO: Fill this out
