@@ -9,13 +9,14 @@ final class CommandValidationTests: XCTestCase {
   func testAddCommandsByStrings() {
     let parser = CommandParser()
     try! parser.register("run", "move", "new")
-    XCTAssert(parser.commands.count == 3)
+    XCTAssert(parser.register.count == 3)
   }
   
   func testAddValidCommandModel() {
     let parser = CommandParser()
-    try! parser.register(MockCommand())
-    XCTAssert(parser.commands.contains(where: { $0 == MockCommand() }))
+    let command = MockCommand()
+    try! parser.register(command)
+    XCTAssert(parser.register.has(command))
   }
   
   func testAddValidCommandWithTwoOptions() {
@@ -23,8 +24,9 @@ final class CommandValidationTests: XCTestCase {
       var options = OptionArray(MockOption(name:"op1"), MockOption(name:"op2"))
     }
     let parser = CommandParser()
-    try! parser.register(C())
-    XCTAssert(parser.commands.contains(where: { $0 == C() }))
+    let command = C()
+    try! parser.register(command)
+    XCTAssert(parser.register.has(command))
   }
   
   func testAddValidCommandWithTwoArguments() {
@@ -32,8 +34,9 @@ final class CommandValidationTests: XCTestCase {
       var arguments : [Argument] = [MockArgument(name:"mockarg1"), MockArgument(name:"mockarg2")]
     }
     let parser = CommandParser()
-    try! parser.register(C())
-    XCTAssert(parser.commands.contains(where: { $0 == C() }))
+    let command = C()
+    try! parser.register(command)
+    XCTAssert(parser.register.has(command))
   }
   
   func testAddValidCommandWithOneOptionAndOneOptionWithArgAndOneArg() {
@@ -42,8 +45,9 @@ final class CommandValidationTests: XCTestCase {
       var arguments : [Argument] = [MockArgument(name:"mockarg")]
     }
     let parser = CommandParser()
-    try! parser.register(C())
-    XCTAssert(parser.commands.contains(where: { $0 == C() }))
+    let command = C()
+    try! parser.register(command)
+    XCTAssert(parser.register.has(command))
   }
   
   
@@ -55,7 +59,7 @@ final class CommandValidationTests: XCTestCase {
       var helpText = ""
     }
     let parser = CommandParser()
-    AssertThrows(expectedError:  CommandModelError.invalidCommand,
+    AssertThrows(expectedError: CommandModelError.invalidCommand,
                  try parser.register(C()))
   }
   
@@ -65,7 +69,7 @@ final class CommandValidationTests: XCTestCase {
       var helpText = ""
     }
     let parser = CommandParser()
-    AssertThrows(expectedError:  CommandModelError.invalidCommand,
+    AssertThrows(expectedError: CommandModelError.invalidCommand,
                  try parser.register(C()))
   }
   
@@ -96,7 +100,7 @@ final class CommandValidationTests: XCTestCase {
       var options = OptionArray()
     }
     let parser = CommandParser()
-    AssertThrows(expectedError:  CommandModelError.invalidCommand,
+    AssertThrows(expectedError: CommandModelError.invalidCommand,
                  try parser.register(C()))
   }
   
@@ -105,7 +109,7 @@ final class CommandValidationTests: XCTestCase {
       var arguments : [Argument] = []
     }
     let parser = CommandParser()
-    AssertThrows(expectedError:  CommandModelError.invalidCommand,
+    AssertThrows(expectedError: CommandModelError.invalidCommand,
                  try parser.register(C()))
   }
   
@@ -115,7 +119,7 @@ final class CommandValidationTests: XCTestCase {
       var usedSubcommand: Command?
     }
     let parser = CommandParser()
-    AssertThrows(expectedError:  CommandModelError.invalidCommand,
+    AssertThrows(expectedError: CommandModelError.invalidCommand,
                  try parser.register(C()))
   }
   
@@ -124,7 +128,7 @@ final class CommandValidationTests: XCTestCase {
       var options = OptionArray(MockOption(name:""))
     }
     let parser = CommandParser()
-    AssertThrows(expectedError:  CommandModelError.invalidCommand,
+    AssertThrows(expectedError: CommandModelError.invalidCommand,
                  try parser.register(C()))
   }
   
@@ -133,7 +137,7 @@ final class CommandValidationTests: XCTestCase {
       var arguments : [Argument] = [MockArgument(name:"")]
     }
     let parser = CommandParser()
-    AssertThrows(expectedError:  CommandModelError.invalidCommand,
+    AssertThrows(expectedError: CommandModelError.invalidCommand,
                  try parser.register(C()))
   }
   
@@ -142,7 +146,7 @@ final class CommandValidationTests: XCTestCase {
       var options = OptionArray(MockOption(),MockOption())
     }
     let parser = CommandParser()
-    AssertThrows(expectedError:  CommandModelError.invalidCommand,
+    AssertThrows(expectedError: CommandModelError.invalidCommand,
                  try parser.register(C()))
   }
   
@@ -151,7 +155,7 @@ final class CommandValidationTests: XCTestCase {
       var arguments : [Argument] = [MockArgument(),MockArgument()]
     }
     let parser = CommandParser()
-    AssertThrows(expectedError:  CommandModelError.invalidCommand,
+    AssertThrows(expectedError: CommandModelError.invalidCommand,
                  try parser.register(C()))
   }
   
@@ -160,7 +164,7 @@ final class CommandValidationTests: XCTestCase {
       var options = OptionArray(MockOption(name:"opt ion"))
     }
     let parser = CommandParser()
-    AssertThrows(expectedError:  CommandModelError.invalidCommand,
+    AssertThrows(expectedError: CommandModelError.invalidCommand,
                  try parser.register(C()))
   }
   
@@ -169,7 +173,7 @@ final class CommandValidationTests: XCTestCase {
       var arguments : [Argument] = [MockArgument(name:"arg ument")]
     }
     let parser = CommandParser()
-    AssertThrows(expectedError:  CommandModelError.invalidCommand,
+    AssertThrows(expectedError: CommandModelError.invalidCommand,
                  try parser.register(C()))
   }
   
@@ -178,7 +182,7 @@ final class CommandValidationTests: XCTestCase {
       var options = OptionArray(MockOption(name:"opt-ion"))
     }
     let parser = CommandParser()
-    AssertThrows(expectedError:  CommandModelError.invalidCommand,
+    AssertThrows(expectedError: CommandModelError.invalidCommand,
                  try parser.register(C()))
   }
   
@@ -187,7 +191,7 @@ final class CommandValidationTests: XCTestCase {
       var arguments : [Argument] = [MockArgument(name:"arg-ument")]
     }
     let parser = CommandParser()
-    AssertThrows(expectedError:  CommandModelError.invalidCommand,
+    AssertThrows(expectedError: CommandModelError.invalidCommand,
                  try parser.register(C()))
   }
 }

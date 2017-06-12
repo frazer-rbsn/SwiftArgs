@@ -6,12 +6,11 @@
 //  Copyright © 2016 Frazer Robinson. All rights reserved.
 //
 
-internal enum CommandError : Error {
+enum CommandError : Error {
   case noSuchSubCommand(command:Command, subcommandName:String),
   noSuchOption(command:Command, optionName:String),
   optionRequiresArgument(command:Command, option:Option)
 }
-
 
 /**
  Encapsulates a command sent to your program.
@@ -83,11 +82,11 @@ public struct OptionArray {
     }
   }
   
-  subscript(index: Int) -> OptionUsed {
-    get {
-      return options[index]
-    }
-  }
+//  subscript(index: Int) -> OptionUsed {
+//    get {
+//      return options[index]
+//    }
+//  }
 }
 
 
@@ -102,7 +101,7 @@ struct OptionUsed {
 }
 
 
-extension CommandWithOptions {
+public extension CommandWithOptions {
   
   public var optionNames : [String] {
     return options.options.map() { $0.option.name }
@@ -122,7 +121,7 @@ extension CommandWithOptions {
     return options.options.filter( { $0.used == true }).map() { $0.option }
   }
   
-  internal func getOption(_ longFormName : String) throws -> Option {
+  func getOption(_ longFormName : String) throws -> Option {
     guard let i = optionLongForms.index(of: longFormName)
       else { throw CommandError.noSuchOption(command:self, optionName: longFormName) }
     return options.options[i].option
@@ -134,7 +133,7 @@ extension CommandWithOptions {
     return i
   }
   
-  internal mutating func setOption(_ longFormName : String, value : String? = nil) throws {
+  mutating func setOption(_ longFormName : String, value : String? = nil) throws {
     let op = try getOption(longFormName)
     if var owa = op as? OptionWithArgument {
       guard let v = value else { throw CommandError.optionRequiresArgument(command:self, option: owa) }
@@ -167,13 +166,13 @@ public protocol CommandWithArguments : Command {
   var arguments : [Argument] { get }
 }
 
-extension CommandWithArguments {
+public extension CommandWithArguments {
   
-  internal var argumentNames : [String] {
+  public var argumentNames : [String] {
     return arguments.map() { $0.name }
   }
   
-  internal var allArgumentsSet : Bool {
+  var allArgumentsSet : Bool {
     let flags = arguments.map() { $0.value != nil }
     return !flags.contains(where: { $0 == false })
   }
@@ -213,6 +212,10 @@ public struct SubcommandArray {
   var commands : [Command] = []
   var usedSubcommand : Command?
   
+  var isEmpty : Bool {
+    return commands.isEmpty
+  }
+  
   public init(_ commands : Command...) {
     self.commands = commands
   }
@@ -222,22 +225,18 @@ public struct SubcommandArray {
       return commands[index]
     }
   }
-  
-  var isEmpty : Bool {
-    return commands.isEmpty
-  }
 }
 
-extension CommandWithSubCommands {
+public extension CommandWithSubCommands {
   
-  internal func getSubCommand(name : String) throws -> Command {
+  public var usedSubcommand : Command? {
+    return subcommands.usedSubcommand
+  }
+  
+  func getSubCommand(name : String) throws -> Command {
     guard let c = subcommands.commands.filter({ $0.name == name }).first
       else { throw CommandError.noSuchSubCommand(command: self, subcommandName: name) }
     return c
-  }
-  
-  var usedSubcommand : Command? {
-    return subcommands.usedSubcommand
   }
 }
 
@@ -251,6 +250,7 @@ public func ==(l: Command, r: Command) -> Bool {
  Has text that can be printed as part of usage information.
  */
 public protocol HasHelpText {
+  
   /**
    Usage information for users.
    */

@@ -54,8 +54,6 @@ public protocol CommandParserDelegate {
  */
 public final class CommandParser : HasDebugMode {
   
-  internal var commands : [Command] = []
-  
   /**
    If `true`, prints debug information. Default value is `false`.
    */
@@ -71,9 +69,9 @@ public final class CommandParser : HasDebugMode {
    */
   public var printHelpOnNoCommand : Bool = true
   
+  var register : CommandRegister = CommandRegister()
   
   public init() {}
-  
   
   /**
    Register command models with the parser, so that when the user supplies command-line arguments
@@ -94,18 +92,8 @@ public final class CommandParser : HasDebugMode {
    */
   public func register(_ commands : Command...) throws {
     for c in commands {
-      try register(c)
+      try register.insert(c)
     }
-  }
-  
-  private func register(_ command : Command) throws {
-    guard !commands.contains(where: { $0 == command }) else {
-      printDebug("Error: Duplicate command model \'\(command)\'.")
-      printDebug("CommandParser already has a registered command with name: \'\(command.name)\'")
-      throw CommandParserError.duplicateCommand
-    }
-    try CommandValidator(debugMode: debugMode).validate(command)
-    commands.append(command)
   }
   
   /**
@@ -125,10 +113,7 @@ public final class CommandParser : HasDebugMode {
    any of it's option or argument models is invalid.
    */
   public func register(_ commandNames : String...) throws {
-    for n in commandNames {
-      let c = BasicCommand(name: n)
-      try register(c)
-    }
+    try register.insert(commandNames)
   }
   
   
@@ -157,11 +142,11 @@ public final class CommandParser : HasDebugMode {
         printDebug("Error: no commands registered with the parser.")
       case .commandNotSupplied:
         delegate?.commandNotSupplied()
-        printCommands()
+        register.printCommands()
         return
       case .noSuchCommand(let name):
         printHelp("Error: no such command '\(name)'")
-        printCommands()
+        register.printCommands()
       case .noOptions(let command):
         printHelp("Error: command \'\(command.name)\' has no options.")
         printUsageFor(command)
@@ -187,7 +172,7 @@ public final class CommandParser : HasDebugMode {
         printDebug("Error: command \'\(command.name)\' has no such option: \'\(option)\'")
         delegate?.parserError(error: .noSuchOption(command: command, option: option))
       case .noSuchSubCommand(let command, let subcommandName):
-        printHelp("Error: command \'\(command.name)\' has no subcommand: \'\(subcommandName)\'")
+        printHelp("Error: command \'\(command.name)\' has no such subcommand: \'\(subcommandName)\'")
         printUsageFor(command)
         delegate?.parserError(error: .noSuchSubCommand(command: command, subcommandName: subcommandName))
       case .optionRequiresArgument(let command, let option):
@@ -221,10 +206,10 @@ public final class CommandParser : HasDebugMode {
   }
   
   private func _parse(_ tokens : [String]) throws -> Command {
-    guard !commands.isEmpty else { throw CommandParserError.noCommands }
+    guard !register.isEmpty else { throw CommandParserError.noCommands }
     guard !tokens.isEmpty, tokens[0] != "" else { throw CommandParserError.commandNotSupplied }
     
-    let command = try getCommand(tokens[0])
+    let command = try register.getCommand(tokens[0])
     let result = try parseCommand(command, tokens: tokens)
     return result.command
   }
@@ -309,11 +294,6 @@ public final class CommandParser : HasDebugMode {
     return (command, tokens)
   }
   
-  private func getCommand(_ name : String) throws -> Command {
-    guard let c = commands.filter({ $0.name == name }).first else { throw CommandParserError.noSuchCommand(name) }
-    return c
-  }
-  
   
   // MARK: Token logic
   
@@ -329,12 +309,6 @@ public final class CommandParser : HasDebugMode {
   
   
   // MARK: Usage text & debug
-  
-  private func printCommands() {
-    if printHelp {
-      UsageInfoPrinter().printCommands(commands)
-    }
-  }
   
   private func printUsageFor(_ c : Command) {
     if printHelp {

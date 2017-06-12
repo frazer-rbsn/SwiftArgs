@@ -56,7 +56,10 @@ public final class UsageInfoPrinter {
       }
     }
     if let c = cmd as? CommandWithSubCommands { //TODO:
-      print("[sub-command]")
+      print("\n\nSUBCOMMANDS:")
+      for subcommand in c.subcommands.commands {
+        _printNameAndHelpText(for: subcommand)
+      }
     }
   }
   

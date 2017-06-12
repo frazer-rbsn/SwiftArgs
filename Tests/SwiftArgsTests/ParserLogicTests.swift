@@ -24,5 +24,4 @@ final class ParserLogicTests: XCTestCase {
     XCTAssertFalse(parser.isLongformOption("-o"))
     XCTAssertFalse(parser.isLongformOption(""))
   }
-  
 }

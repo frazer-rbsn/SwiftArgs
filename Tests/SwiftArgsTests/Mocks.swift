@@ -3,12 +3,14 @@
 class MockCommand : Command {
   var name : String = "mockcommand"
   var helpText: String = "mockcommand help text"
+  
   required init() {}
 }
 
 class MockSubCommand : Command {
   var name : String = "mocksubcommand"
   var helpText: String = "mocksubcommand help text"
+  
   required init(){}
 }
 

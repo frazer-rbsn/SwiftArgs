@@ -31,7 +31,6 @@ final class ParserRuntimeTests : XCTestCase {
     parser.parse(arguments: ["mockcommand"], delegate: delegate)
     XCTAssertNotNil(delegate.command)
     let c = delegate.command as! CommandWithOptions
-    XCTAssertFalse(c.options[0].used)
     XCTAssert(c.usedOptions.count == 0)
   }
   
@@ -45,8 +44,7 @@ final class ParserRuntimeTests : XCTestCase {
     parser.parse(arguments: ["mockcommand", "--mockoptionwitharg=arg"], delegate: delegate)
     XCTAssertNotNil(delegate.command)
     let c = delegate.command as! CommandWithOptions
-    XCTAssert(c.options[0].used)
-    XCTAssert((c.options[0].option as! OptionWithArgument).value! == "arg")
+    XCTAssert((c.usedOptions[0] as! OptionWithArgument).value! == "arg")
     XCTAssert(c.usedOptions.count == 1)
   }
   
@@ -60,8 +58,7 @@ final class ParserRuntimeTests : XCTestCase {
     parser.parse(arguments: ["mockcommand", "--mockoptionwitharg=-arg"], delegate: delegate)
     XCTAssertNotNil(delegate.command)
     let c = delegate.command as! CommandWithOptions
-    XCTAssert(c.options[0].used)
-    XCTAssert((c.options[0].option as! OptionWithArgument).value! == "-arg")
+    XCTAssert((c.usedOptions[0] as! OptionWithArgument).value! == "-arg")
     XCTAssert(c.usedOptions.count == 1)
   }
   
@@ -75,8 +72,7 @@ final class ParserRuntimeTests : XCTestCase {
     parser.parse(arguments: ["mockcommand", "--mockoptionwitharg", "arg"], delegate: delegate)
     XCTAssertNotNil(delegate.command)
     let c = delegate.command as! CommandWithOptions
-    XCTAssert(c.options[0].used)
-    XCTAssert((c.options[0].option as! OptionWithArgument).value! == "arg")
+    XCTAssert((c.usedOptions[0] as! OptionWithArgument).value! == "arg")
     XCTAssert(c.usedOptions.count == 1)
   }
   
@@ -90,8 +86,7 @@ final class ParserRuntimeTests : XCTestCase {
     parser.parse(arguments: ["mockcommand", "--mockoptionwitharg", "-arg"], delegate: delegate)
     XCTAssertNotNil(delegate.command)
     let c = delegate.command as! CommandWithOptions
-    XCTAssert(c.options[0].used)
-    XCTAssert((c.options[0].option as! OptionWithArgument).value! == "-arg")
+    XCTAssert((c.usedOptions[0] as! OptionWithArgument).value! == "-arg")
     XCTAssert(c.usedOptions.count == 1)
   }
   
@@ -105,8 +100,7 @@ final class ParserRuntimeTests : XCTestCase {
     parser.parse(arguments: ["mockcommand", "--mockoptionwitharg="], delegate: delegate)
     XCTAssertNotNil(delegate.command)
     let c = delegate.command as! CommandWithOptions
-    XCTAssert(c.options[0].used)
-    XCTAssert((c.options[0].option as! OptionWithArgument).value! == "")
+    XCTAssert((c.usedOptions[0] as! OptionWithArgument).value! == "")
     XCTAssert(c.usedOptions.count == 1)
   }
   
@@ -120,8 +114,8 @@ final class ParserRuntimeTests : XCTestCase {
     parser.parse(arguments: ["mockcommand", "--op1", "--op2"], delegate: delegate)
     XCTAssertNotNil(delegate.command)
     let c = delegate.command as! CommandWithOptions
-    XCTAssert(c.options[0].used)
-    XCTAssert(c.options[1].used)
+    XCTAssert(c.usedOptions.contains(where: { $0.name == "op1" }))
+    XCTAssert(c.usedOptions.contains(where: { $0.name == "op2" }))
     XCTAssert(c.usedOptions.count == 2)
   }
   
@@ -151,9 +145,7 @@ final class ParserRuntimeTests : XCTestCase {
     parser.parse(arguments: ["mockcommand", "--mockoption", "--mockoptionwitharg=value", "argumentvalue"], delegate: delegate)
     XCTAssertNotNil(delegate.command)
     let c = delegate.command as! CommandWithOptions
-    XCTAssert(c.options[0].used)
-    XCTAssert(c.options[1].used)
-    XCTAssert((c.options[1].option as! OptionWithArgument).value! == "value")
+    XCTAssert((c.usedOptions[1] as! OptionWithArgument).value! == "value")
     XCTAssertEqual((delegate.command as! CommandWithArguments).arguments[0].value!, "argumentvalue")
   }
   
@@ -223,8 +215,7 @@ final class ParserRuntimeTests : XCTestCase {
     parser.parse(arguments: ["mockcommand", "--mockoptionwitharg", "arg", "mocksubcommand"], delegate: delegate)
     XCTAssertNotNil(delegate.command)
     let c = delegate.command as! CommandWithOptions
-    XCTAssert(c.options[0].used)
-    XCTAssert((c.options[0].option as! OptionWithArgument).value! == "arg")
+    XCTAssert((c.usedOptions[0] as! OptionWithArgument).value! == "arg")
     let cs = delegate.command as! CommandWithSubCommands
     XCTAssertNotNil(cs.usedSubcommand)
     XCTAssert(cs.usedSubcommand!.name == MockSubCommand.init().name)
