@@ -253,7 +253,7 @@ public final class CommandParser : HasDebugMode {
     var command = c
     var tokens = tkns
     for t in tokens {
-      guard tokens.index(of: t) != nil else { break } // Check this element hasn't been removed. We're looping through a buffer, not the actual array.
+      guard tokens.firstIndex(of: t) != nil else { break } // Check this element hasn't been removed. We're looping through a buffer, not the actual array.
       guard t.firstChar == "-" else { break }
       let s = getOptionName(t)
       let o = try command.getOption(s)
@@ -261,7 +261,7 @@ public final class CommandParser : HasDebugMode {
         if t.contains("=") {
           try command.setOption(s, value: t.components(separatedBy: "=").last!)
         } else {
-          let i = tokens.index(after: tokens.index(of: t)!)
+          let i = tokens.index(after: tokens.firstIndex(of: t)!)
           try command.setOption(s, value: tokens[safe:UInt(i)])
           tokens.remove(at: i)
         }
@@ -298,7 +298,7 @@ public final class CommandParser : HasDebugMode {
   // MARK: Token logic
   
   func isLongformOption(_ string : String) -> Bool {
-    guard string.characters.count >= 3 else { return false }
+    guard string.count >= 3 else { return false }
     return string.character(atIndex: 0) == "-"
       && string.character(atIndex: 1) == "-"
   }

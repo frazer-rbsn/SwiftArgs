@@ -6,8 +6,7 @@ A minimal, pure Swift library for making command-line tools / interfaces.
 [![codebeat](https://codebeat.co/badges/50ae3c45-d0f4-4a10-be51-0b33831d6ad0)](https://codebeat.co/projects/github-com-frazer-rbsn-swiftargs)
 [![codecov](https://codecov.io/gh/frazer-rbsn/SwiftArgs/branch/master/graph/badge.svg)](https://codecov.io/gh/frazer-rbsn/SwiftArgs)
 ![SPM](https://img.shields.io/badge/Swift%20Package%20Manager-Compatible-brightgreen.svg)
-![Swift version](https://img.shields.io/badge/Swift-3-orange.svg)
-![Swift version](https://img.shields.io/badge/Swift-4-orange.svg)
+![Swift version](https://img.shields.io/badge/Swift-5-orange.svg)
 
 SwiftArgs uses a very basic and limited parser for parsing commands, but it should suffice for basic usage requirements.
 You can use SwiftArgs when making a command-line app in Swift and let it do the parsing work for you.
@@ -19,15 +18,13 @@ Contributions welcome.
 
 ---
 
-### Installation
-
-Requires Swift 3.x or 4.x
+### Use
 
 Using Swift Package Manager:
 
 ```swift
 dependencies: [
-    .Package(url: "https://github.com/frazer-rbsn/SwiftArgs", majorVersion: 1),
+  .Package(url: "https://github.com/frazer-rbsn/SwiftArgs", majorVersion: 1.1),
 ]
 ```
 
@@ -91,26 +88,36 @@ struct MoveCommand : CommandWithArguments {
 In order to act upon runtime commands, create a `CommandParserDelegate` and pass it to the parser.
 
 ```swift
-struct ParserDelegate : CommandParserDelegate {
 
-    func receivedCommand(command: Command) {
-        print("received command: \(command)")
-    }
+class Delegate : CommandParserDelegate {
 
-    func commandNotSupplied() {
-        print("no command supplied")
-    }
+  /**
+   Called if there was a problem.
+   */
+  func parserError(error : CommandParserError) {
+    //Handle error
+  }
+  
+  /**
+   Called if there were no command-line arguments supplied to your program.
+   */
+  func commandNotSupplied() {
+    //Handle commands not supplied
+  }
+  
+  /**
+   Called if a command was parsed successfully.
+   */
+  func receivedCommand(command : Command) {
+    //Handle successfully-parsed commands
+  }
 }
-
-try! parser.parseCommandLine(delegate: ParserDelegate())
+let delegate = Delegate()
+let parser = CommandParser()
+parser.parseCommandLine(delegate: delegate)
 ```
 
 ---
-
-### Build
- * Install Swift 3.x or Swift 4.x toolchain.
- * Run `swift build` in the root of the repo. Unit tests can be run with `swift test`.
-
 
 ### Limitations
 

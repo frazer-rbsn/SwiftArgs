@@ -1,6 +1,7 @@
 import XCTest
-@testable import SwiftArgsTests
 
-XCTMain([
-     testCase(ParserRuntimeTests.allTests),
-])
+import SwiftArgsTests
+
+var tests = [XCTestCaseEntry]()
+tests += SwiftArgsTests.allTests()
+XCTMain(tests)

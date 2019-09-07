@@ -103,32 +103,32 @@ struct OptionUsed {
 
 public extension CommandWithOptions {
   
-  public var optionNames : [String] {
+  var optionNames : [String] {
     return options.options.map() { $0.option.name }
   }
   
   /**
    Option names with the "--" prefix.
    */
-  public var optionLongForms : [String] {
+  var optionLongForms : [String] {
     return options.options.map() { "--" + $0.option.name }
   }
   
   /**
    Options that were used with the command at runtime.
    */
-  public var usedOptions : [Option] {
+  var usedOptions : [Option] {
     return options.options.filter( { $0.used == true }).map() { $0.option }
   }
   
   func getOption(_ longFormName : String) throws -> Option {
-    guard let i = optionLongForms.index(of: longFormName)
+    guard let i = optionLongForms.firstIndex(of: longFormName)
       else { throw CommandError.noSuchOption(command:self, optionName: longFormName) }
     return options.options[i].option
   }
   
   private func getOptionIndex(_ longFormName : String) throws -> Int {
-    guard let i = optionLongForms.index(of: longFormName)
+    guard let i = optionLongForms.firstIndex(of: longFormName)
       else { throw CommandError.noSuchOption(command:self, optionName: longFormName) }
     return i
   }
@@ -168,7 +168,7 @@ public protocol CommandWithArguments : Command {
 
 public extension CommandWithArguments {
   
-  public var argumentNames : [String] {
+  var argumentNames : [String] {
     return arguments.map() { $0.name }
   }
   
@@ -229,7 +229,7 @@ public struct SubcommandArray {
 
 public extension CommandWithSubCommands {
   
-  public var usedSubcommand : Command? {
+  var usedSubcommand : Command? {
     return subcommands.usedSubcommand
   }
   
