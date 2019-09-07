@@ -2,9 +2,6 @@ os: osx
 osx_image: xcode10.3
 
 script:
-  - swift package generate-xcodeproj
-  - xcodebuild -scheme SwiftArgs -sdk macosx -enableCodeCoverage YES test
-after_success: 
-  - bash <(curl -s https://codecov.io/bash)
+  - swift test
 notifications:
   email: false
