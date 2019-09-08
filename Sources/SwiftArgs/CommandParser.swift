@@ -26,7 +26,8 @@ public final class CommandParser {
   }
   
   public func parseCommandLine() throws {
-    let args = CommandLine.arguments
+    var args = CommandLine.arguments
+    args.removeFirst()
     try parse(args)
   }
   
