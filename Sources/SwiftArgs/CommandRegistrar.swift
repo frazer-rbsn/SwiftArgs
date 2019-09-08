@@ -4,10 +4,6 @@ import Foundation
 
 public final class CommandRegistrar {
   
-  enum Error : LocalizedError {
-    case duplicateCommandName(String)
-  }
-  
   private var commands = Set<Command>()
   
   public func register(command : Command) throws {
@@ -25,5 +21,12 @@ public final class CommandRegistrar {
   
   func command(name : String) -> Command? {
     return commands.first(where: { $0.name == name})
+  }
+}
+
+extension CommandRegistrar {
+  
+  enum Error : LocalizedError {
+    case duplicateCommandName(String)
   }
 }

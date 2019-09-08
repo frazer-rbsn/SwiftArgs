@@ -2,12 +2,6 @@
 
 import Foundation
 
-public protocol CommandParserDelegate {
-  func didParseCommand(_ parsedCommand : ParsedCommand)
-  func noCommandsPassed()
-  func parserError(error: LocalizedError)
-}
-
 public final class CommandParser {
   
   private typealias Token = String
@@ -28,7 +22,10 @@ public final class CommandParser {
   
   public func parse(input : String) {
     var tokens = input.split(separator: " ").map(String.init)
-    guard tokens.count > 0 else { fatalError() }
+    guard tokens.count > 0 else {
+      delegate.noCommandsPassed()
+      return
+    }
     let commandName = String(tokens.removeFirst())
     if let command = registrar.command(name: commandName) {
       parse(command: command, tokens: tokens)
@@ -38,7 +35,6 @@ public final class CommandParser {
   private func parse(command : Command, tokens : [Token]) {
     var parsedCommand = ParsedCommand(name: command.name)
     parse(command: command, parsedCommand: &parsedCommand, tokens: tokens)
-    delegate.didParseCommand(parsedCommand)
   }
   
   private func parse(command : Command, parsedCommand : inout ParsedCommand, tokens : [Token]) {
@@ -47,10 +43,16 @@ public final class CommandParser {
       parsedCommand.options.append(option)
       return parse(command: command, parsedCommand: &parsedCommand, tokens: remainingTokens)
     }
-    (parsedCommand.arguments, tokens) = parseArguments(arguments: command.arguments, tokens: tokens)
-    guard tokens.isEmpty else {
-      fatalError()
+    do {
+      (parsedCommand.arguments, tokens) = try parseArguments(arguments: command.arguments, tokens: tokens)
+    } catch {
+      delegate.parserError(error: error)
     }
+    guard tokens.isEmpty else {
+      delegate.parserError(error: Error.unexpectedParameters(tokens))
+      return
+    }
+    delegate.didParseCommand(parsedCommand)
   }
   
   private func parseOption(command : Command, tokens : [Token]) -> (ParsedOption, [Token])? {
@@ -58,18 +60,22 @@ public final class CommandParser {
     let optionNameToken = tokens.removeFirst()
     if let option = command.options.first(where: { $0.token == optionNameToken }) {
       let parsedOption = ParsedOption(name: option.name)
-      (parsedOption.arguments, tokens) = parseArguments(arguments: option.arguments, tokens: tokens)
-      return (parsedOption, tokens)
+      do {
+        (parsedOption.arguments, tokens) = try parseArguments(arguments: option.arguments, tokens: tokens)
+        return (parsedOption, tokens)
+      } catch {
+        delegate.parserError(error: error)
+      }
     }
     return nil
   }
   
-  private func parseArguments(arguments : [Argument], tokens : [Token]) -> ([ParsedArgument], [Token]) {
+  private func parseArguments(arguments : [Argument], tokens : [Token]) throws -> ([ParsedArgument], [Token]) {
     var tokens = tokens
     var parsedArguments = [ParsedArgument]()
     for argument in arguments {
       guard !tokens.isEmpty else {
-        fatalError()
+        throw Error.expectedArgument(argument.name)
       }
       let argumentToken = tokens.removeFirst()
       let parsedArgument = parseArgument(argument: argument, token: argumentToken)
@@ -80,5 +86,19 @@ public final class CommandParser {
   
   private func parseArgument(argument : Argument, token : Token) -> ParsedArgument {
     return ParsedArgument(name: argument.name, value: token)
+  }
+}
+
+public protocol CommandParserDelegate {
+  func didParseCommand(_ parsedCommand : ParsedCommand)
+  func noCommandsPassed()
+  func parserError(error: Error)
+}
+
+extension CommandParser {
+  
+  enum Error : LocalizedError {
+    case unexpectedParameters([String])
+    case expectedArgument(String)
   }
 }
