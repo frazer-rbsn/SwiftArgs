@@ -6,6 +6,10 @@ public final class CommandRegistrar {
   
   private var commands = Set<Command>()
   
+  var hasCommands : Bool {
+    return !commands.isEmpty
+  }
+  
   public func register(command : Command) throws {
     guard !commands.contains(where: { $0.name == command.name }) else {
       throw Error.duplicateCommandName(command.name)

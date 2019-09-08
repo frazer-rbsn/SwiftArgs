@@ -20,15 +20,28 @@ public final class CommandParser {
     self.init(registrar: registrar, delegate: delegate)
   }
   
-  public func parse(input : String) {
-    var tokens = input.split(separator: " ").map(String.init)
-    guard tokens.count > 0 else {
+  public func parse(input : String) throws {
+    let args = input.split(separator: " ").map(String.init)
+    try parse(args)
+  }
+  
+  public func parseCommandLine() throws {
+    let args = CommandLine.arguments
+    try parse(args)
+  }
+  
+  private func parse( _ args : [String]) throws {
+    guard registrar.hasCommands else {
+      throw Error.noCommandsRegistered
+    }
+    guard args.count > 0 else {
       delegate.noCommandsPassed()
       return
     }
-    let commandName = String(tokens.removeFirst())
+    var args = args
+    let commandName = args.removeFirst()
     if let command = registrar.command(name: commandName) {
-      parse(command: command, tokens: tokens)
+      parse(command: command, tokens: args)
     } else {
       delegate.parserError(error: Error.unknownCommand(commandName))
     }
@@ -109,5 +122,6 @@ extension CommandParser {
     case expectedArgument(String)
     case unknownCommand(String)
     case unknownOption(String)
+    case noCommandsRegistered
   }
 }
