@@ -30,7 +30,7 @@ public final class CommandParser {
     try parse(args)
   }
   
-  private func parse( _ args : [String]) throws {
+  private func parse( _ args : [Token]) throws {
     guard registrar.hasCommands else {
       throw Error.noCommandsRegistered
     }

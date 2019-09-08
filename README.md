@@ -8,7 +8,7 @@ A minimal, pure Swift library for making command-line tools / interfaces.
 ![Swift version](https://img.shields.io/badge/Swift-5-orange.svg)
 
 SwiftArgs uses a very basic and limited parser for parsing commands, but it should suffice for basic usage requirements.
-You can use SwiftArgs when making a command-line app in Swift and let it do the parsing work for you.
+You can use SwiftArgs when making a command-line interface in Swift and let it do the parsing work for you.
 
 Contributions welcome.
 
