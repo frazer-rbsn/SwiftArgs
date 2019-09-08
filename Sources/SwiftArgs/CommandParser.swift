@@ -29,6 +29,8 @@ public final class CommandParser {
     let commandName = String(tokens.removeFirst())
     if let command = registrar.command(name: commandName) {
       parse(command: command, tokens: tokens)
+    } else {
+      delegate.parserError(error: Error.unknownCommand(commandName))
     }
   }
   
@@ -58,6 +60,9 @@ public final class CommandParser {
   private func parseOption(command : Command, tokens : [Token]) -> (ParsedOption, [Token])? {
     var tokens = tokens
     let optionNameToken = tokens.removeFirst()
+    guard optionNameToken.hasPrefix("--") else {
+      return nil
+    }
     if let option = command.options.first(where: { $0.token == optionNameToken }) {
       let parsedOption = ParsedOption(name: option.name)
       do {
@@ -66,6 +71,8 @@ public final class CommandParser {
       } catch {
         delegate.parserError(error: error)
       }
+    } else {
+      delegate.parserError(error: Error.unknownOption(optionNameToken))
     }
     return nil
   }
@@ -100,5 +107,7 @@ extension CommandParser {
   enum Error : LocalizedError {
     case unexpectedParameters([String])
     case expectedArgument(String)
+    case unknownCommand(String)
+    case unknownOption(String)
   }
 }
