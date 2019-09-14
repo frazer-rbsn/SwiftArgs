@@ -12,7 +12,7 @@ public final class CommandRegistrar {
   
   public func register(command : Command) throws {
     guard !commands.contains(where: { $0.name == command.name }) else {
-      throw Error.duplicateCommandName(command.name)
+      throw Error.duplicateCommandName(command.name.rawValue)
     }
     commands.insert(command)
   }
@@ -24,7 +24,7 @@ public final class CommandRegistrar {
   }
   
   func command(name : String) -> Command? {
-    return commands.first(where: { $0.name == name})
+    return commands.first(where: { $0.name == CommandName(name) })
   }
 }
 

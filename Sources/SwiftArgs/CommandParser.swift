@@ -56,7 +56,7 @@ public final class CommandParser {
   private func parse(command : Command, parsedCommand : inout ParsedCommand, tokens : [Token]) {
     var tokens = tokens
     if let (option, remainingTokens) = parseOption(command: command, tokens: tokens) {
-      parsedCommand.options.append(option)
+      parsedCommand.options[option.name] = option
       return parse(command: command, parsedCommand: &parsedCommand, tokens: remainingTokens)
     }
     do {
@@ -69,6 +69,20 @@ public final class CommandParser {
       return
     }
     delegate.didParseCommand(parsedCommand)
+  }
+  
+  private func parseArguments(arguments : [Argument], tokens : [Token]) throws -> ([ArgumentName:ParsedArgument], [Token]) {
+    var tokens = tokens
+    var parsedArguments = [ArgumentName:ParsedArgument]()
+    for argument in arguments {
+      guard !tokens.isEmpty else {
+        throw Error.expectedArgument(argument.name.rawValue)
+      }
+      let argumentToken = tokens.removeFirst()
+      let parsedArgument = parseArgument(argument: argument, token: argumentToken)
+      parsedArguments[parsedArgument.name] = parsedArgument
+    }
+    return (parsedArguments, tokens)
   }
   
   private func parseOption(command : Command, tokens : [Token]) -> (ParsedOption, [Token])? {
@@ -89,20 +103,6 @@ public final class CommandParser {
       delegate.parserError(error: Error.unknownOption(optionNameToken))
     }
     return nil
-  }
-  
-  private func parseArguments(arguments : [Argument], tokens : [Token]) throws -> ([ParsedArgument], [Token]) {
-    var tokens = tokens
-    var parsedArguments = [ParsedArgument]()
-    for argument in arguments {
-      guard !tokens.isEmpty else {
-        throw Error.expectedArgument(argument.name)
-      }
-      let argumentToken = tokens.removeFirst()
-      let parsedArgument = parseArgument(argument: argument, token: argumentToken)
-      parsedArguments.append(parsedArgument)
-    }
-    return (parsedArguments, tokens)
   }
   
   private func parseArgument(argument : Argument, token : Token) -> ParsedArgument {
