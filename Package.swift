@@ -11,9 +11,11 @@ let package = Package(
   ],
   dependencies: [],
   targets: [
-    .target(name: "SwiftArgs", dependencies: []),
+    .target(
+      name: "SwiftArgs", 
+      dependencies: []),
     .testTarget(
-       name: "Tests",
+       name: "SwiftArgsTests",
        dependencies: ["SwiftArgs"]),
   ]
 )
