@@ -86,6 +86,9 @@ public final class CommandParser {
   }
   
   private func parseOption(command : Command, tokens : [Token]) -> (ParsedOption, [Token])? {
+    guard !tokens.isEmpty else {
+      return nil
+    }
     var tokens = tokens
     let optionNameToken = tokens.removeFirst()
     guard optionNameToken.hasPrefix("--") else {
