@@ -1,5 +1,7 @@
 # SwiftArgs
 
+**This library is no longer maintained. Please use [Swift Argument Parser](https://github.com/apple/swift-argument-parser) instead.**
+---
 A minimal, pure Swift library for making command-line tools / interfaces.
 
 [![Travis build status](https://travis-ci.org/frazer-rbsn/SwiftArgs.svg?branch=master)](https://travis-ci.org/frazer-rbsn/SwiftArgs)
